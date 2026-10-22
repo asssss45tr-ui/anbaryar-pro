@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: anbaryar
+    runtime: python
+    plan: free
+    buildCommand: echo ok
+    startCommand: python serve.py $PORT
+    envVars:
+      - key: ANBARYAR_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.12.3

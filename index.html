@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d4ed8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>انباریار پرو</title>
+<style>
+@font-face{font-family:'Vazirmatn';src:local('Vazirmatn'),url('Vazirmatn.woff2') format('woff2');font-weight:100 900;font-display:swap}
+:root{
+  --bg:#eef3f8;--surface:#fff;--surface2:#e9eff6;--text:#0b1a2e;--muted:#60758c;--line:#dbe4ee;
+  --brand:#2563eb;--brand2:#06b6d4;--red:#ef4444;--green:#10b981;--amber:#f59e0b;--blue:#3b82f6;--purple:#8b5cf6;
+  --redbg:#fee2e2;--greenbg:#d1fae5;--amberbg:#fef3c7;--bluebg:#dbeafe;--purplebg:#ede9fe;--brandbg:#dbeafe;
+  --navy:#0b1b3a;--navy2:#12306b;
+  --sh:0 1px 2px rgba(11,26,46,.05),0 8px 24px -12px rgba(11,26,46,.16);
+}
+[data-theme=dark]{
+  --bg:#07101e;--surface:#0f1c31;--surface2:#16273f;--text:#e7eef8;--muted:#8ba0b8;--line:#203550;
+  --redbg:#3b1620;--greenbg:#0c3328;--amberbg:#3a2c0c;--bluebg:#13294f;--purplebg:#2a2250;--brandbg:#13294f;
+  --sh:0 1px 2px rgba(0,0,0,.3),0 10px 30px -12px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:'Vazirmatn','Vazir','IRANSans','Samim',Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;overscroll-behavior-y:none}
+body.noscroll{overflow:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto 0;height:300px;background:radial-gradient(560px 230px at 88% -40px,rgba(37,99,235,.2),transparent 70%),radial-gradient(480px 210px at 8% -60px,rgba(6,182,212,.17),transparent 70%);pointer-events:none;z-index:0}
+button{font-family:inherit;cursor:pointer;border:0;color:inherit;background:none}
+input,textarea,select{font-family:inherit;font-size:15px;color:var(--text)}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+a{color:inherit;text-decoration:none}
+/* ---------- shell ---------- */
+#shell{position:relative;z-index:1;min-height:100vh}
+#main{max-width:680px;margin:0 auto;padding:0 14px 118px}
+#side{display:none}
+#top{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 12px) 2px 10px}
+#top h1{margin:0;font-size:18px;font-weight:900;line-height:1.25}
+#top small{color:var(--muted);font-size:12px;display:block}
+.logo{width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,#2563eb,#06b6d4);display:grid;place-items:center;color:#fff;box-shadow:0 8px 18px -6px rgba(37,99,235,.65);flex-shrink:0}
+.ibtn{width:42px;height:42px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;box-shadow:var(--sh);position:relative;flex-shrink:0}
+.ibtn .dot{position:absolute;top:7px;left:7px;min-width:16px;height:16px;border-radius:9px;background:var(--red);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;padding:0 4px}
+.row{display:flex;align-items:center;gap:10px}.sp{flex:1;min-width:0}.wrap{flex-wrap:wrap}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:var(--sh)}
+.card+.card{margin-top:12px}
+.sect{display:flex;align-items:center;justify-content:space-between;margin:18px 4px 10px}.sect h3{margin:0;font-size:15px;font-weight:800}
+.muted{color:var(--muted)}.xs{font-size:12px}.sm{font-size:13px}.b{font-weight:800}.c{text-align:center}
+.red{color:var(--red)}.green{color:var(--green)}.amber{color:var(--amber)}.blue{color:var(--blue)}.brandc{color:var(--brand)}
+.ltr{direction:ltr;unicode-bidi:plaintext}.ellip{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:15px;font-weight:800;font-size:14.5px;background:var(--surface2);transition:.15s}
+.btn:active{transform:scale(.97)}.btn[disabled]{opacity:.45;pointer-events:none}
+.btn.pri{background:linear-gradient(135deg,#2563eb,#06b6d4);color:#fff;box-shadow:0 10px 20px -10px rgba(37,99,235,.85)}
+.btn.red{background:linear-gradient(135deg,#f43f5e,#ef4444);color:#fff}.btn.grn{background:linear-gradient(135deg,#10b981,#059669);color:#fff}
+.btn.amb{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
+.btn.sm{padding:8px 12px;font-size:13px;border-radius:12px}.btn.blk{width:100%;margin-top:8px}.btn.ghost{background:transparent;border:1px solid var(--line)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:13px;font-weight:700;white-space:nowrap;color:var(--muted);transition:.15s}
+.chip.on{background:linear-gradient(135deg,#2563eb,#06b6d4);color:#fff;border-color:transparent;box-shadow:0 6px 14px -6px rgba(37,99,235,.7)}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.p-red{background:var(--redbg);color:var(--red)}.p-green{background:var(--greenbg);color:var(--green)}.p-amber{background:var(--amberbg);color:#b7791f}
+[data-theme=dark] .p-amber{color:var(--amber)}.p-blue{background:var(--bluebg);color:var(--blue)}.p-purple{background:var(--purplebg);color:var(--purple)}.p-gray{background:var(--surface2);color:var(--muted)}
+.item{display:flex;align-items:center;gap:12px;padding:11px 12px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);cursor:pointer;transition:transform .12s}
+.item:active{transform:scale(.985)}.item+.item{margin-top:9px}
+.av{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:17px;flex-shrink:0;overflow:hidden;background-size:cover;background-position:center}
+.av.sq{border-radius:12px}
+.stk{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.sbox{display:flex;flex-direction:column;align-items:center;min-width:48px;padding:3px 8px;border-radius:12px;background:var(--surface2)}
+.sbox small{font-size:10.5px;color:var(--muted);line-height:1.3;max-width:62px}.sbox b{font-size:15px;line-height:1.3}
+.sbox.low{background:var(--amberbg)}.sbox.low b{color:#b7791f}.sbox.neg{background:var(--redbg)}.sbox.neg b{color:var(--red)}.sbox.zero b{color:var(--muted)}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:0 14px;box-shadow:var(--sh)}
+.search input{flex:1;border:0;background:transparent;padding:12px 0;outline:none;min-width:0}
+.inp{width:100%;background:var(--surface2);border:1.5px solid transparent;border-radius:14px;padding:12px 14px;outline:none;transition:.15s}
+.inp:focus{border-color:var(--brand);background:var(--surface)}
+select.inp{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:18px 52%,12px 52%;background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-left:34px}
+textarea.inp{resize:vertical;min-height:70px}
+.fld{margin-bottom:12px}.fld label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px}
+/* KPI */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kc{position:relative;border-radius:20px;padding:13px 14px;color:#fff;overflow:hidden;box-shadow:0 12px 24px -14px rgba(0,0,0,.45);cursor:pointer}
+.kc::after{content:"";position:absolute;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.14);left:-24px;top:-30px}
+.kc .t{font-size:12.5px;opacity:.92;font-weight:700}.kc .v{font-size:26px;font-weight:900;line-height:1.25;margin-top:2px}.kc .s{font-size:11px;opacity:.85}
+.kc .ki{position:absolute;left:12px;bottom:10px;opacity:.5}.kc .ki svg{width:30px;height:30px}
+.kc.blue{background:linear-gradient(135deg,#3b82f6,#2563eb)}.kc.green{background:linear-gradient(135deg,#22c55e,#059669)}.kc.amber{background:linear-gradient(135deg,#fbbf24,#f59e0b)}.kc.red{background:linear-gradient(135deg,#f87171,#ef4444)}.kc.purple{background:linear-gradient(135deg,#a78bfa,#7c3aed)}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:11px;box-shadow:var(--sh)}
+.kpi .t{font-size:11.5px;color:var(--muted)}.kpi .v{font-size:19px;font-weight:900;margin-top:2px}.kpi .s{font-size:11px;color:var(--muted)}
+.qa{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.qa button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 2px;border-radius:16px;background:var(--surface);border:1px solid var(--line);font-weight:800;font-size:12px;box-shadow:var(--sh)}
+.qa .qi{width:38px;height:38px;border-radius:12px;display:grid;place-items:center}
+/* camera */
+.cam{position:relative;border-radius:24px;overflow:hidden;background:#0a1626;aspect-ratio:4/3;box-shadow:var(--sh);border:2px solid transparent;transition:border-color .2s}
+.cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.cam.on video{display:block}
+.cam .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#cfe0f3;text-align:center;padding:20px}
+.cam.on .ph{display:none}
+.reticle{position:absolute;inset:18% 10%;pointer-events:none;display:none}
+.cam.on .reticle{display:block}
+.reticle i{position:absolute;width:28px;height:28px;border:3px solid #fff;opacity:.95}
+.reticle i:nth-child(1){top:0;right:0;border-left:0;border-bottom:0;border-radius:0 10px 0 0}
+.reticle i:nth-child(2){top:0;left:0;border-right:0;border-bottom:0;border-radius:10px 0 0 0}
+.reticle i:nth-child(3){bottom:0;right:0;border-left:0;border-top:0;border-radius:0 0 10px 0}
+.reticle i:nth-child(4){bottom:0;left:0;border-right:0;border-top:0;border-radius:0 0 0 10px}
+.laser{position:absolute;left:4%;right:4%;height:2px;background:linear-gradient(90deg,transparent,#ff4d4d,transparent);box-shadow:0 0 12px 2px rgba(255,77,77,.7);top:10%;animation:laser 2s ease-in-out infinite}
+@keyframes laser{0%,100%{top:8%}50%{top:90%}}
+.camst{position:absolute;top:8px;left:0;right:0;text-align:center;color:#fff;font-size:11px;opacity:.85;text-shadow:0 1px 3px #000;display:none}.cam.on .camst{display:block}
+.camtools{position:absolute;bottom:10px;left:10px;right:10px;display:none;justify-content:space-between;align-items:center}
+.cam.on .camtools{display:flex}
+.camtools button{width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);color:#fff;display:grid;place-items:center}
+.camtools button.on{background:#fbbf24;color:#000}
+.cam.ok{border-color:var(--green);animation:okflash .5s}.cam.bad{border-color:var(--amber)}
+@keyframes okflash{0%{box-shadow:0 0 0 0 rgba(16,185,129,.7)}100%{box-shadow:0 0 0 24px rgba(16,185,129,0)}}
+.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:var(--surface2);border-radius:18px;padding:4px}
+.mb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 2px;border-radius:14px;background:transparent;font-weight:800;font-size:12.5px;color:var(--muted);transition:.2s}
+.mb.on.sale{background:linear-gradient(135deg,#f43f5e,#ef4444);color:#fff}.mb.on.in{background:linear-gradient(135deg,#10b981,#059669);color:#fff}
+.mb.on.xfer{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff}.mb.on.out{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:38px;height:38px;border-radius:12px;background:var(--surface2);font-size:20px;font-weight:900;display:grid;place-items:center}
+.stepper input{width:64px;text-align:center;font-size:17px;font-weight:900;padding:7px;direction:ltr}
+.tic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex-shrink:0}
+.t-out{background:var(--redbg);color:var(--red)}.t-in{background:var(--greenbg);color:var(--green)}.t-xfer{background:var(--bluebg);color:var(--blue)}.t-adj{background:var(--purplebg);color:var(--purple)}
+.last{border-width:1.5px}.last.out{border-color:rgba(239,68,68,.5)}.last.in{border-color:rgba(16,185,129,.5)}.last.xfer{border-color:rgba(59,130,246,.5)}
+/* bottom nav */
+#bnav{position:fixed;z-index:30;bottom:0;left:0;right:0;padding:0 12px calc(env(safe-area-inset-bottom) + 10px);pointer-events:none}
+.nav-in{pointer-events:auto;max-width:520px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 74px 1fr 1fr;align-items:end;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:26px;padding:8px 6px;box-shadow:0 18px 40px -16px rgba(11,26,46,.4)}
+.nb{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;border-radius:14px;position:relative}
+.nb.on{color:var(--brand)}.nb.on::after{content:"";position:absolute;bottom:-3px;width:18px;height:3px;border-radius:3px;background:var(--brand)}
+.fab{width:60px;height:60px;border-radius:22px;margin:-30px auto 0;background:linear-gradient(135deg,#2563eb,#06b6d4);color:#fff;display:grid;place-items:center;box-shadow:0 14px 26px -8px rgba(37,99,235,.9),0 0 0 6px var(--bg)}
+.fab svg{width:27px;height:27px}.fab.on{outline:3px solid rgba(255,255,255,.55);outline-offset:-6px}
+/* sheets */
+.backdrop{position:fixed;inset:0;z-index:60;background:rgba(4,12,24,.58);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;animation:fd .2s}
+.backdrop.top{z-index:90}
+.sheet{width:100%;max-width:600px;max-height:92vh;overflow-y:auto;background:var(--surface);border-radius:28px 28px 0 0;padding:10px 18px calc(env(safe-area-inset-bottom) + 20px);animation:su .28s cubic-bezier(.2,.9,.3,1)}
+.sheet.cen{border-radius:28px;margin:auto 12px}.sheet.wide{max-width:760px}
+.grab{width:42px;height:5px;border-radius:5px;background:var(--line);margin:4px auto 14px}
+.sheet h2{margin:0 0 12px;font-size:18px;font-weight:900}
+@keyframes su{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}@keyframes fd{from{opacity:0}to{opacity:1}}@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.view{animation:up .3s ease}
+.segctl{display:grid;gap:4px;background:var(--surface2);border-radius:16px;padding:4px;margin-bottom:12px}
+.segctl button{padding:10px 4px;border-radius:12px;background:transparent;font-weight:800;color:var(--muted);font-size:13px;transition:.2s}
+.segctl button.on{background:var(--brand);color:#fff}
+.datebtn{display:flex;align-items:center;gap:8px;width:100%;background:var(--surface2);border-radius:14px;padding:12px 14px;font-weight:700;text-align:right}
+.picklist{max-height:240px;overflow-y:auto;margin-top:8px;border-radius:14px;border:1px solid var(--line)}
+.pick{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;background:transparent;text-align:right;border-bottom:1px solid var(--line)}.pick:last-child{border:0}
+.dayh{display:flex;align-items:center;justify-content:space-between;margin:16px 4px 8px;font-weight:800;font-size:13.5px}
+.dayh span{font-weight:600;font-size:11.5px;color:var(--muted)}
+.mv{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;cursor:pointer}.mv+.mv{margin-top:8px}
+.hb{display:flex;align-items:center;gap:10px;margin:7px 0}.hb .n{width:104px;font-size:12.5px}.hb .t{flex:1;height:11px;border-radius:11px;background:var(--surface2);overflow:hidden}.hb .t i{display:block;height:100%;border-radius:11px;background:linear-gradient(90deg,#2563eb,#06b6d4)}.hb .vv{width:44px;text-align:left;font-size:12.5px;font-weight:800}
+svg.ch{width:100%;height:auto;display:block}svg.ch text{font-family:inherit;font-size:9.5px;fill:var(--muted)}.gline{stroke:var(--line);stroke-width:1;stroke-dasharray:3 4}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}.cal .w{font-size:11.5px;color:var(--muted);font-weight:700;padding:4px 0}
+.cal button{aspect-ratio:1;border-radius:12px;background:transparent;font-weight:700;font-size:14px}.cal button.fri{color:var(--red)}.cal button.now{box-shadow:inset 0 0 0 2px var(--brand)}.cal button.sel{background:var(--brand);color:#fff}
+.toasts{position:fixed;z-index:120;bottom:calc(env(safe-area-inset-bottom) + 96px);left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.toast{pointer-events:auto;display:flex;align-items:center;gap:14px;background:#0b1a2e;color:#fff;padding:11px 16px;border-radius:16px;font-size:13.5px;box-shadow:0 12px 30px -8px rgba(0,0,0,.5);animation:up .25s;max-width:92vw}
+.toast button{background:transparent;color:#7dd3fc;font-weight:800;font-size:13px}.toast.out{opacity:0;transform:translateY(8px);transition:.35s}
+.empty{text-align:center;padding:30px 18px}.empty .em{font-size:50px;margin-bottom:6px}
+.banner{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:var(--amberbg);color:#92400e;font-size:13px;margin-bottom:12px}[data-theme=dark] .banner{color:#fcd34d}
+.banner.red{background:var(--redbg);color:#b91c1c}[data-theme=dark] .banner.red{color:#fca5a5}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.bcbox{background:#fff;border-radius:14px;padding:10px;text-align:center;border:1px solid var(--line);margin:10px 0}.bcbox svg{max-width:100%;height:auto}
+.stat2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat2 .card{text-align:center;padding:12px}.stat2 .big{font-size:28px;font-weight:900;line-height:1.2}
+/* table */
+.tw{overflow-x:auto;border-radius:16px;border:1px solid var(--line);background:var(--surface)}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+.tbl th{background:var(--surface2);color:var(--muted);font-weight:800;font-size:11.5px;text-align:right;padding:9px 10px;white-space:nowrap;position:sticky;top:0}
+.tbl td{padding:9px 10px;border-top:1px solid var(--line);white-space:nowrap}
+.tbl tr.clk{cursor:pointer}.tbl tr.clk:active td{background:var(--surface2)}
+.tbl td.n,.tbl th.n{text-align:center}
+.tbl td.pos{color:var(--green);font-weight:800}.tbl td.neg{color:var(--red);font-weight:800}
+/* doc lines */
+.ln{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:16px}.ln+.ln{margin-top:8px}
+.ln.warn{border-color:var(--amber);background:var(--amberbg)}.ln.bad{border-color:var(--red)}
+.dochead{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sticky-act{position:sticky;bottom:92px;z-index:5;margin-top:14px}
+/* count */
+.cr{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface);border:1px solid var(--line);border-radius:14px}.cr+.cr{margin-top:7px}
+.cr.diff{border-color:var(--amber);background:var(--amberbg)}.cr.ok{border-color:rgba(16,185,129,.5)}
+.cr input{width:74px;text-align:center;font-weight:900;direction:ltr;padding:8px}
+/* chat */
+.chat{display:flex;flex-direction:column;gap:10px;padding:4px 0 10px;min-height:46vh}
+.msg{display:flex;gap:8px;align-items:flex-end;animation:up .25s}.msg.u{flex-direction:row}
+.bub{max-width:86%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.75;background:var(--surface);border:1px solid var(--line);box-shadow:var(--sh)}
+.msg.u .bub{background:linear-gradient(135deg,#2563eb,#06b6d4);color:#fff;border:0;border-bottom-right-radius:6px}
+.msg.bot .bub{border-bottom-left-radius:6px}
+.bub .row2{display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-top:1px dashed var(--line)}.bub .row2:first-of-type{border:0}
+.bot-av{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#2563eb);display:grid;place-items:center;color:#fff;flex-shrink:0}
+.chatin{position:sticky;bottom:96px;display:flex;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:6px 6px 6px 12px;box-shadow:var(--sh);z-index:6}
+.chatin input{flex:1;border:0;background:transparent;outline:none;padding:10px 4px;min-width:0}
+/* lock */
+.lock{position:fixed;inset:0;z-index:200;background:linear-gradient(160deg,#0b1b3a,#12306b 60%,#0e7490);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;padding:20px;gap:14px}
+.lock .logo{width:64px;height:64px;border-radius:20px}
+.pins{display:flex;gap:12px;margin:6px 0}.pins i{width:14px;height:14px;border-radius:50%;border:2px solid #fff;opacity:.8}.pins i.f{background:#fff}
+.pad{display:grid;grid-template-columns:repeat(3,76px);gap:12px}.pad button{height:62px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:22px;font-weight:800}.pad button:active{background:rgba(255,255,255,.3)}
+.ulist{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:340px}
+.ulist button{padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;font-weight:700}.ulist button.on{background:#fff;color:#12306b}
+/* fullscreen scanner */
+.scanfull{position:fixed;inset:0;z-index:70;background:#050c18;display:flex;flex-direction:column;animation:fd .2s}
+.scanfull .sf-top{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;color:#fff}
+.scanfull .cam{flex:0 0 auto;border-radius:0;aspect-ratio:auto;height:44vh;box-shadow:none}
+.scanfull .sf-body{flex:1;overflow-y:auto;background:var(--bg);border-radius:24px 24px 0 0;padding:14px}
+/* sidebar (desktop) */
+@media(min-width:920px){
+  #shell{display:grid;grid-template-columns:1fr 252px;}
+  #side{display:flex;flex-direction:column;order:2;position:sticky;top:0;height:100vh;background:linear-gradient(180deg,var(--navy),var(--navy2));color:#cfe0f3;padding:16px 12px;overflow-y:auto}
+  #main{order:1;max-width:1100px;width:100%;margin:0 auto;padding:0 26px 40px}
+  #bnav{display:none}
+  .kpis{grid-template-columns:repeat(4,1fr)}
+  .toasts{bottom:30px}
+  .sticky-act{bottom:12px}.chatin{bottom:12px}
+  .dgrid{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;align-items:start}
+  .dgrid .card+.card{margin-top:0}
+  .sheet{border-radius:28px;margin:auto}.backdrop{align-items:center}
+  .qa{grid-template-columns:repeat(5,1fr)}
+  .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pgrid .item+.item{margin-top:0}
+}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:6px 8px 16px;color:#fff}.sb-brand b{font-size:17px;display:block;line-height:1.2}.sb-brand small{opacity:.7;font-size:11px}
+.sb-i{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:14px;font-weight:700;font-size:14px;color:#b8cbe4;width:100%;text-align:right;margin-bottom:3px}
+.sb-i:hover{background:rgba(255,255,255,.07)}.sb-i.on{background:linear-gradient(135deg,#2563eb,#0ea5e9);color:#fff;box-shadow:0 10px 20px -10px rgba(14,165,233,.9)}
+.sb-i .cnt{margin-right:auto;background:#ef4444;color:#fff;border-radius:9px;font-size:10.5px;padding:0 6px;font-weight:800}
+.sb-foot{margin-top:auto;padding:12px 8px 0;border-top:1px solid rgba(255,255,255,.1);font-size:12px;color:#9fb4d0}
+.moregrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.moregrid button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 4px;border-radius:18px;background:var(--surface2);font-weight:800;font-size:12.5px}
+@media print{body::before,#bnav,#side,#top,.noprint,.toasts{display:none!important}#main{max-width:none;padding:0}.card{box-shadow:none}body{background:#fff;color:#000}}
+
+.nbdot{position:absolute;top:0;left:22%;min-width:16px;height:16px;border-radius:9px;background:var(--red);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;padding:0 4px}
+
+.msg.u{justify-content:flex-end}
+#lockRoot{position:relative;z-index:200}
+#shell.hide{visibility:hidden}
+svg.ch{direction:ltr}
+
+</style>
+</head>
+<body>
+<div id="shell" class="hide">
+  <aside id="side"></aside>
+  <div id="main"><header id="top"></header><main id="view"></main></div>
+</div>
+<nav id="bnav"></nav>
+<div id="sheetRoot"></div><div id="pickerRoot"></div><div id="lockRoot"></div><div class="toasts" id="toasts"></div>
+<script>
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const FA='۰۱۲۳۴۵۶۷۸۹';
+const fa=n=>String(n).replace(/\d/g,d=>FA[d]);
+const en=s=>String(s??'').replace(/[۰-۹]/g,d=>FA.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/٫/g,'.');
+const N=x=>{x=Math.round((+x||0)*1000)/1000;const neg=x<0;let s=Math.abs(x).toString();if(s.includes('e'))s=Math.abs(x).toFixed(3);const p=s.split('.');p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');return(neg?'−':'')+fa(p.join('٫')).replace(/,/g,'٬')};
+const numv=v=>{const x=parseFloat(en(v).replace(/[^\d.]/g,''));return isFinite(x)?x:NaN};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+const clone=o=>JSON.parse(JSON.stringify(o));
+const IC={
+ grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
+ pkg:'<line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+ layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+ list:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+ chart:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+ bar:'<path d="M3 5v14M7 5v14M11 5v14M15 5v9M15 17v2M19 5v14M21 5v14"/>',
+ plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+ minus:'<line x1="5" y1="12" x2="19" y2="12"/>',
+ edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>',
+ trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m5 0V4a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2"/>',
+ cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+ search:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+ set:'<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
+ moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+ sun:'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
+ check:'<polyline points="20 6 9 17 4 12"/>',
+ alert:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+ down:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+ up:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
+ x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+ chev:'<polyline points="15 18 9 12 15 6"/>',chevr:'<polyline points="9 18 15 12 9 6"/>',
+ back:'<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+ cam:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+ zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+ flip:'<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>',
+ print:'<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>',
+ swap:'<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>',
+ clip:'<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><polyline points="9 14 11 16 15 12"/>',
+ users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+ bot:'<rect x="3" y="8" width="18" height="12" rx="4"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/><circle cx="8.5" cy="14" r="1.2"/><circle cx="15.5" cy="14" r="1.2"/>',
+ logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+ shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+ cloud:'<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',
+ wh:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+ tag:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+ file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+ image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+ send:'<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+ lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+ more:'<circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/><circle cx="5" cy="12" r="1.3"/>',
+ cube:'<path d="M12 2.5l8 4.5v10l-8 4.5-8-4.5V7z"/><path d="M4 7l8 4.5L20 7"/><path d="M12 11.5v10"/>'
+};
+const ic=(n,s)=>`<svg class="i" viewBox="0 0 24 24"${s?` style="width:${s}px;height:${s}px"`:''}>${IC[n]||''}</svg>`;
+
+/* ---- Persian text normalisation / fuzzy ---- */
+const normFa=s=>en(String(s||'')).toLowerCase().replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[ۀة]/g,'ه').replace(/[أإآ]/g,'ا').replace(/[ً-ٰٟـ]/g,'').replace(/[‌‍‎‏]/g,' ').replace(/[^\p{L}\p{N}\s]/gu,' ').replace(/\s+/g,' ').trim();
+function lev(a,b){if(a===b)return 0;const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){let c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+function tokSim(q,t){if(q===t)return 1;if(q.length>=3&&(t.startsWith(q)||q.startsWith(t)&&t.length>=3))return .9;if(q.length>=3&&t.includes(q))return .8;const L=Math.max(q.length,t.length);if(L<4)return 0;const s=1-lev(q,t)/L;return s>=.7?s*.85:0}
+
+/* ================= Jalali ================= */
+const div=(a,b)=>~~(a/b),mod=(a,b)=>a-~~(a/b)*b;
+const BRK=[-61,9,38,199,426,686,756,818,1111,1181,1210,1635,2060,2097,2192,2262,2324,2394,2456,3178];
+function jalCal(jy,noLeap){const bl=BRK.length;let gy=jy+621,leapJ=-14,jp=BRK[0],jm,jump,leap,leapG,march,n,i;
+ for(i=1;i<bl;i++){jm=BRK[i];jump=jm-jp;if(jy<jm)break;leapJ+=div(jump,33)*8+div(mod(jump,33),4);jp=jm}
+ n=jy-jp;leapJ+=div(n,33)*8+div(mod(n,33)+3,4);if(mod(jump,33)===4&&jump-n===4)leapJ+=1;
+ leapG=div(gy,4)-div((div(gy,100)+1)*3,4)-150;march=20+leapJ-leapG;if(noLeap)return{gy,march};
+ if(jump-n<6)n=n-jump+div(jump+4,33)*33;leap=mod(mod(n+1,33)-1,4);if(leap===-1)leap=4;return{leap,gy,march}}
+function g2d(gy,gm,gd){let d=div((gy+div(gm-8,6)+100100)*1461,4)+div(153*mod(gm+9,12)+2,5)+gd-34840408;return d-div(div(gy+100100+div(gm-8,6),100)*3,4)+752}
+function d2g(jdn){let j=4*jdn+139361631;j+=div(div(4*jdn+183187720,146097)*3,4)*4-3908;const i=div(mod(j,1461),4)*5+308;const gd=div(mod(i,153),5)+1,gm=mod(div(i,153),12)+1,gy=div(j,1461)-100100+div(8-gm,6);return{gy,gm,gd}}
+function j2d(jy,jm,jd){const r=jalCal(jy,true);return g2d(r.gy,3,r.march)+(jm-1)*31-div(jm,7)*(jm-7)+jd-1}
+function d2j(jdn){const gy=d2g(jdn).gy;let jy=gy-621;const r=jalCal(jy),f=g2d(gy,3,r.march);let k=jdn-f;
+ if(k>=0){if(k<=185)return{jy,jm:1+div(k,31),jd:mod(k,31)+1};k-=186}else{jy-=1;k+=179;if(r.leap===1)k+=1}return{jy,jm:7+div(k,30),jd:mod(k,30)+1}}
+const jLen=(y,m)=>m<=6?31:m<=11?30:(jalCal(y).leap===0?30:29);
+const pad=n=>String(n).padStart(2,'0');
+const isoOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const todayISO=()=>isoOf(new Date());
+const parse=iso=>{const[y,m,d]=iso.split('-').map(Number);return{y,m,d}};
+const addDays=(iso,n)=>{const p=parse(iso);return isoOf(new Date(p.y,p.m-1,p.d+n))};
+const diffDays=(a,b)=>{const p=parse(a),q=parse(b);return Math.round((Date.UTC(q.y,q.m-1,q.d)-Date.UTC(p.y,p.m-1,p.d))/864e5)};
+const MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+const WDAYS=['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه'];
+const toJ=iso=>{const p=parse(iso);return d2j(g2d(p.y,p.m,p.d))};
+const fromJ=(jy,jm,jd)=>{const g=d2g(j2d(jy,jm,jd));return g.gy+'-'+pad(g.gm)+'-'+pad(g.gd)};
+const dFull=iso=>{if(!iso)return'—';const j=toJ(iso);return fa(j.jd)+' '+MONTHS[j.jm-1]+' '+fa(j.jy)};
+const dShort=iso=>{if(!iso)return'—';const j=toJ(iso);return fa(j.jd)+' '+MONTHS[j.jm-1]};
+const dNum=iso=>{const j=toJ(iso);return fa(j.jy+'/'+pad(j.jm)+'/'+pad(j.jd))};
+const wday=iso=>{const p=parse(iso);return WDAYS[new Date(p.y,p.m-1,p.d).getDay()]};
+const hhmm=ts=>{const d=new Date(ts);return fa(pad(d.getHours())+':'+pad(d.getMinutes()))};
+function rel(iso){if(!iso)return'—';const d=diffDays(iso,todayISO());return d===0?'امروز':d===1?'دیروز':fa(d)+' روز پیش'}
+
+
+/* ================= EAN / UPC (encoder + decoder) ================= */
+const L_BITS=['0001101','0011001','0010011','0111101','0100011','0110001','0101111','0111011','0110111','0001011'];
+const R_BITS=L_BITS.map(s=>s.replace(/[01]/g,c=>c==='0'?'1':'0'));
+const G_BITS=R_BITS.map(s=>[...s].reverse().join(''));
+const PAR=['LLLLLL','LLGLGG','LLGGLG','LLGGGL','LGLLGG','LGGLLG','LGGGLL','LGLGLG','LGLGGL','LGGLGL'];
+const runsOf=b=>{const r=[];let c=b[0],n=0;for(const x of b){if(x===c)n++;else{r.push(n);c=x;n=1}}r.push(n);return r};
+const LW=L_BITS.map(runsOf),GW=G_BITS.map(runsOf);
+function eanOK(s){if(!/^\d+$/.test(s))return false;const d=s.split('').map(Number),k=d.pop();let t=0;d.reverse().forEach((x,i)=>t+=x*(i%2?1:3));return(10-t%10)%10===k}
+function eanCheck(d12){let t=0;d12.split('').reverse().forEach((x,i)=>t+=(+x)*(i%2?1:3));return String((10-t%10)%10)}
+function eanBits(c){
+ if(c.length===13){const p=PAR[+c[0]];let b='101';for(let i=0;i<6;i++){const d=+c[i+1];b+=p[i]==='L'?L_BITS[d]:G_BITS[d]}b+='01010';for(let i=7;i<13;i++)b+=R_BITS[+c[i]];return b+'101'}
+ let b='101';for(let i=0;i<4;i++)b+=L_BITS[+c[i]];b+='01010';for(let i=4;i<8;i++)b+=R_BITS[+c[i]];return b+'101'}
+const normEAN=c=>c.length===12?'0'+c:c;
+const canEAN=c=>/^\d+$/.test(c)&&(c.length===13||c.length===8||c.length===12)&&eanOK(c);
+function eanSVG(code,o={}){code=normEAN(code);const m=o.m||2,h=o.h||64,bits=eanBits(code),q=9,W=(bits.length+q*2)*m,H=h+20;let r='',i=0;
+ while(i<bits.length){if(bits[i]==='1'){let j=i;while(j<bits.length&&bits[j]==='1')j++;r+=`<rect x="${(q+i)*m}" y="0" width="${(j-i)*m}" height="${h}"/>`;i=j}else i++}
+ return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#fff"/><g fill="#000">${r}</g><text x="${W/2}" y="${h+15}" text-anchor="middle" font-family="monospace" font-size="14" fill="#000" letter-spacing="2">${code}</text></svg>`}
+function eanCanvas(code,m,h,pad_){code=normEAN(code);const bits=eanBits(code),q=pad_||12,cv=document.createElement('canvas');cv.width=(bits.length+q*2)*m;cv.height=h;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,h);x.fillStyle='#000';
+ for(let i=0;i<bits.length;i++)if(bits[i]==='1')x.fillRect((q+i)*m,Math.round(h*.12),m,Math.round(h*.76));return cv}
+function matchDigit(w,i,right,lim){const t=w[i]+w[i+1]+w[i+2]+w[i+3];if(!(t>0))return null;const u=t/7;let be=9,bd=-1,bt='';
+ const cand=right?[['R',LW]]:[['L',LW],['G',GW]];
+ for(const[ty,T]of cand)for(let d=0;d<10;d++){const p=T[d];let e=0;for(let k=0;k<4;k++){const x=w[i+k]/u-p[k];e+=x*x}if(e<be){be=e;bd=d;bt=ty}}
+ return be<lim?{d:bd,t:bt}:null}
+const gOK=(w,i,n,u)=>{for(let k=0;k<n;k++){const r=w[i+k]/u;if(r<.3||r>2.4)return false}return true};
+function decodeAt(w,s,n){const lim=n===13?1.4:0.6,half=n===13?6:4,need=3+half*4+5+half*4+3;if(s+need>w.length)return null;
+ const u=(w[s]+w[s+1]+w[s+2])/3;if(!(u>0)||!gOK(w,s,3,u))return null;
+ let o=s+3;const digs=[];let par='';
+ for(let k=0;k<half;k++){const m=matchDigit(w,o,false,lim);if(!m)return null;digs.push(m.d);par+=m.t;o+=4}
+ if(!gOK(w,o,5,u))return null;o+=5;
+ for(let k=0;k<half;k++){const m=matchDigit(w,o,true,lim);if(!m)return null;digs.push(m.d);o+=4}
+ if(!gOK(w,o,3,u))return null;
+ let code;if(n===13){const f=PAR.indexOf(par);if(f<0)return null;code=f+digs.join('')}else{if(par!=='LLLL')return null;code=digs.join('')}
+ return eanOK(code)?code:null}
+function tryRuns(w,c0,a8){for(let s=0;s+43<=w.length;s++){if((c0^(s&1))!==1)continue;const r=decodeAt(w,s,13)||(a8&&decodeAt(w,s,8));if(r)return r}return null}
+function lineToRuns(line){const n=line.length,W=Math.max(24,(n/7)|0),ps=new Float32Array(n+1);for(let i=0;i<n;i++)ps[i+1]=ps[i]+line[i];
+ const w=[];let cur=-1,st=0,c0=0;
+ for(let x=0;x<n;x++){const a=Math.max(0,x-W),b=Math.min(n,x+W+1),mean=(ps[b]-ps[a])/(b-a),dk=line[x]<mean*.92-2?1:0;
+  if(dk!==cur){if(cur!==-1)w.push(x-st);else c0=dk;cur=dk;st=x}}
+ w.push(n-st);return{w,c0}}
+function decodeLine(line,a8){const{w,c0}=lineToRuns(line);if(w.length<43)return null;
+ let r=tryRuns(w,c0,a8);if(r)return r;
+ const rw=w.slice().reverse(),cl=c0^((w.length-1)&1);return tryRuns(rw,cl,a8)}
+/* G: Uint8 gray, width sw, height sh */
+function scanGray(G,sw,sh){for(const a8 of [false,true]){const r=scanGray1(G,sw,sh,a8);if(r)return r}return null}
+function scanGray1(G,sw,sh,a8){
+ const fr=[.5,.45,.55,.4,.6,.35,.65,.3,.7,.25,.75,.2,.8,.15,.85,.1,.9];
+ for(const f of fr){const y=Math.round(sh*f),ln=new Float32Array(sw);for(let x=0;x<sw;x++){let a=0,c=0;for(let d=-1;d<=1;d++){const yy=y+d;if(yy>=0&&yy<sh){a+=G[yy*sw+x];c++}}ln[x]=a/c}const r=decodeLine(ln,a8);if(r)return r}
+ for(const f of [.5,.42,.58,.34,.66,.26,.74]){const x=Math.round(sw*f),ln=new Float32Array(sh);for(let y=0;y<sh;y++){let a=0,c=0;for(let d=-1;d<=1;d++){const xx=x+d;if(xx>=0&&xx<sw){a+=G[y*sw+xx];c++}}ln[y]=a/c}const r=decodeLine(ln,a8);if(r)return r}
+ return null}
+let _cv=null;
+function fallbackDecode(v){const W=v.videoWidth,H=v.videoHeight;if(!W)return null;const sw=Math.min(1280,W),sh=Math.round(H*sw/W);
+ if(!_cv){_cv=document.createElement('canvas')}_cv.width=sw;_cv.height=sh;const cx=_cv.getContext('2d',{willReadFrequently:true});cx.drawImage(v,0,0,sw,sh);
+ const d=cx.getImageData(0,0,sw,sh).data,G=new Uint8Array(sw*sh);for(let i=0,j=0;i<d.length;i+=4,j++)G[j]=(d[i]*77+d[i+1]*150+d[i+2]*29)>>8;return scanGray(G,sw,sh)}
+const cleanCode=c=>String(c||'').replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[\s\u200c\u200f\u200e\-_.]/g,'').trim();
+const bkey=c=>{c=cleanCode(c);return /^\d+$/.test(c)?(c.replace(/^0+/,'')||'0'):c.toLowerCase()};
+
+/* ================= store ================= */
+const APP_VER='۱٫۰';
+const UNITS=['عدد','کارتن','بسته','کیلوگرم','متر','لیتر','جفت','دست'];
+const R_IN={buy:'خرید',ret:'برگشت از مشتری',prod:'تولید / مونتاژ',gift:'هدیه / نمونه',other:'سایر'};
+const R_OUT={sale:'فروش',use:'مصرف داخلی',waste:'ضایعات / خرابی',ret:'برگشت به تأمین‌کننده',gift:'هدیه / نمونه',other:'سایر'};
+const T_NAME={in:'ورود',out:'خروج',xfer:'انتقال',adj:'شمارش'};
+const T_IC={in:'down',out:'up',xfer:'swap',adj:'clip'};
+const ROLES={admin:'مدیر',keeper:'انباردار',seller:'فروشنده'};
+const PERM={admin:'*',keeper:['view','prod.add','prod.edit','in','out','xfer','count','reports','scan','assistant','act'],seller:['view','out.sale','scan.sale','assistant','act.sale']};
+const DKEY='anbaryar_pro_v2',LEGACY='scan_anbar_v1';
+let db=null,PM={},BM={},ST={},WM={},CM={},CUR=null;
+
+const IDB={d:null,
+ open(){return this.d||(this.d=new Promise((ok,no)=>{try{const r=indexedDB.open('anbaryar',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}catch(e){no(e)}}))},
+ async get(k){try{const d=await this.open();return await new Promise((ok,no)=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})}catch(e){try{const v=localStorage.getItem('kv_'+k);return v?JSON.parse(v):undefined}catch(_){return undefined}}},
+ async set(k,v){try{const d=await this.open();return await new Promise((ok,no)=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})}catch(e){try{localStorage.setItem('kv_'+k,JSON.stringify(v))}catch(_){}}},
+ async del(k){try{const d=await this.open();return await new Promise(ok=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').delete(k);t.oncomplete=()=>ok()})}catch(e){try{localStorage.removeItem('kv_'+k)}catch(_){}}},
+ async keys(){try{const d=await this.open();return await new Promise((ok,no)=>{const q=d.transaction('kv').objectStore('kv').getAllKeys();q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})}catch(e){return[]}}
+};
+
+function blank(){return{v:2,products:[],moves:[],wh:[{id:'wh',name:'انبار مرکزی',u:0},{id:'shop',name:'مغازه',u:0}],cats:[],users:[],counts:[],log:[],dead:{},seq:{p:0,in:0,out:0,xfer:0,cnt:0},
+ settings:{name:'انباریار پرو',su:0},prefs:{}}}
+const DEFPREF={defWh:'wh',saleWh:'shop',sound:true,vib:true,cam:'environment',theme:'auto',lastBackup:0,autoCam:true};
+function normalize(d){const b=blank();d=d||{};
+ for(const k of ['products','moves','wh','cats','users','counts','log'])d[k]=Array.isArray(d[k])&&(k!=='wh'||d[k].length)?d[k]:b[k];
+ d.dead=d.dead||{};d.seq={...b.seq,...(d.seq||{})};d.settings={...b.settings,...(d.settings||{})};d.prefs={...DEFPREF,...(d.prefs||{})};d.v=2;return d}
+function migrateV1(o){const d=blank(),t=Date.now();
+ d.products=(o.products||[]).map((p,i)=>({id:p.id,name:p.name,code:'P'+String(i+1).padStart(4,'0'),barcode:p.barcode||'',cat:'',brand:'',unit:p.unit||'عدد',min:p.min||0,loc:'',img:'',desc:'',alias:[],created:p.createdAt||t,u:t}));
+ d.seq.p=d.products.length;
+ d.moves=(o.moves||[]).map(m=>{const x={id:m.id,doc:m.id,no:0,pid:m.pid,date:m.date,ts:m.ts||t,note:m.note||'',party:'',inv:'',reason:'',user:'',u:m.ts||t};
+  if(m.type==='in'){Object.assign(x,{type:'in',wh:m.loc,qty:m.qty,reason:'buy'})}
+  else if(m.type==='sale'||m.type==='out'){Object.assign(x,{type:'out',wh:m.loc,qty:m.qty,reason:m.type==='sale'?'sale':'other'})}
+  else if(m.type==='xfer'){Object.assign(x,{type:'xfer',wh:m.from,to:m.to,qty:m.qty})}
+  else{Object.assign(x,{type:'adj',wh:m.loc,delta:m.delta,counted:m.counted,qty:Math.abs(m.delta||0),reason:'count'})}
+  return x});
+ if(o.settings&&o.settings.shop)d.settings.name=o.settings.shop;
+ return d}
+async function loadDB(){
+ let d=await IDB.get('db');
+ if(!d){try{const r=localStorage.getItem(LEGACY);if(r){d=migrateV1(JSON.parse(r));d._migrated=true}}catch(e){}}
+ db=normalize(d);delete db._migrated;
+ if(!d)db=normalize(blank());
+ recalc();return !!d}
+let saveT=null,dirtyHook=null;
+function save(){clearTimeout(saveT);saveT=setTimeout(flush,250);if(dirtyHook)dirtyHook()}
+async function flush(){clearTimeout(saveT);saveT=null;try{await IDB.set('db',db)}catch(e){}}
+addEventListener('pagehide',flush);document.addEventListener('visibilitychange',()=>{if(document.hidden)flush()});
+const touch=o=>{o.u=Date.now();return o};
+
+/* ---- derived stock ---- */
+function recalc(){PM={};BM={};ST={};WM={};CM={};
+ db.wh.forEach(w=>WM[w.id]=w);db.cats.forEach(c=>CM[c.id]=c);
+ db.products.forEach(p=>{PM[p.id]=p;if(p.barcode)BM[bkey(p.barcode)]=p.id;const w={};db.wh.forEach(x=>w[x.id]=0);ST[p.id]={t:0,w,lastIn:'',lastOut:'',in30:0,out30:0,in7:0,out7:0}});
+ const t=todayISO(),d7=addDays(t,-6),d30=addDays(t,-29);
+ for(const m of db.moves){const s=ST[m.pid];if(!s)continue;
+  if(m.type==='in'){s.w[m.wh]=(s.w[m.wh]||0)+m.qty;s.t+=m.qty;if(m.date>s.lastIn)s.lastIn=m.date;if(m.date>=d30)s.in30+=m.qty;if(m.date>=d7)s.in7+=m.qty}
+  else if(m.type==='out'){s.w[m.wh]=(s.w[m.wh]||0)-m.qty;s.t-=m.qty;if(m.date>s.lastOut)s.lastOut=m.date;if(m.date>=d30)s.out30+=m.qty;if(m.date>=d7)s.out7+=m.qty}
+  else if(m.type==='xfer'){s.w[m.wh]=(s.w[m.wh]||0)-m.qty;s.w[m.to]=(s.w[m.to]||0)+m.qty}
+  else if(m.type==='adj'){s.w[m.wh]=(s.w[m.wh]||0)+m.delta;s.t+=m.delta}}
+ const r=x=>Math.round(x*1000)/1000;
+ for(const id in ST){const s=ST[id];s.t=r(s.t);for(const k in s.w)s.w[k]=r(s.w[k])}}
+const stockAt=(pid,wh)=>(ST[pid]&&ST[pid].w[wh])||0;
+function status(p){const s=ST[p.id];if(!s)return'ok';if(s.t<0||Object.values(s.w).some(v=>v<0))return'neg';if(s.t<=0)return'out';if(p.min>0&&s.t<=p.min)return'low';return'ok'}
+const STAT_PILL={low:'<span class="pill p-amber">کم‌موجودی</span>',out:'<span class="pill p-red">تمام شد</span>',neg:'<span class="pill p-red">منفی</span>',ok:''};
+const whName=id=>(WM[id]&&WM[id].name)||'—';
+const catName=id=>(CM[id]&&CM[id].name)||'';
+const isDark=()=>document.documentElement.dataset.theme==='dark';
+
+/* ---- permissions / log ---- */
+function can(a){const r=CUR?CUR.role:'admin',p=PERM[r];return p==='*'||p.includes(a)}
+const canOut=()=>can('out')||can('out.sale');
+function addLog(act,txt){db.log.push({id:uid(),ts:Date.now(),user:CUR?CUR.name:'مدیر',act,txt,u:Date.now()});if(db.log.length>1500)db.log.splice(0,db.log.length-1500)}
+const curName=()=>CUR?CUR.name:'';
+
+/* ---- documents ---- */
+function nextCode(){db.seq.p++;return'P'+String(db.seq.p).padStart(4,'0')}
+function makeInternal(){let c;do{c='29'+String(Math.floor(Math.random()*1e10)).padStart(10,'0');c+=eanCheck(c)}while(BM[bkey(c)]);return c}
+function commitDoc(d){/* d:{type,wh,to,date,party,inv,reason,note,lines:[{pid,qty}]} */
+ const doc=uid(),no=++db.seq[d.type],ts=Date.now(),out=[];let k=0;
+ for(const l of d.lines){if(!(l.qty>0)||!PM[l.pid])continue;
+  const m={id:uid(),doc,no,pid:l.pid,type:d.type,qty:l.qty,wh:d.wh,date:d.date||todayISO(),ts:ts+(k++),reason:d.reason||'',party:d.party||'',inv:d.inv||'',note:d.note||'',user:curName(),u:ts+k};
+  if(d.type==='xfer')m.to=d.to;out.push(m)}
+ if(!out.length)return null;
+ db.moves.push(...out);
+ addLog(d.type,T_NAME[d.type]+' #'+fa(no)+' — '+fa(out.length)+' قلم'+(d.party?' — '+d.party:''));
+ save();recalc();return{doc,no,moves:out}}
+function commitAdj(wh,pid,counted,o={}){const cur=stockAt(pid,wh),delta=Math.round((counted-cur)*1000)/1000;if(!delta)return null;
+ const ts=Date.now(),m={id:uid(),doc:o.doc||uid(),no:o.no||0,pid,type:'adj',wh,delta,counted,sys:cur,qty:Math.abs(delta),date:o.date||todayISO(),ts,reason:o.reason||'count',party:'',inv:'',note:o.note||'',user:curName(),u:ts};
+ db.moves.push(m);return m}
+function delMoves(ids){const S=new Set(ids),t=Date.now(),gone=db.moves.filter(m=>S.has(m.id));db.moves=db.moves.filter(m=>!S.has(m.id));gone.forEach(m=>db.dead[m.id]=t);save();recalc();return gone}
+function restoreMoves(arr){const t=Date.now()+1;arr.forEach(m=>{m.u=t;delete db.dead[m.id];db.moves.push(m)});save();recalc()}
+function delProduct(id){const p=PM[id];const mv=db.moves.filter(m=>m.pid===id),t=Date.now();db.products=db.products.filter(x=>x.id!==id);db.moves=db.moves.filter(m=>m.pid!==id);db.dead[id]=t;mv.forEach(m=>db.dead[m.id]=t);addLog('prod.del','حذف کالا: '+p.name);save();recalc();return{p,mv}}
+function restoreProduct(o){const t=Date.now()+1;o.p.u=t;delete db.dead[o.p.id];db.products.push(o.p);o.mv.forEach(m=>{m.u=t;delete db.dead[m.id]});db.moves.push(...o.mv);save();recalc()}
+function findProduct(code){const id=BM[bkey(code)];if(id)return PM[id];const c=String(code).trim().toLowerCase();return db.products.find(p=>(p.code||'').toLowerCase()===c)||null}
+
+/* ---- auto backup (daily snapshot inside the browser) ---- */
+async function autoBackup(){try{const day=todayISO(),keys=await IDB.keys();if(keys.includes('bk-'+day))return;
+ await IDB.set('bk-'+day,JSON.stringify(db));const bks=keys.filter(k=>String(k).startsWith('bk-')).sort();while(bks.length>=7){await IDB.del(bks.shift())}}catch(e){}}
+
+/* ================= sync merge (identical logic to server.py) ================= */
+const COLS=['products','moves','wh','cats','users','counts','log'];
+const DEAD_TTL=180*864e5;
+const _u=r=>typeof r.u==='number'?r.u:0;
+function mergeDb(a,b,now){now=now||Date.now();const dead={};
+ for(const s of [a.dead||{},b.dead||{}])for(const k in s)if(typeof s[k]==='number')dead[k]=Math.max(dead[k]||0,s[k]);
+ const out={v:2};
+ for(const col of COLS){const best=new Map();
+  for(const r of [...(a[col]||[]),...(b[col]||[])]){if(!r||!r.id)continue;const o=best.get(r.id);if(!o||_u(r)>_u(o))best.set(r.id,r)}
+  out[col]=[];for(const r of best.values()){const d=dead[r.id];if(d&&d>=_u(r))continue;if(d)delete dead[r.id];out[col].push(r)}}
+ const pids=new Set(out.products.map(p=>p.id));out.moves=out.moves.filter(m=>pids.has(m.pid));
+ out.log=out.log.sort((x,y)=>x.ts-y.ts).slice(-1500);
+ for(const k of Object.keys(dead))if(now-dead[k]>DEAD_TTL)delete dead[k];
+ out.dead=dead;
+ const sa=a.seq||{},sb=b.seq||{};out.seq={};for(const k of new Set([...Object.keys(sa),...Object.keys(sb)]))out.seq[k]=Math.max(sa[k]||0,sb[k]||0);
+ const ta=a.settings||{},tb=b.settings||{};let t=(tb.su||0)>(ta.su||0)?tb:ta;if(!t.name&&(ta.name||tb.name))t=ta.name?ta:tb;out.settings={name:t.name,su:t.su||0};
+ return out}
+
+/* ================= camera scanner component ================= */
+const Cam={host:null,video:null,stream:null,det:null,timer:null,on:false,busy:false,cand:null,torch:false,cb:null,frames:0,seenMap:{},wasOn:false,
+ mount(host,cb){this.unmount();this.host=host;this.cb=cb;host.classList.add('cam');host.classList.remove('on','ok','bad');
+  host.innerHTML=`<video playsinline muted autoplay></video><div class="reticle"><i></i><i></i><i></i><i></i><div class="laser"></div></div><div class="camst"></div>
+  <div class="ph"><div style="opacity:.8">${ic('cam',44)}</div><div class="b camMsg">برای اسکن، دوربین را روشن کنید</div><button class="btn pri camGo">روشن کردن دوربین</button></div>
+  <div class="camtools"><button class="camTorch" aria-label="چراغ">${ic('zap')}</button><button class="camOff" aria-label="خاموش">${ic('x')}</button><button class="camFlip" aria-label="تعویض دوربین">${ic('flip')}</button></div>`;
+  this.video=host.querySelector('video');
+  host.querySelector('.camGo').onclick=()=>this.start();host.querySelector('.camOff').onclick=()=>this.stop();
+  host.querySelector('.camFlip').onclick=()=>this.flip();host.querySelector('.camTorch').onclick=()=>this.toggleTorch();
+  let ok=false;try{ok=localStorage.getItem('anb_camok')==='1'}catch(e){}if(ok&&db.prefs.autoCam!==false)this.start()},
+ unmount(){this.stop();this.host=null;this.video=null;this.cb=null;this.seenMap={}},
+ msg(h){const m=this.host&&this.host.querySelector('.camMsg');if(m)m.innerHTML=h},
+ async start(){if(this.on||!this.host)return;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){this.msg('دوربین در این آدرس کار نمی‌کند.<br><span class="xs">صفحه باید با <b class="ltr">http://localhost</b> یا HTTPS باز شود. فعلاً بارکد را تایپ کنید یا اسکنر بلوتوثی بزنید.</span>');return}
+  try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:db.prefs.cam||'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+   if(!this.host){st.getTracks().forEach(t=>t.stop());return}
+   this.stream=st;const v=this.video;v.srcObject=st;await v.play().catch(()=>{});this.on=true;this.host.classList.add('on');try{localStorage.setItem('anb_camok','1')}catch(e){}
+   try{const tr=st.getVideoTracks()[0],cp=tr.getCapabilities?tr.getCapabilities():{};if(cp.focusMode&&cp.focusMode.includes('continuous'))await tr.applyConstraints({advanced:[{focusMode:'continuous'}]})}catch(e){}
+   this.det=null;if('BarcodeDetector' in window){try{const sup=await BarcodeDetector.getSupportedFormats();const want=['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf','qr_code'].filter(f=>sup.includes(f));if(want.length)this.det=new BarcodeDetector({formats:want})}catch(e){}}
+   this.loop()}
+  catch(e){this.on=false;this.msg((e&&e.name==='NotAllowedError')?'اجازهٔ دوربین داده نشد.<br><span class="xs">روی آیکون قفل کنار آدرس بزن و دوربین را مجاز کن.</span>':'دوربین پیدا یا باز نشد.<br><span class="xs">'+esc(e&&e.name||'')+'</span>')}},
+ stop(){this.on=false;clearTimeout(this.timer);if(this.stream){this.stream.getTracks().forEach(t=>t.stop());this.stream=null}if(this.video)this.video.srcObject=null;if(this.host){this.host.classList.remove('on');const t=this.host.querySelector('.camTorch');if(t)t.classList.remove('on')}this.torch=false},
+ async flip(){db.prefs.cam=db.prefs.cam==='environment'?'user':'environment';save();this.stop();await this.start()},
+ async toggleTorch(){try{const tr=this.stream.getVideoTracks()[0],cp=tr.getCapabilities?tr.getCapabilities():{};if(!cp.torch){toast('این دوربین چراغ ندارد');return}this.torch=!this.torch;await tr.applyConstraints({advanced:[{torch:this.torch}]});this.host.querySelector('.camTorch').classList.toggle('on',this.torch)}catch(e){toast('چراغ روشن نشد')}},
+ flash(ok){if(!this.host)return;const c=this.host;c.classList.remove('ok','bad');void c.offsetWidth;c.classList.add(ok?'ok':'bad');setTimeout(()=>c&&c.classList.remove('bad'),700)},
+ async loop(){if(!this.on)return;this.timer=setTimeout(()=>this.loop(),this.det?100:130);
+  if(this.busy||document.hidden||Cam.paused)return;const v=this.video;if(!v||v.readyState<2)return;this.busy=true;
+  try{let code=null,viaDet=false;
+   if(this.det){try{const r=await this.det.detect(v);if(r.length){code=r[0].rawValue;viaDet=true}}catch(e){this.det=null}}
+   if(!code)code=fallbackDecode(v);
+   this.frames++;const st=this.host&&this.host.querySelector('.camst');if(st)st.textContent='در حال جستجوی بارکد · '+(this.det?'سیستمی+داخلی':'داخلی')+' · '+fa(this.frames%1000);
+   if(code){const now=Date.now(),st=this.seenMap[code]||(this.seenMap[code]={seen:0,armed:true});
+    if(now-st.seen>900)st.armed=true;st.seen=now;
+    const confirmed=viaDet||(this.cand&&this.cand.code===code&&now-this.cand.t<1500);
+    if(confirmed){this.cand=null;if(st.armed){st.armed=false;this.cb&&this.cb(code,'cam')}}else this.cand={code,t:now}}
+  }catch(e){}this.busy=false}};
+document.addEventListener('visibilitychange',()=>{if(document.hidden){Cam.wasOn=Cam.on;if(Cam.on)Cam.stop()}else if(Cam.wasOn&&Cam.host){Cam.wasOn=false;Cam.start()}});
+/* عکس ثابت (فوکوس بهتر از ویدیو) */
+async function decodePhoto(f){let code=null;try{const bmp=await createImageBitmap(f);
+ if('BarcodeDetector' in window){try{const r=await new BarcodeDetector().detect(bmp);if(r.length)code=r[0].rawValue}catch(e){}}
+ for(const mw of [1600,1000,2200]){if(code)break;for(const rot of [0,90,180,270]){
+  const sc=Math.min(1,mw/Math.max(bmp.width,bmp.height)),w=Math.round(bmp.width*sc),h=Math.round(bmp.height*sc),sw=rot%180?h:w,sh=rot%180?w:h;
+  const cv=document.createElement('canvas');cv.width=sw;cv.height=sh;const x=cv.getContext('2d',{willReadFrequently:true});x.translate(sw/2,sh/2);x.rotate(rot*Math.PI/180);x.drawImage(bmp,-w/2,-h/2,w,h);
+  const d=x.getImageData(0,0,sw,sh).data,G=new Uint8Array(sw*sh);for(let i=0,j=0;i<d.length;i+=4,j++)G[j]=(d[i]*77+d[i+1]*150+d[i+2]*29)>>8;
+  code=scanGray(G,sw,sh);if(code)break}}}catch(e){}return code}
+function photoPick(cb){const i=document.createElement('input');i.type='file';i.accept='image/*';i.setAttribute('capture','environment');i.onchange=async()=>{const f=i.files&&i.files[0];if(!f)return;toast('در حال خواندن عکس…');const c=await decodePhoto(f);if(c)cb(c,'photo');else{beep('warn');toast('بارکدی در عکس پیدا نشد؛ نزدیک‌تر و واضح‌تر بگیر')}};i.click()}
+/* اسکنر سخت‌افزاری (بلوتوثی/USB مثل کیبورد) */
+(function(){let buf='',last=0;document.addEventListener('keydown',e=>{
+ const t=e.target;if(t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))return;if(e.ctrlKey||e.metaKey||e.altKey)return;if(document.querySelector('.lock'))return;const now=Date.now();
+ if(e.key==='Enter'){if(buf.length>=4&&window.onCode)window.onCode(buf,'kbd');buf='';return}
+ if(e.key.length===1){if(now-last>80)buf='';buf+=e.key;last=now}})})();
+
+/* ================= UI primitives ================= */
+function syncScroll(){document.body.classList.toggle('noscroll',!!($('#sheetRoot').innerHTML||$('#pickerRoot').innerHTML||document.querySelector('.scanfull')))}
+function sheet(html,cls=''){$('#sheetRoot').innerHTML=`<div class="backdrop" onclick="if(event.target===this)closeSheet()"><div class="sheet ${cls}"><div class="grab"></div>${html}</div></div>`;syncScroll()}
+function closeSheet(){$('#sheetRoot').innerHTML='';syncScroll()}
+function toast(msg,undo){const t=document.createElement('div');t.className='toast';t.innerHTML=`<span>${esc(msg)}</span>${undo?'<button>بازگردانی</button>':''}`;
+ if(undo)t.querySelector('button').onclick=()=>{undo();t.remove()};$('#toasts').appendChild(t);setTimeout(()=>t.classList.add('out'),undo?5200:3500);setTimeout(()=>t.remove(),undo?5700:4000)}
+function confirmBox(msg,ok,fn,danger=true,sub=''){sheet(`<h2>${esc(msg)}</h2>${sub?`<p class="sm muted">${esc(sub)}</p>`:''}<div class="grid2"><button class="btn ${danger?'red':'pri'}" id="cfOk">${esc(ok)}</button><button class="btn" onclick="closeSheet()">انصراف</button></div>`,'cen');$('#cfOk').onclick=()=>{closeSheet();fn()}}
+let AC;function beep(kind){if(db.prefs.sound){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=kind==='warn'?330:880;g.gain.value=.08;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+(kind?.2:.09))}catch(e){}}
+ if(db.prefs.vib&&navigator.vibrate)navigator.vibrate(kind?[60,40,60]:35)}
+function hue(s){let h=0;for(const ch of String(s))h=(h*31+ch.charCodeAt(0))%360;return h}
+function avatar(p,sz){const st=sz?`width:${sz}px;height:${sz}px;border-radius:${Math.round(sz*.3)}px;font-size:${Math.round(sz*.38)}px;`:'';
+ if(p.img)return`<div class="av" style="${st}background-image:url('${p.img}')"></div>`;const h=hue(p.name);
+ return`<div class="av" style="${st}background:linear-gradient(135deg,hsl(${h} 65% 52%),hsl(${(h+40)%360} 65% 44%))">${esc((p.name||'?').trim().charAt(0))}</div>`}
+function emptyBox(e,t,x,b){return`<div class="card empty"><div class="em">${e}</div><div class="b" style="font-size:16px">${t}</div><p class="muted sm" style="margin:6px 0 14px">${x||''}</p>${b||''}</div>`}
+function pickDate(initial,cb){const base=initial||todayISO(),j=toJ(base);let vy=j.jy,vm=j.jm,sel=initial||'';const root=$('#pickerRoot');
+ function draw(){const first=fromJ(vy,vm,1),p=parse(first),off=(new Date(p.y,p.m-1,p.d).getDay()+1)%7,len=jLen(vy,vm),td=todayISO();
+  let cells=['ش','ی','د','س','چ','پ','ج'].map(w=>`<div class="w">${w}</div>`).join('')+'<span></span>'.repeat(off);
+  for(let d=1;d<=len;d++){const iso=fromJ(vy,vm,d),col=(off+d-1)%7;cells+=`<button class="${col===6?'fri':''} ${iso===td?'now':''} ${iso===sel?'sel':''}" onclick="window.__pk('${iso}')">${fa(d)}</button>`}
+  root.innerHTML=`<div class="backdrop top" onclick="if(event.target===this)window.__pc()"><div class="sheet"><div class="grab"></div><div class="cal-head"><button class="ibtn" onclick="window.__pm(1)">${ic('chev')}</button><div class="b" style="font-size:17px">${MONTHS[vm-1]} ${fa(vy)}</div><button class="ibtn" onclick="window.__pm(-1)">${ic('chevr')}</button></div><div class="cal">${cells}</div><div class="grid2" style="margin-top:14px"><button class="btn" onclick="window.__pk('${td}')">امروز</button><button class="btn" onclick="window.__pc()">انصراف</button></div></div></div>`;syncScroll()}
+ window.__pm=d=>{vm+=d;if(vm>12){vm=1;vy++}if(vm<1){vm=12;vy--}draw()};window.__pc=()=>{root.innerHTML='';syncScroll()};window.__pk=iso=>{root.innerHTML='';syncScroll();cb(iso)};draw()}
+const dateBtn=(iso,fn)=>`<button class="datebtn" onclick="${fn}">${ic('cal')}<span>${wday(iso)}، ${dFull(iso)}</span></button>`;
+
+/* انتخاب کالا (جستجو + اسکن) */
+function pickProduct(cb,opt={}){
+ const mine=db.products.slice().sort((a,b)=>(b.hits||0)-(a.hits||0)||a.name.localeCompare(b.name,'fa'));
+ window.__ppcb=id=>{closeSheet();cb(id)};
+ window.__ppq=()=>{const q=normFa($('#ppQ').value),qq=en($('#ppQ').value).trim();let l=mine.filter(p=>!opt.filter||opt.filter(p));
+  if(q)l=l.filter(p=>normFa(p.name).includes(q)||(p.barcode||'').includes(qq)||(p.code||'').toLowerCase().includes(qq.toLowerCase())||(p.alias||[]).some(a=>normFa(a).includes(q)));
+  $('#ppL').innerHTML=l.length?l.slice(0,60).map(p=>`<button class="pick" onclick="__ppcb('${p.id}')">${avatar(p,34)}<span class="sp"><span class="b sm">${esc(p.name)}</span><br><span class="xs muted ltr">${esc(p.barcode||p.code||'')}</span></span><span class="xs muted">${N(ST[p.id].t)} ${esc(p.unit||'')}</span></button>`).join(''):'<div class="muted sm c" style="padding:14px">کالایی پیدا نشد</div>'};
+ sheet(`<h2>انتخاب کالا</h2><div class="row"><div class="search sp">${ic('search')}<input id="ppQ" placeholder="نام، کد یا بارکد…" oninput="__ppq()"></div><button class="btn pri sm" id="ppScan">${ic('bar',18)}</button></div><div class="picklist" id="ppL" style="max-height:48vh"></div>
+ ${can('prod.add')?`<button class="btn blk" onclick="closeSheet();productForm({after:id=>(window.__ppcb2||(()=>{}))(id)})">${ic('plus',18)} کالای جدید</button>`:''}`);
+ window.__ppcb2=id=>cb(id);
+ $('#ppScan').onclick=()=>{closeSheet();openScanner({title:'اسکن کالا',handle:(code,src,ctl)=>{const p=findProduct(code);if(p){ctl.close();cb(p.id)}else{ctl.close();unknownCode(code,{use:cb})}}})};
+ __ppq();setTimeout(()=>{const i=$('#ppQ');i&&i.focus()},250)}
+/* اسکنر تمام‌صفحه برای ثبت سند / شمارش / جستجو */
+let SCN=null;
+function openScanner(o){closeScanner();const prev=window.onCode;const el=document.createElement('div');el.className='scanfull';
+ el.innerHTML=`<div class="sf-top"><button class="ibtn" style="background:rgba(255,255,255,.12);color:#fff;border:0" id="sfX">${ic('x')}</button><div class="sp b">${esc(o.title||'اسکن')}</div><button class="btn sm pri" id="sfDone">${o.doneText||'پایان'}</button></div><div class="cam" id="sfCam"></div>
+ <div class="sf-body"><div class="row" style="gap:8px"><div class="search sp">${ic('bar',18)}<input id="sfMan" class="ltr" inputmode="numeric" placeholder="بارکد را بنویسید…"></div><button class="btn pri sm" id="sfGo">ثبت</button><button class="btn sm" id="sfPh" title="عکس">${ic('cam',18)}</button></div><div id="sfSay" class="hint" style="margin:8px 2px"></div><div id="sfBody"></div></div>`;
+ document.body.appendChild(el);syncScroll();
+ const ctl={el,say(m,k){const s=$('#sfSay');if(s){s.innerHTML=m?`<span class="pill ${k==='bad'?'p-amber':k==='ok'?'p-green':'p-gray'}" style="font-size:12.5px">${esc(m)}</span>`:''}Cam.flash(k!=='bad')},
+  refresh(){const b=$('#sfBody');if(b&&o.body)b.innerHTML=o.body()},close(){closeScanner();if(o.onClose)o.onClose()}};
+ const h=(c,s)=>{c=String(c||'').trim();if(c)o.handle(c,s,ctl)};
+ SCN={ctl,prev};window.onCode=h;Cam.mount($('#sfCam'),h);ctl.refresh();
+ $('#sfX').onclick=$('#sfDone').onclick=()=>ctl.close();
+ const man=()=>{const i=$('#sfMan');const v=en(i.value).trim();if(v){i.value='';h(v,'man')}};
+ $('#sfGo').onclick=man;$('#sfMan').onkeydown=e=>{if(e.key==='Enter')man()};$('#sfPh').onclick=()=>photoPick(h);
+ return ctl}
+function closeScanner(){if(!SCN)return;Cam.unmount();SCN.ctl.el.remove();window.onCode=SCN.prev||defaultCode;SCN=null;syncScroll()}
+
+/* ================= router / layout ================= */
+const NAV=[
+ {id:'dash',t:'داشبورد',i:'grid',ok:()=>can('view')},
+ {id:'products',t:'کالاها',i:'pkg',ok:()=>can('view')},
+ {id:'in',t:'ورود کالا',i:'down',ok:()=>can('in')},
+ {id:'out',t:'خروج کالا',i:'up',ok:()=>canOut()},
+ {id:'stock',t:'موجودی',i:'layers',ok:()=>can('view')},
+ {id:'scan',t:'اسکن سریع',i:'bar',ok:()=>can('scan')||can('scan.sale')},
+ {id:'xfer',t:'انتقال بین انبارها',i:'swap',ok:()=>can('xfer')},
+ {id:'count',t:'انبارگردانی',i:'clip',ok:()=>can('count')},
+ {id:'docs',t:'اسناد و تاریخچه',i:'file',ok:()=>can('view')},
+ {id:'reports',t:'گزارش‌ها',i:'chart',ok:()=>can('reports')},
+ {id:'assistant',t:'دستیار هوشمند',i:'bot',ok:()=>can('assistant')},
+ {id:'users',t:'کاربران و دسترسی',i:'users',ok:()=>can('users')},
+ {id:'settings',t:'تنظیمات',i:'set',ok:()=>can('settings')}
+];
+const VIEWS={};
+let R={id:'dash',p:''};
+function parseHash(){const h=(location.hash||'').replace(/^#\/?/,'').split('/');return{id:h[0]||'dash',p:h.slice(1).join('/')}}
+function go(id,p){const h='#/'+id+(p?'/'+p:'');if(location.hash===h)render();else location.hash=h}
+addEventListener('hashchange',()=>{closeSheet();$('#pickerRoot').innerHTML='';render()});
+function lowCount(){return db.products.filter(p=>{const s=status(p);return s==='low'||s==='out'||s==='neg'}).length}
+function layout(){const items=NAV.filter(n=>n.ok());
+ const low=lowCount();
+ $('#side').innerHTML=`<div class="sb-brand"><div class="logo">${ic('cube',24)}</div><div><b>${esc(db.settings.name)}</b><small>مدیریت هوشمند انبار و موجودی</small></div></div>
+ ${items.map(n=>`<button class="sb-i ${R.id===n.id?'on':''}" onclick="go('${n.id}')">${ic(n.i,19)}<span>${n.t}</span>${n.id==='stock'&&low?`<span class="cnt">${fa(low)}</span>`:''}</button>`).join('')}
+ <div class="sb-foot">${CUR?`<div class="row" style="margin-bottom:8px"><div class="av" style="width:34px;height:34px;border-radius:11px;font-size:14px;background:#2563eb">${esc(CUR.name.charAt(0))}</div><div class="sp"><b style="color:#fff">${esc(CUR.name)}</b><br>${ROLES[CUR.role]}</div><button class="ibtn" style="width:34px;height:34px;background:rgba(255,255,255,.1);color:#fff;border:0" onclick="logout()">${ic('logout',16)}</button></div>`:''}نسخه ${APP_VER} · ${wday(todayISO())} ${dShort(todayISO())}</div>`;
+ const tt=(NAV.find(n=>n.id===R.id)||{}).t||db.settings.name;
+ $('#top').innerHTML=`<div class="logo" onclick="go('dash')">${ic('cube',22)}</div><div class="sp"><h1>${R.id==='dash'?esc(db.settings.name):tt}</h1><small>${wday(todayISO())}، ${dFull(todayISO())}${CUR?' · '+esc(CUR.name):''}</small></div>
+ ${can('assistant')?`<button class="ibtn" onclick="go('assistant')" aria-label="دستیار">${ic('bot')}</button>`:''}<button class="ibtn" onclick="cycleTheme()" id="themeBtn" aria-label="تم">${ic(isDark()?'sun':'moon')}</button>${CUR?`<button class="ibtn" onclick="logout()" aria-label="خروج">${ic('logout')}</button>`:''}`;
+ const tab=(id,i,t)=>{const n=NAV.find(x=>x.id===id);if(n&&!n.ok())return'<span></span>';return`<button class="nb ${R.id===id?'on':''}" onclick="go('${id}')">${ic(i)}<span>${t}</span>${id==='stock'&&low?`<span class="nbdot">${fa(low)}</span>`:''}</button>`};
+ const scanOk=NAV.find(n=>n.id==='scan').ok();
+ $('#bnav').innerHTML=`<div class="nav-in">${tab('dash','grid','داشبورد')}${tab('products','pkg','کالاها')}<div>${scanOk?`<button class="fab ${R.id==='scan'?'on':''}" onclick="go('scan')" aria-label="اسکن">${ic('bar')}</button>`:''}</div>${tab('stock','layers','موجودی')}<button class="nb ${['in','out','xfer','count','docs','reports','assistant','users','settings'].includes(R.id)?'on':''}" onclick="moreSheet()">${ic('more')}<span>بیشتر</span></button></div>`}
+function moreSheet(){const items=NAV.filter(n=>n.ok()&&!['dash','products','stock','scan'].includes(n.id));
+ sheet(`<h2>همهٔ بخش‌ها</h2><div class="moregrid">${items.map(n=>`<button onclick="closeSheet();go('${n.id}')">${ic(n.i,24)}<span>${n.t}</span></button>`).join('')}</div>${CUR?`<button class="btn blk" onclick="closeSheet();logout()">${ic('logout',18)} خروج از حساب (${esc(CUR.name)})</button>`:''}`)}
+function defaultCode(code){/* اسکنر سخت‌افزاری روی هر صفحه */const p=findProduct(code);if(p)productSheet(p.id);else unknownCode(code,{use:pid=>productSheet(pid)})}
+/* بارکد ناشناخته: کالای مشابه، اتصال به کالای موجود، یا کالای جدید */
+let UC=null;
+function unknownCode(code,o){code=cleanCode(code);const k=bkey(code);beep('warn');
+ const near=db.products.filter(p=>{if(!p.barcode)return false;const b=bkey(p.barcode);if(b.length!==k.length)return false;let d=0;for(let i=0;i<b.length&&d<3;i++)if(b[i]!==k[i])d++;return d>0&&d<=2}).slice(0,3);
+ if(!can('prod.add')&&!can('prod.edit')){toast('این بارکد ثبت نشده');return}
+ UC={code,o:o||{}};
+ sheet(`<h2>بارکد ثبت نشده</h2><div class="ltr b" style="font-size:20px;text-align:center;margin:6px 0 10px;letter-spacing:1px">${esc(code)}</div>
+ <p class="sm muted">این کد با هیچ کالایی نمی‌خواند. اگر کالا را قبلاً بدون بارکد ثبت کرده‌ای، به آن وصلش کن.</p>
+ ${near.length?`<div class="sm b" style="margin:8px 0 4px">شاید خوانش اشتباه بوده؟ کالاهای با بارکد نزدیک:</div>`+near.map(p=>`<button class="btn blk" onclick="ucUse('${p.id}')">${esc(p.name)} <span class="ltr xs muted">${esc(p.barcode)}</span></button>`).join(''):''}
+ ${can('prod.edit')?`<button class="btn pri blk" onclick="ucLink()">اتصال به کالای موجود</button>`:''}
+ ${can('prod.add')?`<button class="btn blk" onclick="ucNew()">ثبت کالای جدید با این بارکد</button>`:''}
+ <button class="btn blk" onclick="closeSheet()">انصراف</button>`,'cen')}
+function ucUse(pid){const o=UC&&UC.o;closeSheet();if(o&&o.use)o.use(pid)}
+function ucNew(){const u=UC;closeSheet();setTimeout(()=>productForm({barcode:u.code,after:id=>{if(u.o.use)u.o.use(id)}}),50)}
+function ucLink(){const u=UC;closeSheet();setTimeout(()=>pickProduct(pid=>{const p=PM[pid];if(p.barcode&&!confirm('این کالا بارکد دیگری دارد. جایگزین شود؟'))return;p.barcode=u.code;touch(p);addLog('prod.edit','اتصال بارکد به: '+p.name);save();recalc();toast('✓ بارکد به «'+p.name+'» وصل شد');if(u.o.use)u.o.use(pid)}),50)}
+window.onCode=defaultCode;
+function render(){R=parseHash();const v=VIEWS[R.id]||VIEWS.dash;
+ if(!NAV.find(n=>n.id===R.id)||!NAV.find(n=>n.id===R.id).ok()){if(R.id!=='dash'){location.replace('#/dash');return}}
+ Cam.unmount();window.onCode=defaultCode;
+ layout();const el=$('#view');el.classList.remove('view');void el.offsetWidth;el.classList.add('view');
+ el.innerHTML=v.html(R.p);if(v.after)v.after(R.p);window.scrollTo({top:0})}
+const rerender=()=>{const y=window.scrollY;const v=VIEWS[R.id]||VIEWS.dash;layout();$('#view').innerHTML=v.html(R.p);if(v.after)v.after(R.p);window.scrollTo({top:y})};
+function applyTheme(){const t=db.prefs.theme,dark=t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=dark?'dark':'light';document.querySelector('meta[name=theme-color]').content=dark?'#07101e':'#1d4ed8'}
+function cycleTheme(){db.prefs.theme=isDark()?'light':'dark';save();applyTheme();layout()}
+
+/* ================= products ================= */
+const PS={q:'',cat:'all',st:'all'};
+function stockBoxes(p,max=3){const s=ST[p.id],st=status(p);
+ const per=db.wh.length<=max?db.wh.map(w=>{const v=s.w[w.id]||0;return`<span class="sbox ${v<0?'neg':v===0?'zero':''}"><small>${esc(w.name)}</small><b>${N(v)}</b></span>`}).join(''):'';
+ return`<div class="stk">${db.wh.length>1&&per?per:`<span class="sbox ${st==='low'?'low':st==='neg'?'neg':s.t===0?'zero':''}"><small>موجودی</small><b>${N(s.t)}</b></span>`}</div>`}
+VIEWS.products={html(){
+ const cats=db.cats.slice().sort((a,b)=>a.name.localeCompare(b.name,'fa'));
+ const F=[['all','همه'],['low','کم‌موجودی'],['out','تمام‌شده'],['neg','منفی'],['nobc','بدون بارکد']];
+ return`<div class="row" style="margin-bottom:10px"><div class="search sp">${ic('search')}<input id="pQ" placeholder="جستجوی نام، کد یا بارکد…" value="${esc(PS.q)}" oninput="PS.q=this.value;renderProdList()"></div>
+ <button class="btn sm" onclick="scanFind()" aria-label="اسکن" style="padding:12px 13px">${ic('bar',19)}</button>${can('prod.add')?`<button class="btn pri" onclick="productForm({})" style="padding:12px 14px">${ic('plus')}</button>`:''}</div>
+ ${cats.length?`<div class="chips"><button class="chip ${PS.cat==='all'?'on':''}" onclick="PS.cat='all';rerender()">همهٔ دسته‌ها</button>${cats.map(c=>`<button class="chip ${PS.cat===c.id?'on':''}" onclick="PS.cat='${c.id}';rerender()">${esc(c.name)}</button>`).join('')}</div>`:''}
+ <div class="chips">${F.map(f=>`<button class="chip ${PS.st===f[0]?'on':''}" onclick="PS.st='${f[0]}';rerender()">${f[1]}</button>`).join('')}</div><div id="prodList"></div>`},
+ after(){renderProdList()}};
+function scanFind(){openScanner({title:'اسکن برای پیدا کردن کالا',handle:(code,src,ctl)=>{const p=findProduct(code);ctl.close();if(p)productSheet(p.id);else unknownCode(code,{use:pid=>productSheet(pid)})}})}
+function renderProdList(){const box=$('#prodList');if(!box)return;
+ const q=normFa(PS.q),qq=en(PS.q).trim().toLowerCase();
+ let l=db.products.filter(p=>{if(q&&!normFa(p.name).includes(q)&&!(p.barcode||'').includes(qq)&&!(p.code||'').toLowerCase().includes(qq)&&!normFa(p.brand||'').includes(q)&&!(p.alias||[]).some(a=>normFa(a).includes(q)))return false;
+  if(PS.cat!=='all'&&p.cat!==PS.cat)return false;const f=status(p);
+  return PS.st==='all'||(PS.st==='low'&&f==='low')||(PS.st==='out'&&f==='out')||(PS.st==='neg'&&f==='neg')||(PS.st==='nobc'&&!p.barcode)});
+ const rank={neg:0,out:1,low:2,ok:3};l.sort((a,b)=>PS.st==='all'?a.name.localeCompare(b.name,'fa'):rank[status(a)]-rank[status(b)]||a.name.localeCompare(b.name,'fa'));
+ if(!l.length){box.innerHTML=db.products.length?emptyBox('🔍','موردی پیدا نشد','فیلتر یا جستجو را عوض کن.'):emptyBox('📦','هنوز کالایی ثبت نشده','کالا را با دکمهٔ + اضافه کن یا مستقیم بارکدش را اسکن کن.',`<div class="grid2">${can('prod.add')?`<button class="btn pri" onclick="productForm({})">${ic('plus')} کالای جدید</button>`:''}${can('settings')?`<button class="btn" onclick="loadSample()">داده نمونه</button>`:''}</div>`);return}
+ box.innerHTML=`<div class="pgrid" style="margin-top:2px">${l.slice(0,300).map(p=>{const st=status(p);
+  return`<div class="item" onclick="productSheet('${p.id}')">${avatar(p)}<div class="sp"><div class="b ellip">${esc(p.name)}</div><div class="xs muted ellip">${esc(p.code||'')}${p.cat&&catName(p.cat)?' · '+esc(catName(p.cat)):''}${p.brand?' · '+esc(p.brand):''}</div><div style="margin-top:2px">${STAT_PILL[st]}${p.min>0?`<span class="xs muted"> حداقل ${N(p.min)}</span>`:''}</div></div>${stockBoxes(p)}</div>`}).join('')}</div>${l.length>300?`<div class="hint c">۳۰۰ مورد اول نشان داده شد؛ جستجو کنید.</div>`:''}`}
+
+/* ---- product sheet ---- */
+function productSheet(id){const p=PM[id];if(!p)return;const s=ST[id],st=status(p);
+ const hist=db.moves.filter(m=>m.pid===id).sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts).slice(0,8);
+ const days=14,t=todayISO(),outs=Array.from({length:days},(_,i)=>{const d=addDays(t,-(days-1-i));return sum(db.moves.filter(m=>m.pid===id&&m.type==='out'&&m.date===d),m=>m.qty)});
+ sheet(`<div class="row" style="margin-bottom:12px">${avatar(p,54)}<div class="sp"><div class="b" style="font-size:17px">${esc(p.name)}</div><div class="xs muted">${esc(p.code||'')}${p.cat&&catName(p.cat)?' · '+esc(catName(p.cat)):''}${p.brand?' · '+esc(p.brand):''}</div><div class="xs muted ltr" style="text-align:right">${esc(p.barcode||'بدون بارکد')}</div></div>${STAT_PILL[st]}</div>
+ <div class="stat2"><div class="card"><div class="xs muted">موجودی کل</div><div class="big ${s.t<0?'red':st==='low'?'amber':''}">${N(s.t)}</div><div class="xs muted">${esc(p.unit||'')}${p.min>0?' · حداقل '+N(p.min):''}</div></div>
+ <div class="card" style="padding:8px 10px">${db.wh.map(w=>`<div class="row2 row" style="justify-content:space-between;padding:3px 0"><span class="xs muted">${esc(w.name)}</span><b class="${(s.w[w.id]||0)<0?'red':''}">${N(s.w[w.id]||0)}</b></div>`).join('')}</div></div>
+ <div class="grid3" style="margin-top:10px"><div class="card c" style="padding:10px"><div class="xs muted">آخرین ورود</div><div class="sm b">${s.lastIn?dShort(s.lastIn):'—'}</div></div><div class="card c" style="padding:10px"><div class="xs muted">آخرین خروج</div><div class="sm b">${s.lastOut?dShort(s.lastOut):'—'}</div></div><div class="card c" style="padding:10px"><div class="xs muted">خروج ۳۰ روز</div><div class="sm b">${N(s.out30)}</div></div></div>
+ ${p.loc||p.desc?`<div class="card sm" style="margin-top:10px">${p.loc?`<div><b>محل نگهداری:</b> ${esc(p.loc)}</div>`:''}${p.desc?`<div class="muted">${esc(p.desc)}</div>`:''}</div>`:''}
+ <div class="chips" style="margin-top:10px">${can('in')?`<button class="chip" onclick="closeSheet();docNew('in',{pid:'${id}'})">${ic('down',15)} ورود</button>`:''}${canOut()?`<button class="chip" onclick="closeSheet();docNew('out',{pid:'${id}'})">${ic('up',15)} خروج</button>`:''}${can('xfer')?`<button class="chip" onclick="closeSheet();docNew('xfer',{pid:'${id}'})">${ic('swap',15)} انتقال</button>`:''}${can('count')?`<button class="chip" onclick="closeSheet();quickCount('${id}')">${ic('clip',15)} شمارش</button>`:''}</div>
+ ${canEAN(p.barcode||'')?`<div class="bcbox">${eanSVG(p.barcode,{h:56})}</div>`:''}
+ <div class="grid3" style="margin-top:6px">${can('prod.edit')?`<button class="btn sm" onclick="closeSheet();productForm({id:'${id}'})">${ic('edit',16)} ویرایش</button>`:'<span></span>'}<button class="btn sm" ${canEAN(p.barcode||'')?'':'disabled'} onclick="printLabel('${id}')">${ic('print',16)} برچسب</button>${can('prod.del')?`<button class="btn sm" style="color:var(--red)" onclick="askDelProduct('${id}')">${ic('trash',16)} حذف</button>`:'<span></span>'}</div>
+ <div class="sect" style="margin:14px 4px 8px"><h3>آخرین حرکت‌ها</h3></div>${hist.length?hist.map(m=>mvRow(m,true)).join(''):'<div class="muted sm c">حرکتی ثبت نشده</div>'}`)}
+function askDelProduct(id){const p=PM[id],n=db.moves.filter(m=>m.pid===id).length;confirmBox(`«${p.name}» و ${fa(n)} حرکتش حذف شود؟`,'حذف',()=>{const o=delProduct(id);closeSheet();rerender();toast('کالا حذف شد',()=>{restoreProduct(o);rerender()})})}
+function printLabel(id){const p=PM[id];const html=`<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>برچسب</title><style>body{font-family:Tahoma,sans-serif;margin:0;padding:16px;text-align:center}.l{display:inline-block;border:1px dashed #999;padding:10px 14px;margin:6px;width:240px}.n{font-weight:700;font-size:14px;margin-bottom:6px}svg{width:100%;height:auto}</style></head><body>${Array(12).fill(`<div class="l"><div class="n">${esc(p.name)}</div>${eanSVG(p.barcode,{h:60})}</div>`).join('')}</body></html>`;
+ const f=document.createElement('iframe');f.style.cssText='position:fixed;right:-9999px;width:0;height:0';document.body.appendChild(f);f.contentDocument.open();f.contentDocument.write(html);f.contentDocument.close();setTimeout(()=>{f.contentWindow.focus();f.contentWindow.print();setTimeout(()=>f.remove(),3000)},300)}
+
+/* ---- image helper ---- */
+function imgResize(file,max=160){return new Promise((ok,no)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const sc=Math.min(1,max/Math.max(im.width,im.height)),w=Math.round(im.width*sc),h=Math.round(im.height*sc),cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);ok(cv.toDataURL('image/jpeg',.7))};im.onerror=no;im.src=fr.result};fr.onerror=no;fr.readAsDataURL(file)})}
+
+/* ---- product form ---- */
+let PF={};
+function productForm(o){
+ const ex=o.id?PM[o.id]:null;
+ PF={id:o.id||null,name:'',code:'',barcode:'',cat:'',brand:'',unit:'عدد',min:'',loc:'',desc:'',img:'',init:{},after:o.after,...(ex?{name:ex.name,code:ex.code||'',barcode:ex.barcode||'',cat:ex.cat||'',brand:ex.brand||'',unit:ex.unit||'عدد',min:ex.min||'',loc:ex.loc||'',desc:ex.desc||'',img:ex.img||''}:{}),...(o.keep||{}),...(o.barcode?{barcode:o.barcode}:{}),...(o.name?{name:o.name}:{})};
+ drawProductForm()}
+function drawProductForm(){const edit=!!PF.id;
+ const units=UNITS.includes(PF.unit)?UNITS:[...UNITS,PF.unit];
+ sheet(`<h2>${edit?'✏️ ویرایش کالا':'🆕 کالای جدید'}</h2>
+ <div class="row" style="margin-bottom:12px;align-items:flex-start"><div id="pfImg" style="flex-shrink:0">${PF.img?`<div class="av" style="width:74px;height:74px;border-radius:18px;background-image:url('${PF.img}')"></div>`:`<div class="av" style="width:74px;height:74px;border-radius:18px;background:var(--surface2);color:var(--muted)">${ic('image',28)}</div>`}</div>
+  <div class="sp"><div class="row wrap" style="gap:8px"><button class="btn sm" onclick="pfPhoto()">${ic('cam',16)} عکس کالا</button>${PF.img?`<button class="btn sm" style="color:var(--red)" onclick="pfRead();PF.img='';drawProductForm()">حذف عکس</button>`:''}</div><div class="hint">عکس اختیاری است و کوچک ذخیره می‌شود.</div></div></div>
+ <div class="fld"><label>نام کالا *</label><input id="pfName" class="inp" value="${esc(PF.name)}" placeholder="مثلاً کابل شارژر تایپ‌سی"></div>
+ <div class="grid2"><div class="fld"><label>کد کالا</label><input id="pfCode" class="inp ltr" value="${esc(PF.code)}" placeholder="خودکار"></div>
+ <div class="fld"><label>برند</label><input id="pfBrand" class="inp" value="${esc(PF.brand)}"></div></div>
+ <div class="fld"><label>بارکد</label><div class="row"><input id="pfBar" class="inp ltr sp" inputmode="numeric" value="${esc(PF.barcode)}" placeholder="اسکن کن یا بنویس"><button class="btn sm" onclick="pfScan()">${ic('cam',16)} اسکن</button></div>
+ <div style="margin-top:6px"><button class="btn sm" onclick="pfRead();PF.barcode=makeInternal();drawProductForm()">ساخت بارکد داخلی (کالای بدون بارکد)</button></div></div>
+ <div class="grid2"><div class="fld"><label>دستهٔ کالا</label><select id="pfCat" class="inp" onchange="pfCatCh()"><option value="">— بدون دسته —</option>${db.cats.map(c=>`<option value="${c.id}" ${PF.cat===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}<option value="__new">➕ دستهٔ جدید…</option></select><input id="pfNewCat" class="inp" style="display:none;margin-top:6px" placeholder="نام دستهٔ جدید"></div>
+ <div class="fld"><label>واحد شمارش</label><select id="pfUnit" class="inp">${units.map(u=>`<option ${PF.unit===u?'selected':''}>${esc(u)}</option>`).join('')}</select></div></div>
+ <div class="grid2"><div class="fld"><label>حداقل موجودی (هشدار)</label><input id="pfMin" class="inp ltr" inputmode="decimal" value="${PF.min||''}" placeholder="اختیاری"></div>
+ <div class="fld"><label>محل نگهداری</label><input id="pfLoc" class="inp" value="${esc(PF.loc)}" placeholder="قفسه / راهرو"></div></div>
+ <div class="fld"><label>توضیحات</label><textarea id="pfDesc" class="inp" placeholder="مشخصات کامل کالا">${esc(PF.desc)}</textarea></div>
+ ${edit?'':`<div class="fld"><label>موجودی اولیه (اختیاری)</label>${db.wh.map(w=>`<div class="row" style="margin-bottom:6px"><span class="sm sp">${esc(w.name)}</span><input class="inp ltr pfInit" data-w="${w.id}" inputmode="decimal" style="width:110px" value="${PF.init[w.id]||''}" placeholder="۰"></div>`).join('')}</div>`}
+ <div class="grid2"><button class="btn pri" onclick="pfSave()">${ic('check')} ذخیره</button><button class="btn" onclick="closeSheet()">انصراف</button></div>`);
+ setTimeout(()=>{const n=$('#pfName');if(n&&!PF.name)n.focus()},250)}
+function pfCatCh(){$('#pfNewCat').style.display=$('#pfCat').value==='__new'?'':'none'}
+function pfRead(){PF.name=$('#pfName').value.trim();PF.code=$('#pfCode').value.trim();PF.brand=$('#pfBrand').value.trim();PF.barcode=en($('#pfBar').value).trim();PF.cat=$('#pfCat').value;PF.unit=$('#pfUnit').value;PF.min=$('#pfMin').value;PF.loc=$('#pfLoc').value.trim();PF.desc=$('#pfDesc').value.trim();PF.newCat=($('#pfNewCat')||{}).value||'';
+ PF.init={};document.querySelectorAll('.pfInit').forEach(i=>{if(i.value)PF.init[i.dataset.w]=i.value})}
+function pfPhoto(){pfRead();const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=async()=>{const f=i.files&&i.files[0];if(!f)return;try{PF.img=await imgResize(f)}catch(e){toast('عکس خوانده نشد')}drawProductForm()};i.click()}
+function pfScan(){pfRead();const keep={...PF};closeSheet();openScanner({title:'اسکن بارکد کالا',handle:(code,src,ctl)=>{keep.barcode=code;ctl.close();beep();productForm({id:keep.id,keep})}})}
+function pfSave(){pfRead();if(!PF.name){$('#pfName').focus();return toast('نام کالا را بنویس')}
+ PF.barcode=cleanCode(PF.barcode);const dup=PF.barcode&&BM[bkey(PF.barcode)];if(dup&&dup!==PF.id)return toast('این بارکد برای «'+PM[dup].name+'» ثبت شده');
+ if(PF.code){const d2=db.products.find(p=>p.id!==PF.id&&(p.code||'').toLowerCase()===PF.code.toLowerCase());if(d2)return toast('این کد برای «'+d2.name+'» ثبت شده')}
+ let cat=PF.cat;if(cat==='__new'){const nm=PF.newCat.trim();if(nm){let c=db.cats.find(x=>x.name===nm);if(!c){c=touch({id:uid(),name:nm});db.cats.push(c)}cat=c.id}else cat=''}
+ const min=numv(PF.min),data={name:PF.name,code:PF.code||(PF.id?(PM[PF.id].code||nextCode()):nextCode()),barcode:PF.barcode,cat,brand:PF.brand,unit:PF.unit,min:min>0?min:0,loc:PF.loc,desc:PF.desc,img:PF.img};
+ let id=PF.id;
+ if(id){Object.assign(PM[id],data);touch(PM[id]);addLog('prod.edit','ویرایش کالا: '+data.name)}
+ else{const p=touch({id:uid(),created:Date.now(),alias:[],hits:0,...data});db.products.push(p);id=p.id;recalc();addLog('prod.add','کالای جدید: '+p.name);
+  for(const w of db.wh){const q=numv(PF.init[w.id]);if(q>0)commitDoc({type:'in',wh:w.id,date:todayISO(),reason:'other',note:'موجودی اولیه',lines:[{pid:id,qty:q}]})}}
+ save();recalc();closeSheet();const af=PF.after;if(R.id!=='scan')rerender();toast('✓ کالا ذخیره شد');if(af)af(id)}
+
+/* ================= documents: in / out / transfer ================= */
+let DOC=null;
+const DOC_META={in:{t:'ورود کالا',ic:'down',col:'green',btn:'grn',go:'ثبت سند ورود'},out:{t:'خروج کالا',ic:'up',col:'red',btn:'red',go:'ثبت سند خروج'},xfer:{t:'انتقال بین انبارها',ic:'swap',col:'blue',btn:'pri',go:'ثبت انتقال'}};
+function newDoc(type){const w=db.wh.map(x=>x.id),def=w.includes(db.prefs.defWh)?db.prefs.defWh:w[0];
+ const from=type==='out'&&w.includes(db.prefs.saleWh)?db.prefs.saleWh:def;
+ return{type,wh:from,to:w.find(x=>x!==from)||from,date:todayISO(),party:'',inv:'',reason:type==='in'?'buy':type==='out'?'sale':'',note:'',lines:[]}}
+function docNew(type,o={}){DOC=newDoc(type);if(o.pid)DOC.lines.push({pid:o.pid,qty:o.qty||1});go(type)}
+function docAdd(pid,q=1){const l=DOC.lines.find(x=>x.pid===pid);if(l)l.qty=Math.round((l.qty+q)*1000)/1000;else DOC.lines.push({pid,qty:q});return l?l.qty:q}
+const docHtmlFor=type=>()=>{if(!DOC||DOC.type!==type)DOC=newDoc(type);return docHtml()};
+VIEWS.in={html:docHtmlFor('in'),after:docAfter};VIEWS.out={html:docHtmlFor('out'),after:docAfter};VIEWS.xfer={html:docHtmlFor('xfer'),after:docAfter};
+function suppliers(){const s=new Set();db.moves.forEach(m=>{if(m.type==='in'&&m.party)s.add(m.party)});return[...s].slice(0,60)}
+function recipients(){const s=new Set();db.moves.forEach(m=>{if(m.type==='out'&&m.party)s.add(m.party)});return[...s].slice(0,60)}
+function docHtml(){const t=DOC.type,M=DOC_META[t],whOpts=(sel,ex)=>db.wh.filter(w=>w.id!==ex).map(w=>`<option value="${w.id}" ${sel===w.id?'selected':''}>${esc(w.name)}</option>`).join('');
+ const sellerOnly=!can('out')&&t==='out';
+ return`<div class="card"><div class="row" style="margin-bottom:12px"><div class="tic t-${t}" style="width:44px;height:44px;border-radius:14px">${ic(M.ic,22)}</div><div class="sp"><div class="b" style="font-size:16px">${M.t}</div><div class="xs muted">سند ${M.t.split(' ')[0]} شمارهٔ ${fa(db.seq[t]+1)}</div></div></div>
+ <div class="dochead">
+ ${t==='xfer'?`<div class="fld"><label>از انبار</label><select class="inp" onchange="DOC.wh=this.value;if(DOC.to===DOC.wh)DOC.to=db.wh.find(w=>w.id!==DOC.wh).id;rerender()">${whOpts(DOC.wh)}</select></div><div class="fld"><label>به انبار</label><select class="inp" onchange="DOC.to=this.value;rerender()">${whOpts(DOC.to,DOC.wh)}</select></div>`
+ :`<div class="fld"><label>${t==='in'?'انبار مقصد':'انبار مبدأ'}</label><select class="inp" onchange="DOC.wh=this.value;rerender()">${whOpts(DOC.wh)}</select></div>`}
+ <div class="fld"><label>تاریخ</label>${dateBtn(DOC.date,"pickDate(DOC.date,v=>{DOC.date=v;rerender()})")}</div>
+ ${t==='in'?`<div class="fld"><label>تأمین‌کننده</label><input class="inp" list="dlSup" value="${esc(DOC.party)}" oninput="DOC.party=this.value" placeholder="نام تأمین‌کننده"><datalist id="dlSup">${suppliers().map(s=>`<option value="${esc(s)}">`).join('')}</datalist></div>
+ <div class="fld"><label>شمارهٔ فاکتور</label><input class="inp ltr" value="${esc(DOC.inv)}" oninput="DOC.inv=this.value"></div>
+ <div class="fld"><label>علت ورود</label><select class="inp" onchange="DOC.reason=this.value">${Object.entries(R_IN).map(([k,v])=>`<option value="${k}" ${DOC.reason===k?'selected':''}>${v}</option>`).join('')}</select></div>`:''}
+ ${t==='out'?`<div class="fld"><label>علت خروج</label><select class="inp" ${sellerOnly?'disabled':''} onchange="DOC.reason=this.value">${Object.entries(R_OUT).map(([k,v])=>`<option value="${k}" ${DOC.reason===k?'selected':''}>${v}</option>`).join('')}</select></div>
+ <div class="fld"><label>تحویل‌گیرنده / مشتری</label><input class="inp" list="dlRec" value="${esc(DOC.party)}" oninput="DOC.party=this.value" placeholder="اختیاری"><datalist id="dlRec">${recipients().map(s=>`<option value="${esc(s)}">`).join('')}</datalist></div>
+ <div class="fld"><label>شمارهٔ حواله / فاکتور</label><input class="inp ltr" value="${esc(DOC.inv)}" oninput="DOC.inv=this.value"></div>`:''}
+ </div><div class="fld"><label>یادداشت</label><input class="inp" value="${esc(DOC.note)}" oninput="DOC.note=this.value" placeholder="اختیاری"></div></div>
+ <div class="sect"><h3>اقلام سند <span class="muted xs" id="docSum"></span></h3><div class="row" style="gap:8px"><button class="btn sm" onclick="docPick()">${ic('plus',16)} افزودن</button><button class="btn sm pri" onclick="docScan()">${ic('bar',16)} اسکن</button></div></div>
+ <div id="docLines"></div>
+ <div class="sticky-act"><button class="btn ${M.btn} blk" style="margin:0;padding:15px" onclick="docSubmit()">${ic('check',20)} ${M.go}</button></div>`}
+function docAfter(){drawDocLines();window.onCode=(code)=>docCode(code)}
+function docCode(code,ctl){const p=findProduct(code);if(!p){if(ctl)ctl.close();unknownCode(code,{use:pid=>{docAdd(pid,1);drawDocLines()}});return}
+ const q=docAdd(p.id,1);beep();if(ctl){ctl.say(p.name+' ← '+N(q),'ok');ctl.refresh()}else{drawDocLines();toast('+ '+p.name)}}
+function docPick(){pickProduct(id=>{docAdd(id,1);drawDocLines()})}
+function docScan(){openScanner({title:DOC_META[DOC.type].t+' — اسکن اقلام',doneText:'پایان',handle:(c,s,ctl)=>docCode(c,ctl),body:()=>DOC.lines.length?DOC.lines.slice().reverse().map(l=>`<div class="ln"><span class="sp b sm">${esc(PM[l.pid].name)}</span><b>${N(l.qty)}</b></div>`).join(''):'<div class="muted sm c">هنوز کالایی اسکن نشده</div>',onClose:()=>{window.onCode=docCode;drawDocLines()}})}
+function drawDocLines(){const box=$('#docLines');if(!box||!DOC)return;const t=DOC.type,src=DOC.wh;
+ DOC.lines=DOC.lines.filter(l=>PM[l.pid]);
+ box.innerHTML=DOC.lines.length?DOC.lines.map((l,i)=>{const p=PM[l.pid],have=stockAt(p.id,src),bad=(t==='out'||t==='xfer')&&l.qty>have+1e-9;
+  return`<div class="ln ${bad?'warn':''}">${avatar(p,40)}<div class="sp"><div class="b sm ellip">${esc(p.name)}</div><div class="xs ${bad?'red':'muted'}">${t==='in'?'موجودی فعلی':'موجودی '+esc(whName(src))}: ${N(have)} ${esc(p.unit||'')}${bad?' — کمبود':''}</div></div>
+  <div class="stepper"><button onclick="docQty(${i},-1)">−</button><input class="inp" inputmode="decimal" value="${l.qty}" onchange="docQtySet(${i},this.value)"><button onclick="docQty(${i},1)">+</button></div><button class="ibtn" style="width:36px;height:36px;border-radius:11px;color:var(--red)" onclick="DOC.lines.splice(${i},1);drawDocLines()">${ic('x',16)}</button></div>`}).join(''):`<div class="card empty" style="padding:22px"><div class="muted sm">کالا را با «افزودن» یا «اسکن» وارد کن.<br>اسکنر بلوتوثی هم کار می‌کند: بارکد را بزن، خودکار اضافه می‌شود.</div></div>`;
+ const s=$('#docSum');if(s)s.textContent=DOC.lines.length?`· ${fa(DOC.lines.length)} قلم، جمع ${N(sum(DOC.lines,l=>l.qty))}`:''}
+function docQty(i,d){const l=DOC.lines[i];l.qty=Math.max(1,Math.round((l.qty+d)*1000)/1000);drawDocLines()}
+function docQtySet(i,v){const x=numv(v);DOC.lines[i].qty=x>0?x:1;drawDocLines()}
+function docSubmit(){if(!DOC.lines.length)return toast('اول کالا اضافه کن');
+ const t=DOC.type;if(t==='xfer'&&DOC.wh===DOC.to)return toast('مبدأ و مقصد باید فرق کنند');
+ if(t==='out'&&!can('out'))DOC.reason='sale';
+ const short=(t==='out'||t==='xfer')?DOC.lines.filter(l=>l.qty>stockAt(l.pid,DOC.wh)+1e-9):[];
+ const go=()=>{const lines=DOC.lines.map(l=>({...l})),d={...DOC,lines};const r=commitDoc(d);if(!r)return toast('چیزی ثبت نشد');
+  DOC=newDoc(t);beep();rerender();toast('✓ '+DOC_META[t].t+' ثبت شد (سند '+fa(r.no)+')',()=>{delMoves(r.moves.map(m=>m.id));rerender()})};
+ if(short.length)confirmBox(`موجودی ${fa(short.length)} قلم کافی نیست`,'با موجودی منفی ثبت شود',go,true,short.map(l=>PM[l.pid].name).slice(0,4).join('، ')+(short.length>4?' و …':''));
+ else go()}
+
+/* ---- movement rows + document sheet ---- */
+function mvLabel(m){return m.type==='xfer'?`${whName(m.wh)} ← ${whName(m.to)}`:whName(m.wh)}
+function mvRow(m,showDate){const p=PM[m.pid];if(!p)return'';
+ const sign=m.type==='in'?'+':m.type==='xfer'?'':m.type==='adj'?(m.delta>=0?'+':'−'):'−',qv=m.type==='adj'?Math.abs(m.delta):m.qty,col=m.type==='in'||(m.type==='adj'&&m.delta>=0)?'green':m.type==='out'||m.type==='adj'?'red':'blue';
+ return`<div class="mv" onclick="docSheet('${m.doc}')"><div class="tic t-${m.type}">${ic(T_IC[m.type],18)}</div><div class="sp"><div class="b sm ellip">${esc(p.name)}</div><div class="xs muted ellip">${T_NAME[m.type]}${m.no?' #'+fa(m.no):''} · ${esc(mvLabel(m))}${showDate?' · '+dShort(m.date):''} · ${hhmm(m.ts)}${m.party?' · '+esc(m.party):''}</div></div><div class="b ${col}" style="font-size:16px">${sign}${N(qv)}</div></div>`}
+function docSheet(id){const ms=db.moves.filter(m=>m.doc===id&&PM[m.pid]);if(!ms.length)return;const m0=ms[0],t=m0.type;
+ const rs=(t==='in'?R_IN:R_OUT)[m0.reason]||(t==='adj'?'انبارگردانی':'');
+ sheet(`<div class="row" style="margin-bottom:10px"><div class="tic t-${t}" style="width:44px;height:44px">${ic(T_IC[t],22)}</div><div class="sp"><div class="b" style="font-size:17px">${T_NAME[t]}${m0.no?' شمارهٔ '+fa(m0.no):''}</div><div class="xs muted">${wday(m0.date)}، ${dFull(m0.date)} · ${hhmm(m0.ts)}</div></div></div>
+ <div class="card sm"><div class="row2 row" style="justify-content:space-between"><span class="muted">${t==='xfer'?'مسیر':'انبار'}</span><b>${esc(mvLabel(m0))}</b></div>
+ ${rs?`<div class="row2 row" style="justify-content:space-between"><span class="muted">علت</span><b>${esc(rs)}</b></div>`:''}
+ ${m0.party?`<div class="row2 row" style="justify-content:space-between"><span class="muted">${t==='in'?'تأمین‌کننده':'تحویل‌گیرنده'}</span><b>${esc(m0.party)}</b></div>`:''}
+ ${m0.inv?`<div class="row2 row" style="justify-content:space-between"><span class="muted">شمارهٔ فاکتور/حواله</span><b class="ltr">${esc(m0.inv)}</b></div>`:''}
+ ${m0.user?`<div class="row2 row" style="justify-content:space-between"><span class="muted">ثبت‌کننده</span><b>${esc(m0.user)}</b></div>`:''}
+ ${m0.note?`<div class="row2 row" style="justify-content:space-between"><span class="muted">یادداشت</span><b>${esc(m0.note)}</b></div>`:''}</div>
+ <div class="tw" style="margin-top:10px"><table class="tbl" style="min-width:0"><tr><th>کالا</th><th class="n">${t==='adj'?'سیستم':'تعداد'}</th>${t==='adj'?'<th class="n">شمارش</th><th class="n">اختلاف</th>':''}</tr>${ms.map(m=>`<tr class="clk" onclick="closeSheet();productSheet('${m.pid}')"><td>${esc(PM[m.pid].name)}</td><td class="n">${t==='adj'?N(m.sys??'')+'':N(m.qty)}</td>${t==='adj'?`<td class="n">${N(m.counted)}</td><td class="n ${m.delta>=0?'pos':'neg'}">${m.delta>0?'+':''}${N(m.delta)}</td>`:''}</tr>`).join('')}</table></div>
+ <div class="grid2" style="margin-top:12px"><button class="btn" onclick="printDoc('${id}')">${ic('print',18)} چاپ</button>${can('move.del')?`<button class="btn" style="color:var(--red)" onclick="askDelDoc('${id}')">${ic('trash',18)} حذف سند</button>`:'<span></span>'}</div>`)}
+function askDelDoc(id){const n=db.moves.filter(m=>m.doc===id).length;confirmBox(`این سند (${fa(n)} قلم) حذف شود؟`,'حذف',()=>{const g=delMoves(db.moves.filter(m=>m.doc===id).map(m=>m.id));addLog('doc.del','حذف سند ('+fa(g.length)+' قلم)');closeSheet();rerender();toast('سند حذف شد',()=>{restoreMoves(g);rerender()})},true,'موجودی‌ها دوباره محاسبه می‌شوند.')}
+function printDoc(id){const ms=db.moves.filter(m=>m.doc===id&&PM[m.pid]),m0=ms[0],t=m0.type;
+ const html=`<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>سند</title><style>body{font-family:Tahoma,sans-serif;padding:24px}table{width:100%;border-collapse:collapse;margin-top:14px}td,th{border:1px solid #999;padding:6px 10px;text-align:right}h2{margin:0}p{margin:4px 0;color:#333}</style></head><body><h2>${esc(db.settings.name)} — سند ${T_NAME[t]}${m0.no?' شمارهٔ '+fa(m0.no):''}</h2><p>تاریخ: ${dFull(m0.date)} · ${esc(mvLabel(m0))}</p>${m0.party?`<p>${t==='in'?'تأمین‌کننده':'تحویل‌گیرنده'}: ${esc(m0.party)}</p>`:''}${m0.inv?`<p>شمارهٔ: ${esc(m0.inv)}</p>`:''}<table><tr><th>#</th><th>کالا</th><th>کد</th><th>تعداد</th></tr>${ms.map((m,i)=>`<tr><td>${fa(i+1)}</td><td>${esc(PM[m.pid].name)}</td><td>${esc(PM[m.pid].code||'')}</td><td>${N(t==='adj'?m.delta:m.qty)}</td></tr>`).join('')}</table><p style="margin-top:40px">امضا: ____________</p></body></html>`;
+ const f=document.createElement('iframe');f.style.cssText='position:fixed;right:-9999px;width:0;height:0';document.body.appendChild(f);f.contentDocument.open();f.contentDocument.write(html);f.contentDocument.close();setTimeout(()=>{f.contentWindow.focus();f.contentWindow.print();setTimeout(()=>f.remove(),3000)},300)}
+
+/* ---- documents history ---- */
+const HS={type:'all',q:'',limit:40};
+function groupDocs(list){const g=new Map();for(const m of list){let d=g.get(m.doc);if(!d){d={doc:m.doc,type:m.type,no:m.no,date:m.date,ts:m.ts,party:m.party,inv:m.inv,wh:m.wh,to:m.to,items:[],qty:0,names:[]};g.set(m.doc,d)}d.items.push(m);d.qty+=m.type==='adj'?Math.abs(m.delta):m.qty;if(d.names.length<3)d.names.push(PM[m.pid].name);if(m.ts>d.ts)d.ts=m.ts}return[...g.values()]}
+VIEWS.docs={html(){const F=[['all','همه'],['in','ورود'],['out','خروج'],['xfer','انتقال'],['adj','شمارش']];
+ let l=db.moves.filter(m=>PM[m.pid]&&(HS.type==='all'||m.type===HS.type));const q=normFa(HS.q);
+ if(q)l=l.filter(m=>normFa(PM[m.pid].name).includes(q)||normFa(m.party||'').includes(q)||(m.inv||'').includes(en(HS.q).trim())||(PM[m.pid].barcode||'').includes(en(HS.q).trim()));
+ const docs=groupDocs(l).sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts),total=docs.length,shown=docs.slice(0,HS.limit),days={};shown.forEach(d=>(days[d.date]=days[d.date]||[]).push(d));
+ return`<div class="search" style="margin-bottom:10px">${ic('search')}<input id="hQ" placeholder="جستجوی کالا، تأمین‌کننده، شمارهٔ فاکتور…" value="${esc(HS.q)}" oninput="HS.q=this.value;clearTimeout(window.__ht);window.__ht=setTimeout(()=>{rerender();const i=$('#hQ');i.focus();i.setSelectionRange(999,999)},280)"></div>
+ <div class="chips">${F.map(f=>`<button class="chip ${HS.type===f[0]?'on':''}" onclick="HS.type='${f[0]}';HS.limit=40;rerender()">${f[1]}</button>`).join('')}</div>
+ ${total?Object.keys(days).map(d=>`<div class="dayh"><div>${wday(d)} ${dFull(d)}</div><span>${fa(days[d].length)} سند</span></div>${days[d].map(x=>`<div class="mv" onclick="docSheet('${x.doc}')"><div class="tic t-${x.type}">${ic(T_IC[x.type],18)}</div><div class="sp"><div class="b sm ellip">${T_NAME[x.type]}${x.no?' #'+fa(x.no):''} · ${fa(x.items.length)} قلم${x.party?' · '+esc(x.party):''}</div><div class="xs muted ellip">${esc(x.names.join('، '))}${x.items.length>3?' …':''} · ${esc(mvLabel(x))} · ${hhmm(x.ts)}</div></div><div class="b ${x.type==='in'?'green':x.type==='out'?'red':x.type==='xfer'?'blue':''}">${N(x.qty)}</div></div>`).join('')}`).join(''):emptyBox('📜','سندی نیست','هر ورود، خروج و انتقال اینجا با تاریخ ثبت می‌شود.')}
+ ${total>shown.length?`<button class="btn blk" onclick="HS.limit+=40;rerender()">نمایش بیشتر (${fa(total-shown.length)} سند دیگر)</button>`:''}`}};
+
+/* ================= quick scan (instant sale / entry) ================= */
+const SQ={mode:'sale',wh:null,to:null,qty:1,last:null};
+VIEWS.scan={html(){
+ if(!can('scan'))SQ.mode='sale';
+ if(!SQ.wh||!WM[SQ.wh])SQ.wh=db.prefs.saleWh&&WM[db.prefs.saleWh]?db.prefs.saleWh:db.wh[0].id;
+ if(!SQ.to||!WM[SQ.to]||SQ.to===SQ.wh)SQ.to=(db.wh.find(w=>w.id!==SQ.wh)||{}).id||SQ.wh;
+ return`<div class="cam" id="camBox"></div><div class="card" id="scanCtl" style="margin-top:12px"></div>
+ <div class="card" style="margin-top:12px;padding:10px 12px"><div class="row"><div class="search sp" style="box-shadow:none">${ic('bar',18)}<input id="manCode" class="ltr" inputmode="numeric" placeholder="بارکد یا کد کالا را بنویسید / اسکنر بلوتوثی" onkeydown="if(event.key==='Enter')manSubmit()"></div><button class="btn pri sm" onclick="manSubmit()">ثبت</button></div>
+ <button class="btn blk" onclick="photoPick(quickCode)">📷 عکس بگیر و بخوان (اگر زنده نخواند)</button></div>
+ <div id="lastBox" style="margin-top:12px"></div><div id="scanStats" style="margin-top:12px"></div><div id="recentBox"></div>`},
+ after(){Cam.mount($('#camBox'),(c,s)=>quickCode(c,s));window.onCode=quickCode;drawScanCtl();drawScanStats();drawRecent();if(SQ.last)showLast(SQ.last)}};
+function setMode(m){SQ.mode=m;SQ.qty=1;drawScanCtl()}
+function qtyAdd(d){SQ.qty=Math.max(1,Math.round((SQ.qty+d)*1000)/1000);$('#qtyIn').value=SQ.qty}
+function drawScanCtl(){const m=SQ.mode,all={sale:['فروش','cart'],in:['ورود','down'],xfer:['انتقال','swap'],out:['خروج','up']};
+ const M=Object.fromEntries(Object.entries(all).filter(([k])=>can('scan')||k==='sale'));
+ if(!can('in'))delete M.in;if(!can('xfer'))delete M.xfer;if(!can('out'))delete M.out;
+ const seg=Object.entries(M).map(([k,v])=>`<button class="mb ${k==='sale'?'sale':k} ${m===k?'on':''}" onclick="setMode('${k}')">${ic(v[1]==='cart'?'up':v[1],18)}${v[0]}</button>`).join('');
+ const whs=db.wh.map(w=>`<button class="chip ${SQ.wh===w.id?'on':''}" onclick="SQ.wh='${w.id}';if(SQ.to===SQ.wh)SQ.to=(db.wh.find(x=>x.id!==SQ.wh)||{}).id;drawScanCtl()">${esc(w.name)}</button>`).join('');
+ const tos=m==='xfer'?`<span class="sm b muted">به</span><div class="row" style="gap:8px">${db.wh.filter(w=>w.id!==SQ.wh).map(w=>`<button class="chip ${SQ.to===w.id?'on':''}" onclick="SQ.to='${w.id}';drawScanCtl()">${esc(w.name)}</button>`).join('')}</div>`:'';
+ const lbl={sale:'فروش از',in:'ورود به',out:'خروج از',xfer:'انتقال از'}[m];
+ $('#scanCtl').innerHTML=`<div class="modes" style="grid-template-columns:repeat(${Object.keys(M).length},1fr)">${seg}</div>
+ <div class="row wrap" style="margin-top:12px"><span class="sm b muted">${lbl}</span><div class="row wrap" style="gap:8px">${whs}</div>${tos}<span class="sp"></span>
+ <div class="stepper"><button onclick="qtyAdd(-1)" aria-label="کم">−</button><input id="qtyIn" class="inp" inputmode="decimal" value="${SQ.qty}" onchange="const v=numv(this.value);SQ.qty=v>0?v:1;this.value=SQ.qty"><button onclick="qtyAdd(1)" aria-label="زیاد">+</button></div></div>
+ <div class="hint">هر اسکن، «${all[m][0]}» را به‌اندازهٔ تعداد بالا ثبت می‌کند و تعداد به ۱ برمی‌گردد. اشتباه شد؟ «بازگردانی».</div>`}
+function manSubmit(){const i=$('#manCode'),v=en(i.value).trim();if(!v)return;i.value='';quickCode(v,'man')}
+function quickCode(raw,src){const code=String(raw||'').trim();if(!code)return;const p=findProduct(code);
+ if(!p){Cam.flash(false);unknownCode(code,{use:pid=>quickMove(pid)});return}
+ quickMove(p.id)}
+function quickDoc(pid,wh){const m=SQ.mode,d={type:m==='sale'||m==='out'?'out':m,wh,date:todayISO(),reason:m==='sale'?'sale':m==='out'?'other':m==='in'?'buy':'',lines:[{pid,qty:SQ.qty>0?SQ.qty:1}]};if(m==='xfer')d.to=SQ.to;return d}
+function quickMove(pid,force,whOverride){const d=quickDoc(pid,whOverride||SQ.wh),dec=d.type==='out'||d.type==='xfer';
+ if(dec&&!force&&stockAt(pid,d.wh)<d.lines[0].qty-1e-9){return shortSheet(d)}
+ const p=PM[pid];p.hits=(p.hits||0)+1;const r=commitDoc(d);if(!r)return;
+ beep();Cam.flash(true);SQ.qty=1;SQ.last=r.moves[0].id;showLast(SQ.last);drawScanStats();drawScanCtl();drawRecent()}
+function shortSheet(d){const pid=d.lines[0].pid,p=PM[pid];beep('warn');const alt=db.wh.filter(w=>w.id!==d.wh&&stockAt(pid,w.id)>=d.lines[0].qty);
+ sheet(`<h2>⚠️ موجودی کافی نیست</h2><p class="sm">«${esc(p.name)}» — موجودی ${esc(whName(d.wh))}: <b>${N(stockAt(pid,d.wh))}</b> است و می‌خواهی <b>${N(d.lines[0].qty)}</b> کم شود.</p>
+ ${d.type==='out'?alt.map(w=>`<button class="btn pri blk" onclick="closeSheet();quickMove('${pid}',true,'${w.id}')">از ${esc(w.name)} کم شود (موجودی ${N(stockAt(pid,w.id))})</button>`).join(''):''}
+ <button class="btn red blk" onclick="closeSheet();quickMove('${pid}',true)">با موجودی منفی ثبت شود</button><button class="btn blk" onclick="closeSheet()">انصراف</button>`,'cen')}
+function showLast(mid){const m=db.moves.find(x=>x.id===mid);if(!m||!PM[m.pid]){$('#lastBox').innerHTML='';return}const p=PM[m.pid],s=ST[p.id],st=status(p),sign=m.type==='in'?'+':m.type==='xfer'?'':'−';
+ let warn='';if(st==='low'&&m.type!=='in')warn=`<div class="pill p-amber" style="margin-top:8px">⚠️ موجودی کم است (${N(s.t)} از حداقل ${N(p.min)})</div>`;if(st==='neg')warn='<div class="pill p-red" style="margin-top:8px">موجودی منفی شد — شمارش را بررسی کن</div>';if(st==='out')warn='<div class="pill p-red" style="margin-top:8px">موجودی تمام شد</div>';
+ $('#lastBox').innerHTML=`<div class="card last ${m.type}"><div class="row"><div class="tic t-${m.type}">${ic(T_IC[m.type],20)}</div><div class="sp"><div class="b ellip">${esc(p.name)}</div><div class="xs muted">${T_NAME[m.type]} · ${esc(mvLabel(m))} · <b>${sign}${N(m.qty)}</b></div></div>
+ <div class="stk">${db.wh.slice(0,3).map(w=>`<span class="sbox"><small>${esc(w.name)}</small><b>${N(s.w[w.id]||0)}</b></span>`).join('')}</div></div>${warn}
+ <div class="grid2" style="margin-top:10px"><button class="btn sm" onclick="undoQuick('${m.id}')">${ic('x',16)} بازگردانی</button><button class="btn sm pri" onclick="quickMove('${p.id}')">${ic('plus',16)} یکی دیگر</button></div></div>`}
+function undoQuick(id){const m=db.moves.find(x=>x.id===id);if(!m)return;delMoves(db.moves.filter(x=>x.doc===m.doc).map(x=>x.id));SQ.last=null;$('#lastBox').innerHTML='';drawScanStats();drawRecent();toast('بازگردانی شد')}
+function drawScanStats(){const t=todayISO();let o=0,i=0;db.moves.forEach(m=>{if(m.date!==t)return;if(m.type==='out')o+=m.qty;else if(m.type==='in')i+=m.qty});const low=lowCount();
+ const el=$('#scanStats');if(!el)return;el.innerHTML=`<div class="grid3"><div class="kpi"><div class="t">خروج امروز</div><div class="v red">${N(o)}</div></div><div class="kpi"><div class="t">ورود امروز</div><div class="v green">${N(i)}</div></div><div class="kpi" onclick="PS.st='low';go('products')" style="cursor:pointer"><div class="t">نیاز به توجه</div><div class="v ${low?'amber':''}">${fa(low)}</div></div></div>`}
+function drawRecent(){const el=$('#recentBox');if(!el)return;const r=db.moves.filter(m=>PM[m.pid]).sort((a,b)=>b.ts-a.ts).slice(0,5);el.innerHTML=r.length?`<div class="sect"><h3>آخرین ثبت‌ها</h3><a class="xs brandc" style="cursor:pointer" onclick="go('docs')">همه</a></div>${r.map(m=>mvRow(m)).join('')}`:''}
+
+/* ================= charts ================= */
+function dualBars(labels,a,b,ca='#10b981',cb='#ef4444'){const W=340,H=170,pl=6,pr=6,pt=10,pb=22,n=labels.length,mx=Math.max(1,...a,...b),iw=W-pl-pr,ih=H-pt-pb,gw=iw/n,bw=Math.min(11,gw*.36);let g='',s='';
+ for(let i=0;i<=3;i++){const y=pt+ih-ih*i/3;g+=`<line class="gline" x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}"/>`;if(i)g+=`<text x="${W-pr}" y="${y-3}" text-anchor="end">${fa(Math.round(mx*i/3))}</text>`}
+ const step=Math.ceil(n/7);labels.forEach((l,i)=>{const cx=pl+gw*(i+.5),ha=a[i]/mx*ih,hb=b[i]/mx*ih;
+  s+=`<rect x="${cx-bw-1}" y="${pt+ih-ha}" width="${bw}" height="${Math.max(ha,a[i]?2:0)}" rx="3.5" fill="${ca}"/><rect x="${cx+1}" y="${pt+ih-hb}" width="${bw}" height="${Math.max(hb,b[i]?2:0)}" rx="3.5" fill="${cb}"/>`;
+  if(i%step===0||i===n-1)s+=`<text x="${cx}" y="${H-6}" text-anchor="middle">${l}</text>`});
+ return`<svg class="ch" viewBox="0 0 ${W} ${H}">${g}${s}</svg>`}
+function series(days,filterFn){const t=todayISO(),start=addDays(t,-(days-1)),size=Math.max(1,Math.ceil(days/14)),nb=Math.ceil(days/size),labels=[],a=[],b=[];
+ const inR=db.moves.filter(m=>m.date>=start&&PM[m.pid]&&(!filterFn||filterFn(m)));
+ for(let i=0;i<nb;i++){const s=addDays(start,i*size),e=addDays(s,size-1);labels.push(fa(toJ(e).jd));const r=inR.filter(m=>m.date>=s&&m.date<=e);a.push(sum(r.filter(m=>m.type==='in'),m=>m.qty));b.push(sum(r.filter(m=>m.type==='out'),m=>m.qty))}
+ return{labels,a,b}}
+
+/* ================= dashboard ================= */
+const DS={days:14};
+function recentDocs(type,n){return groupDocs(db.moves.filter(m=>m.type===type&&PM[m.pid])).sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts).slice(0,n)}
+function docMini(x){return`<div class="mv" onclick="docSheet('${x.doc}')"><div class="tic t-${x.type}">${ic(T_IC[x.type],18)}</div><div class="sp"><div class="b sm ellip">${esc(x.names.join('، '))}${x.items.length>3?' …':''}</div><div class="xs muted">${dShort(x.date)} · ${fa(x.items.length)} قلم${x.party?' · '+esc(x.party):''}</div></div><div class="b ${x.type==='in'?'green':'red'}">${N(x.qty)}</div></div>`}
+VIEWS.dash={html(){
+ const t=todayISO(),tIn=sum(db.moves.filter(m=>m.date===t&&m.type==='in'&&PM[m.pid]),m=>m.qty),tOut=sum(db.moves.filter(m=>m.date===t&&m.type==='out'&&PM[m.pid]),m=>m.qty);
+ const total=sum(db.products,p=>Math.max(0,ST[p.id].t)),neg=db.products.filter(p=>status(p)==='neg').length;
+ const lows=db.products.filter(p=>['low','out','neg'].includes(status(p))).sort((a,b)=>ST[a.id].t-ST[b.id].t);
+ const S=series(DS.days),ins=recentDocs('in',4),outs=recentDocs('out',4);
+ const days=Math.floor((Date.now()-(db.prefs.lastBackup||0))/864e5),needBk=db.products.length>0&&can('settings')&&(!db.prefs.lastBackup||days>=7);
+ if(!db.products.length)return`<div class="card" style="text-align:center;padding:26px 18px"><div class="logo" style="width:64px;height:64px;border-radius:20px;margin:0 auto 12px">${ic('cube',34)}</div><div class="b" style="font-size:19px">به ${esc(db.settings.name)} خوش آمدید</div><p class="muted sm">انبار و مغازه‌ات را با اسکن بارکد مدیریت کن. از اینجا شروع کن:</p>
+  <div class="grid2">${can('prod.add')?`<button class="btn pri" onclick="productForm({})">${ic('plus')} ثبت اولین کالا</button>`:''}${can('settings')?`<button class="btn" onclick="loadSample()">دیدن با داده نمونه</button>`:''}</div></div>`;
+ return`${needBk?`<div class="banner">💾 <span class="sp">${db.prefs.lastBackup?`${fa(days)} روز است پشتیبان نگرفته‌ای.`:'هنوز پشتیبان نگرفته‌ای.'}</span><button class="btn sm" onclick="exportJSON();rerender()">همین حالا</button></div>`:''}
+ ${neg?`<div class="banner red">⛔ <span class="sp">${fa(neg)} کالا موجودی منفی دارد؛ انبارگردانی کن.</span><button class="btn sm" onclick="PS.st='neg';go('products')">ببین</button></div>`:''}
+ <div class="kpis"><div class="kc blue" onclick="go('products')"><div class="t">کل کالاها</div><div class="v">${N(db.products.length)}</div><div class="s">قلم</div><div class="ki">${ic('pkg')}</div></div>
+ <div class="kc green" onclick="go('stock')"><div class="t">موجودی کل</div><div class="v">${N(total)}</div><div class="s">واحد در ${fa(db.wh.length)} انبار</div><div class="ki">${ic('layers')}</div></div>
+ <div class="kc amber" onclick="HS.type='in';go('docs')"><div class="t">ورود امروز</div><div class="v">${N(tIn)}</div><div class="s">واحد</div><div class="ki">${ic('down')}</div></div>
+ <div class="kc red" onclick="HS.type='out';go('docs')"><div class="t">خروج امروز</div><div class="v">${N(tOut)}</div><div class="s">واحد</div><div class="ki">${ic('up')}</div></div></div>
+ <div class="qa" style="margin-top:12px">
+ ${can('in')?`<button onclick="docNew('in')"><span class="qi t-in">${ic('down',20)}</span>ورود</button>`:'<span></span>'}${canOut()?`<button onclick="docNew('out')"><span class="qi t-out">${ic('up',20)}</span>خروج</button>`:'<span></span>'}${can('xfer')?`<button onclick="docNew('xfer')"><span class="qi t-xfer">${ic('swap',20)}</span>انتقال</button>`:'<span></span>'}${can('count')?`<button onclick="go('count')"><span class="qi t-adj">${ic('clip',20)}</span>انبارگردانی</button>`:'<span></span>'}<button onclick="go('scan')"><span class="qi" style="background:var(--bluebg);color:var(--brand)">${ic('bar',20)}</span>اسکن</button></div>
+ <div class="dgrid" style="margin-top:14px"><div><div class="sect" style="margin-top:6px"><h3>نمودار گردش کالا</h3><span class="xs muted"><b class="green">●</b> ورود &nbsp;<b class="red">●</b> خروج</span></div>
+  <div class="card"><div class="chips" style="padding-bottom:4px">${[[7,'۷ روز'],[14,'۱۴ روز'],[30,'۳۰ روز'],[90,'۹۰ روز']].map(d=>`<button class="chip ${DS.days===d[0]?'on':''}" onclick="DS.days=${d[0]};rerender()">${d[1]}</button>`).join('')}</div>${dualBars(S.labels,S.a,S.b)}</div></div>
+ <div><div class="sect" style="margin-top:6px"><h3>⚠️ کالاهای کم‌موجودی</h3>${lows.length>5?`<a class="xs brandc" style="cursor:pointer" onclick="PS.st='low';go('products')">همه (${fa(lows.length)})</a>`:''}</div>
+  <div class="card" style="padding:6px 12px">${lows.length?lows.slice(0,6).map(p=>`<div class="row" style="padding:9px 0;cursor:pointer;border-top:1px dashed var(--line)" onclick="productSheet('${p.id}')">${avatar(p,34)}<span class="sp sm b ellip">${esc(p.name)}</span><span class="pill ${status(p)==='low'?'p-amber':'p-red'}">${N(ST[p.id].t)}${p.min>0?' / '+N(p.min):''}</span></div>`).join(''):'<div class="muted sm c" style="padding:12px">همه‌چیز به اندازهٔ کافی موجود است ✅</div>'}</div></div></div>
+ <div class="dgrid"><div><div class="sect"><h3>آخرین ورودها</h3><a class="xs brandc" style="cursor:pointer" onclick="HS.type='in';go('docs')">همه</a></div>${ins.length?ins.map(docMini).join(''):'<div class="card muted sm c">ورودی ثبت نشده</div>'}</div>
+ <div><div class="sect"><h3>آخرین خروج‌ها</h3><a class="xs brandc" style="cursor:pointer" onclick="HS.type='out';go('docs')">همه</a></div>${outs.length?outs.map(docMini).join(''):'<div class="card muted sm c">خروجی ثبت نشده</div>'}</div></div>
+ ${db.wh.length>1?`<div class="sect"><h3>موجودی هر انبار</h3></div><div class="grid${db.wh.length>=3?3:2}">${db.wh.map(w=>`<div class="kpi" onclick="SS.wh='${w.id}';go('stock')" style="cursor:pointer"><div class="t">${esc(w.name)}</div><div class="v">${N(sum(db.products,p=>Math.max(0,stockAt(p.id,w.id))))}</div><div class="s">${fa(db.products.filter(p=>stockAt(p.id,w.id)>0).length)} قلم</div></div>`).join('')}</div>`:''}`}};
+
+/* ================= stock ================= */
+const SS={wh:'all',cat:'all',st:'all',q:'',sort:'name'};
+function stockRows(){const q=normFa(SS.q),qq=en(SS.q).trim().toLowerCase();
+ let l=db.products.filter(p=>{if(q&&!normFa(p.name).includes(q)&&!(p.barcode||'').includes(qq)&&!(p.code||'').toLowerCase().includes(qq))return false;if(SS.cat!=='all'&&p.cat!==SS.cat)return false;
+  const qv=SS.wh==='all'?ST[p.id].t:stockAt(p.id,SS.wh),st=status(p);
+  if(SS.st==='low')return st==='low'||st==='out'||st==='neg';if(SS.st==='have')return qv>0;if(SS.st==='zero')return qv<=0;return true});
+ const v=p=>SS.wh==='all'?ST[p.id].t:stockAt(p.id,SS.wh);
+ if(SS.sort==='asc')l.sort((a,b)=>v(a)-v(b));else if(SS.sort==='desc')l.sort((a,b)=>v(b)-v(a));else if(SS.sort==='move')l.sort((a,b)=>ST[b.id].out30-ST[a.id].out30);else l.sort((a,b)=>a.name.localeCompare(b.name,'fa'));
+ return l}
+VIEWS.stock={html(){const cats=db.cats.slice().sort((a,b)=>a.name.localeCompare(b.name,'fa')),fast=db.products.filter(p=>ST[p.id].out30>0).sort((a,b)=>ST[b.id].out30-ST[a.id].out30).slice(0,5);
+ const low=lowCount();
+ return`<div class="row" style="margin-bottom:10px"><div class="search sp">${ic('search')}<input id="sQ" placeholder="جستجو در موجودی…" value="${esc(SS.q)}" oninput="SS.q=this.value;drawStock()"></div><button class="btn sm" onclick="scanStockFind()" style="padding:12px 13px">${ic('bar',19)}</button><button class="btn sm" onclick="exportCSV('stock')" style="padding:12px 13px">${ic('down',19)}</button></div>
+ ${low?`<div class="banner">⚠️ <span class="sp">${fa(low)} کالا به حداقل موجودی رسیده یا تمام شده است.</span><button class="btn sm" onclick="SS.st='low';rerender()">فقط همین‌ها</button></div>`:''}
+ <div class="chips"><button class="chip ${SS.wh==='all'?'on':''}" onclick="SS.wh='all';rerender()">همهٔ انبارها</button>${db.wh.map(w=>`<button class="chip ${SS.wh===w.id?'on':''}" onclick="SS.wh='${w.id}';rerender()">${esc(w.name)}</button>`).join('')}</div>
+ <div class="chips">${[['all','همه'],['low','کم‌موجودی/تمام'],['have','موجود'],['zero','ناموجود']].map(f=>`<button class="chip ${SS.st===f[0]?'on':''}" onclick="SS.st='${f[0]}';rerender()">${f[1]}</button>`).join('')}${cats.map(c=>`<button class="chip ${SS.cat===c.id?'on':''}" onclick="SS.cat=SS.cat==='${c.id}'?'all':'${c.id}';rerender()">${esc(c.name)}</button>`).join('')}</div>
+ <div class="row" style="margin:2px 2px 10px;gap:8px"><span class="xs muted">مرتب‌سازی:</span><select class="inp" style="width:auto;padding:7px 12px" onchange="SS.sort=this.value;drawStock()">${[['name','نام'],['asc','موجودی کم ← زیاد'],['desc','موجودی زیاد ← کم'],['move','پرتحرک‌ترین']].map(o=>`<option value="${o[0]}" ${SS.sort===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select><span class="sp"></span><span class="xs muted" id="stCnt"></span></div>
+ ${fast.length&&SS.q===''?`<div class="card" style="margin-bottom:12px"><div class="b sm" style="margin-bottom:6px">🔥 پرتحرک‌ترین کالاها (۳۰ روز)</div>${fast.map(p=>`<div class="hb" style="cursor:pointer" onclick="productSheet('${p.id}')"><span class="n ellip">${esc(p.name)}</span><div class="t"><i style="width:${ST[p.id].out30/ST[fast[0].id].out30*100}%"></i></div><span class="vv">${N(ST[p.id].out30)}</span></div>`).join('')}</div>`:''}
+ <div id="stockBox"></div>`},after(){drawStock()}};
+function scanStockFind(){openScanner({title:'اسکن برای دیدن موجودی',handle:(code,src,ctl)=>{const p=findProduct(code);if(p){ctl.close();productSheet(p.id)}else{ctl.close();unknownCode(code,{use:pid=>productSheet(pid)})}}})}
+function drawStock(){const box=$('#stockBox');if(!box)return;const l=stockRows();const c=$('#stCnt');if(c)c.textContent=fa(l.length)+' کالا';
+ if(!l.length){box.innerHTML=emptyBox('📭','موردی نیست','فیلتر را عوض کن.');return}
+ const whs=SS.wh==='all'?db.wh:db.wh.filter(w=>w.id===SS.wh);
+ if(innerWidth>=700){box.innerHTML=`<div class="tw"><table class="tbl"><tr><th>کالا</th><th>کد</th>${whs.map(w=>`<th class="n">${esc(w.name)}</th>`).join('')}${whs.length>1?'<th class="n">جمع</th>':''}<th class="n">حداقل</th><th class="n">وضعیت</th></tr>${l.slice(0,400).map(p=>{const s=ST[p.id],st=status(p);
+  return`<tr class="clk" onclick="productSheet('${p.id}')"><td><b>${esc(p.name)}</b></td><td class="ltr">${esc(p.code||'')}</td>${whs.map(w=>`<td class="n ${(s.w[w.id]||0)<0?'neg':''}">${N(s.w[w.id]||0)}</td>`).join('')}${whs.length>1?`<td class="n"><b>${N(s.t)}</b></td>`:''}<td class="n muted">${p.min>0?N(p.min):'—'}</td><td class="n">${STAT_PILL[st]||'<span class="pill p-green">موجود</span>'}</td></tr>`}).join('')}</table></div>`}
+ else box.innerHTML=l.slice(0,300).map(p=>{const s=ST[p.id],st=status(p),v=SS.wh==='all'?s.t:stockAt(p.id,SS.wh);
+  return`<div class="item" onclick="productSheet('${p.id}')">${avatar(p)}<div class="sp"><div class="b ellip">${esc(p.name)}</div><div class="xs muted ellip">${esc(p.code||'')}${p.min>0?' · حداقل '+N(p.min):''}</div><div style="margin-top:2px">${STAT_PILL[st]}</div></div>${SS.wh==='all'?stockBoxes(p,3):`<div class="stk"><span class="sbox ${v<0?'neg':st==='low'?'low':v===0?'zero':''}"><small>${esc(whName(SS.wh))}</small><b>${N(v)}</b></span></div>`}</div>`}).join('')}
+
+/* ================= stocktake ================= */
+function countRec(id){return db.counts.find(c=>c.id===id)}
+VIEWS.count={html(p){
+ if(p){const c=countRec(p);if(c)return c.status==='done'?countDone(c):countDraft(c)}
+ const list=db.counts.slice().sort((a,b)=>b.ts-a.ts);
+ return`<div class="card"><div class="row"><div class="tic t-adj" style="width:44px;height:44px;border-radius:14px">${ic('clip',22)}</div><div class="sp"><div class="b">انبارگردانی</div><div class="xs muted">شمارش واقعی کالا و ثبت اختلاف با موجودی سیستم</div></div></div><button class="btn pri blk" onclick="countStart()">${ic('plus',18)} شروع انبارگردانی جدید</button></div>
+ <div class="sect"><h3>سوابق</h3></div>${list.length?list.map(c=>`<div class="item" onclick="go('count','${c.id}')"><div class="tic t-adj">${ic('clip',18)}</div><div class="sp"><div class="b sm">انبارگردانی ${esc(whName(c.wh))}${c.cat&&catName(c.cat)?' · '+esc(catName(c.cat)):''}</div><div class="xs muted">${dFull(c.date)} · ${esc(c.user||'')}</div></div>${c.status==='done'?`<div class="stk"><span class="pill ${c.diffs?'p-amber':'p-green'}">${c.diffs?fa(c.diffs)+' اختلاف':'بدون اختلاف'}</span></div>`:'<span class="pill p-blue">پیش‌نویس</span>'}</div>`).join(''):emptyBox('📋','هنوز انبارگردانی نکرده‌ای','با شمارش دوره‌ای، اختلاف موجودی واقعی و سیستم را پیدا کن.')}`}};
+function countStart(){const cats=db.cats;sheet(`<h2>شروع انبارگردانی</h2><div class="fld"><label>کدام انبار؟</label><select id="csWh" class="inp">${db.wh.map(w=>`<option value="${w.id}">${esc(w.name)}</option>`).join('')}</select></div>
+ <div class="fld"><label>فقط یک دسته (اختیاری)</label><select id="csCat" class="inp"><option value="">همهٔ کالاها</option>${cats.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></div>
+ <div class="grid2"><button class="btn pri" onclick="countCreate()">${ic('check')} شروع</button><button class="btn" onclick="closeSheet()">انصراف</button></div>`)}
+function countCreate(){const wh=$('#csWh').value,cat=$('#csCat').value,c=touch({id:uid(),wh,cat,date:todayISO(),ts:Date.now(),user:curName(),status:'draft',real:{},notes:{},no:++db.seq.cnt});db.counts.push(c);save();closeSheet();go('count',c.id)}
+function cntList(c){return db.products.filter(p=>!c.cat||p.cat===c.cat).sort((a,b)=>a.name.localeCompare(b.name,'fa'))}
+const CF={f:'all',q:''};
+function countDraft(c){const l=cntList(c),done=l.filter(p=>c.real[p.id]!==undefined).length;
+ return`<div class="card"><div class="row"><button class="ibtn" onclick="go('count')">${ic('back',18)}</button><div class="sp"><div class="b">انبارگردانی ${esc(whName(c.wh))}${c.cat&&catName(c.cat)?' · '+esc(catName(c.cat)):''}</div><div class="xs muted">${dFull(c.date)} · ${fa(done)} از ${fa(l.length)} کالا شمرده شد</div></div></div>
+ <div style="height:8px;border-radius:8px;background:var(--surface2);margin:12px 0;overflow:hidden"><div style="height:100%;width:${l.length?done/l.length*100:0}%;background:linear-gradient(90deg,#2563eb,#06b6d4)"></div></div>
+ <div class="grid2"><button class="btn pri" onclick="countScan('${c.id}')">${ic('bar',18)} اسکن و شمارش</button><button class="btn grn" onclick="countFinish('${c.id}')">${ic('check',18)} ثبت نتیجه</button></div></div>
+ <div class="row" style="margin:12px 0 8px"><div class="search sp">${ic('search')}<input placeholder="جستجوی کالا…" value="${esc(CF.q)}" oninput="CF.q=this.value;drawCountRows('${c.id}')"></div></div>
+ <div class="chips">${[['all','همه'],['todo','نشمرده'],['diff','دارای اختلاف']].map(f=>`<button class="chip ${CF.f===f[0]?'on':''}" onclick="CF.f='${f[0]}';rerender()">${f[1]}</button>`).join('')}<span class="sp"></span><button class="chip" onclick="askDelCount('${c.id}')" style="color:var(--red)">حذف</button></div><div id="cntRows"></div>`}
+VIEWS.count.after=function(p){const c=p&&countRec(p);if(c&&c.status==='draft'){drawCountRows(c.id);window.onCode=code=>countCode(c.id,code)}};
+function drawCountRows(id){const c=countRec(id),box=$('#cntRows');if(!c||!box)return;const q=normFa(CF.q);
+ let l=cntList(c).filter(p=>!q||normFa(p.name).includes(q)||(p.barcode||'').includes(en(CF.q).trim()));
+ l=l.filter(p=>{const r=c.real[p.id];if(CF.f==='todo')return r===undefined;if(CF.f==='diff')return r!==undefined&&r!==stockAt(p.id,c.wh);return true});
+ box.innerHTML=l.length?l.slice(0,300).map(p=>{const sys=stockAt(p.id,c.wh),r=c.real[p.id],d=r===undefined?null:Math.round((r-sys)*1000)/1000;
+  return`<div class="cr ${d===null?'':d===0?'ok':'diff'}" id="cr_${p.id}">${avatar(p,38)}<div class="sp"><div class="b sm ellip">${esc(p.name)}</div><div class="xs muted">سیستم: <b>${N(sys)}</b>${d!==null&&d!==0?` · <b class="${d>0?'green':'red'}">${d>0?'+':''}${N(d)}</b>`:''}</div></div><input class="inp" inputmode="decimal" value="${r===undefined?'':r}" placeholder="—" onchange="countSet('${c.id}','${p.id}',this.value)"></div>`}).join(''):'<div class="card muted sm c">موردی نیست</div>'}
+function countSet(id,pid,v){const c=countRec(id);const x=v===''?undefined:numv(v);if(x===undefined||isNaN(x))delete c.real[pid];else c.real[pid]=x;touch(c);save();rerender()}
+function countCode(id,code,ctl){const c=countRec(id),p=findProduct(code);if(!p){if(ctl)ctl.close();unknownCode(code,{use:pid=>{c.real[pid]=Math.round(((c.real[pid]||0)+1)*1000)/1000;touch(c);save();rerender()}});return}
+ if(c.cat&&p.cat!==c.cat){beep('warn');if(ctl)ctl.say('«'+p.name+'» خارج از دستهٔ این انبارگردانی است','bad');return}
+ c.real[p.id]=Math.round(((c.real[p.id]||0)+1)*1000)/1000;touch(c);save();beep();if(ctl){ctl.say(p.name+' ← '+N(c.real[p.id]),'ok');ctl.refresh()}else{drawCountRows(id)}}
+function countScan(id){const c=countRec(id);openScanner({title:'شمارش انبار '+whName(c.wh),handle:(code,s,ctl)=>countCode(id,code,ctl),body:()=>{const arr=Object.entries(c.real).filter(([pid])=>PM[pid]);return arr.length?arr.slice(-12).reverse().map(([pid,v])=>`<div class="ln"><span class="sp b sm">${esc(PM[pid].name)}</span><b>${N(v)}</b></div>`).join(''):'<div class="muted sm c">با هر اسکن، شمارش یک واحد زیاد می‌شود</div>'},onClose:()=>rerender()})}
+function askDelCount(id){confirmBox('این انبارگردانی حذف شود؟','حذف',()=>{db.counts=db.counts.filter(c=>c.id!==id);db.dead[id]=Date.now();save();go('count')})}
+function countFinish(id){const c=countRec(id),l=cntList(c).filter(p=>c.real[p.id]!==undefined);if(!l.length)return toast('هنوز چیزی نشمرده‌ای');
+ const diffs=l.filter(p=>c.real[p.id]!==stockAt(p.id,c.wh)),more=sum(diffs,p=>Math.max(0,c.real[p.id]-stockAt(p.id,c.wh))),less=sum(diffs,p=>Math.max(0,stockAt(p.id,c.wh)-c.real[p.id]));
+ const unc=cntList(c).length-l.length;
+ sheet(`<h2>ثبت نتیجهٔ انبارگردانی</h2><div class="stat2"><div class="card"><div class="xs muted">کالاهای شمرده‌شده</div><div class="big">${fa(l.length)}</div></div><div class="card"><div class="xs muted">دارای اختلاف</div><div class="big ${diffs.length?'amber':'green'}">${fa(diffs.length)}</div></div></div>
+ <div class="grid2" style="margin-top:10px"><div class="kpi"><div class="t">مازاد</div><div class="v green">+${N(more)}</div></div><div class="kpi"><div class="t">کسری</div><div class="v red">−${N(less)}</div></div></div>
+ ${unc?`<div class="hint">${fa(unc)} کالا شمرده نشده و دست نمی‌خورد.</div>`:''}
+ <div class="fld" style="margin-top:12px"><label>علت اختلاف / یادداشت</label><input id="cfNote" class="inp" placeholder="مثلاً خرابی، سرقت، خطای ثبت…"></div>
+ <p class="hint">با ثبت، موجودی سیستم برای کالاهای دارای اختلاف به عدد شمارش‌شده اصلاح می‌شود (سند «شمارش» ثبت می‌شود).</p>
+ <div class="grid2"><button class="btn pri" onclick="countApply('${id}')">${ic('check')} ثبت و اصلاح موجودی</button><button class="btn" onclick="closeSheet()">انصراف</button></div>`)}
+function countApply(id){const c=countRec(id),note=($('#cfNote')||{}).value||'',doc=uid(),lines=[];let n=0;
+ for(const p of cntList(c)){const r=c.real[p.id];if(r===undefined)continue;const sys=stockAt(p.id,c.wh),delta=Math.round((r-sys)*1000)/1000;lines.push({pid:p.id,sys,real:r,diff:delta});
+  if(delta){commitAdj(c.wh,p.id,r,{doc,no:c.no,note:note||'انبارگردانی',reason:'count',date:c.date});n++}}
+ c.status='done';c.lines=lines;c.diffs=n;c.note=note;c.doc=doc;c.doneAt=Date.now();touch(c);addLog('count','انبارگردانی '+whName(c.wh)+' — '+fa(n)+' اختلاف');save();recalc();closeSheet();rerender();toast('✓ انبارگردانی ثبت شد')}
+function countDone(c){const L=(c.lines||[]).filter(x=>PM[x.pid]),d=L.filter(x=>x.diff);
+ return`<div class="card"><div class="row"><button class="ibtn" onclick="go('count')">${ic('back',18)}</button><div class="sp"><div class="b">گزارش انبارگردانی ${esc(whName(c.wh))}</div><div class="xs muted">${dFull(c.date)} · ${esc(c.user||'')}${c.note?' · '+esc(c.note):''}</div></div><button class="ibtn noprint" onclick="window.print()">${ic('print',18)}</button></div>
+ <div class="grid3" style="margin-top:12px"><div class="kpi"><div class="t">شمرده‌شده</div><div class="v">${fa(L.length)}</div></div><div class="kpi"><div class="t">اختلاف</div><div class="v ${d.length?'amber':'green'}">${fa(d.length)}</div></div><div class="kpi"><div class="t">مجموع اختلاف</div><div class="v ${sum(d,x=>x.diff)<0?'red':'green'}">${N(sum(d,x=>x.diff))}</div></div></div></div>
+ <div class="sect"><h3>جزئیات</h3><button class="btn sm noprint" onclick="exportCountCSV('${c.id}')">${ic('down',16)} اکسل</button></div>
+ <div class="tw"><table class="tbl"><tr><th>کالا</th><th class="n">سیستم</th><th class="n">شمارش</th><th class="n">اختلاف</th></tr>${L.sort((a,b)=>Math.abs(b.diff)-Math.abs(a.diff)).map(x=>`<tr class="clk" onclick="productSheet('${x.pid}')"><td>${esc(PM[x.pid].name)}</td><td class="n">${N(x.sys)}</td><td class="n">${N(x.real)}</td><td class="n ${x.diff>0?'pos':x.diff<0?'neg':''}">${x.diff>0?'+':''}${N(x.diff)}</td></tr>`).join('')}</table></div>`}
+function quickCount(pid){const p=PM[pid];sheet(`<h2>شمارش «${esc(p.name)}»</h2><div class="fld"><label>انبار</label><select id="qcWh" class="inp" onchange="$('#qcSys').textContent=N(stockAt('${pid}',this.value))">${db.wh.map(w=>`<option value="${w.id}">${esc(w.name)}</option>`).join('')}</select><div class="hint">موجودی سیستم: <b id="qcSys">${N(stockAt(pid,db.wh[0].id))}</b></div></div>
+ <div class="fld"><label>تعداد شمارش‌شده</label><input id="qcN" class="inp ltr" inputmode="decimal" style="font-size:22px;font-weight:900;text-align:center" autofocus></div><div class="grid2"><button class="btn pri" onclick="quickCountDo('${pid}')">${ic('check')} ثبت</button><button class="btn" onclick="closeSheet()">انصراف</button></div>`)}
+function quickCountDo(pid){const v=numv($('#qcN').value);if(!(v>=0))return toast('عدد را بنویس');const wh=$('#qcWh').value;const m=commitAdj(wh,pid,v,{note:'شمارش دستی'});closeSheet();if(!m)return toast('موجودی همین است');addLog('count','شمارش '+PM[pid].name);save();recalc();rerender();toast('✓ موجودی اصلاح شد')}
+
+/* ================= reports ================= */
+const RP={tab:'turn',range:'7',from:'',to:'',wh:'all'};
+function rpRange(){const t=todayISO();let f=t,e=t;
+ if(RP.range==='7')f=addDays(t,-6);else if(RP.range==='30')f=addDays(t,-29);else if(RP.range==='90')f=addDays(t,-89);
+ else if(RP.range==='month'){const j=toJ(t);f=fromJ(j.jy,j.jm,1)}
+ else if(RP.range==='all'){f=db.moves.reduce((m,x)=>x.date<m?x.date:m,t)}
+ else if(RP.range==='custom'){f=RP.from||addDays(t,-29);e=RP.to||t}
+ return{f,e}}
+function download(name,data,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:type+';charset=utf-8'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+const csvq=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+function turnRows(f,e,wh){/* opening must be net of earlier in/out/adj/xfer: recompute properly */
+ const R={};db.products.forEach(p=>R[p.id]={p,open:0,in:0,out:0,adj:0,xf:0});
+ for(const m of db.moves){const r=R[m.pid];if(!r||m.date>e)continue;const before=m.date<f;
+  const eff=(w)=>wh==='all'||w===wh;
+  if(m.type==='in'&&eff(m.wh)){if(before)r.open+=m.qty;else r.in+=m.qty}
+  else if(m.type==='out'&&eff(m.wh)){if(before)r.open-=m.qty;else r.out+=m.qty}
+  else if(m.type==='adj'&&eff(m.wh)){if(before)r.open+=m.delta;else r.adj+=m.delta}
+  else if(m.type==='xfer'&&wh!=='all'){const d=(m.to===wh?m.qty:0)-(m.wh===wh?m.qty:0);if(before)r.open+=d;else r.xf+=d}}
+ return Object.values(R).map(r=>({...r,close:Math.round((r.open+r.in-r.out+r.adj+r.xf)*1000)/1000,open:Math.round(r.open*1000)/1000})).filter(r=>r.open||r.in||r.out||r.adj||r.xf||r.close)}
+VIEWS.reports={html(){if(!db.products.length)return emptyBox('📊','گزارشی نیست','اول چند کالا و حرکت ثبت کن.');
+ const {f,e}=rpRange(),T=[['turn','گردش کالا'],['io','ورود و خروج'],['low','کم‌موجودی'],['xfer','انتقال‌ها'],['counts','انبارگردانی‌ها'],['top','پرتحرک و راکد']];
+ const RG=[['7','۷ روز'],['30','۳۰ روز'],['month','این ماه'],['90','۹۰ روز'],['all','همه'],['custom','بازهٔ دلخواه']];
+ const needRange=!['low','counts'].includes(RP.tab);
+ return`<div class="chips">${T.map(x=>`<button class="chip ${RP.tab===x[0]?'on':''}" onclick="RP.tab='${x[0]}';rerender()">${x[1]}</button>`).join('')}</div>
+ ${needRange?`<div class="chips">${RG.map(x=>`<button class="chip ${RP.range===x[0]?'on':''}" onclick="RP.range='${x[0]}';rerender()">${x[1]}</button>`).join('')}</div>
+ ${RP.range==='custom'?`<div class="grid2" style="margin-bottom:10px"><div>${dateBtn(f,"pickDate(RP.from||'"+f+"',v=>{RP.from=v;rerender()})")}</div><div>${dateBtn(e,"pickDate(RP.to||'"+e+"',v=>{RP.to=v;rerender()})")}</div></div>`:`<div class="hint" style="margin:-2px 4px 8px">از ${dFull(f)} تا ${dFull(e)}</div>`}`:''}
+ ${['turn','io'].includes(RP.tab)&&db.wh.length>1?`<div class="chips"><button class="chip ${RP.wh==='all'?'on':''}" onclick="RP.wh='all';rerender()">همهٔ انبارها</button>${db.wh.map(w=>`<button class="chip ${RP.wh===w.id?'on':''}" onclick="RP.wh='${w.id}';rerender()">${esc(w.name)}</button>`).join('')}</div>`:''}
+ ${rpTab(f,e)}`}};
+function rpTab(f,e){const wh=RP.wh;
+ if(RP.tab==='turn'){const rows=turnRows(f,e,wh).sort((a,b)=>(b.in+b.out)-(a.in+a.out)),S=series(Math.min(120,diffDays(f,e)+1)),tin=sum(rows,r=>r.in),tout=sum(rows,r=>r.out);
+  return`<div class="grid3"><div class="kpi"><div class="t">ورود</div><div class="v green">${N(tin)}</div></div><div class="kpi"><div class="t">خروج</div><div class="v red">${N(tout)}</div></div><div class="kpi"><div class="t">خالص</div><div class="v">${N(tin-tout)}</div></div></div>
+  <div class="card" style="margin-top:12px">${dualBars(S.labels,S.a,S.b)}</div>
+  <div class="sect"><h3>گردش هر کالا</h3><div class="row noprint" style="gap:6px"><button class="btn sm" onclick="exportCSV('turn')">${ic('down',16)} اکسل</button><button class="btn sm" onclick="window.print()">${ic('print',16)}</button></div></div>
+  <div class="tw"><table class="tbl"><tr><th>کالا</th><th class="n">ابتدا</th><th class="n">ورود</th><th class="n">خروج</th>${wh!=='all'?'<th class="n">انتقال</th>':''}<th class="n">شمارش</th><th class="n">انتها</th></tr>${rows.slice(0,400).map(r=>`<tr class="clk" onclick="productSheet('${r.p.id}')"><td><b>${esc(r.p.name)}</b></td><td class="n">${N(r.open)}</td><td class="n pos">${r.in?'+'+N(r.in):'—'}</td><td class="n neg">${r.out?'−'+N(r.out):'—'}</td>${wh!=='all'?`<td class="n">${r.xf?(r.xf>0?'+':'')+N(r.xf):'—'}</td>`:''}<td class="n">${r.adj?(r.adj>0?'+':'')+N(r.adj):'—'}</td><td class="n"><b>${N(r.close)}</b></td></tr>`).join('')}</table></div>`}
+ if(RP.tab==='io'){const l=db.moves.filter(m=>PM[m.pid]&&(m.type==='in'||m.type==='out')&&m.date>=f&&m.date<=e&&(wh==='all'||m.wh===wh));
+  const docs=groupDocs(l).sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts),tin=sum(l.filter(m=>m.type==='in'),m=>m.qty),tout=sum(l.filter(m=>m.type==='out'),m=>m.qty);
+  const byReason={};l.filter(m=>m.type==='out').forEach(m=>byReason[m.reason||'other']=(byReason[m.reason||'other']||0)+m.qty);
+  return`<div class="grid3"><div class="kpi"><div class="t">ورود</div><div class="v green">${N(tin)}</div><div class="s">${fa(docs.filter(d=>d.type==='in').length)} سند</div></div><div class="kpi"><div class="t">خروج</div><div class="v red">${N(tout)}</div><div class="s">${fa(docs.filter(d=>d.type==='out').length)} سند</div></div><div class="kpi"><div class="t">خالص</div><div class="v">${N(tin-tout)}</div></div></div>
+  ${Object.keys(byReason).length?`<div class="card" style="margin-top:12px"><div class="b sm" style="margin-bottom:6px">خروج بر اساس علت</div>${Object.entries(byReason).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="hb"><span class="n">${esc(R_OUT[k]||k)}</span><div class="t"><i style="width:${v/tout*100}%"></i></div><span class="vv">${N(v)}</span></div>`).join('')}</div>`:''}
+  <div class="sect"><h3>اسناد</h3><button class="btn sm noprint" onclick="exportCSV('moves')">${ic('down',16)} اکسل</button></div>
+  <div class="tw"><table class="tbl"><tr><th>تاریخ</th><th>نوع</th><th class="n">شماره</th><th>طرف حساب</th><th class="n">اقلام</th><th class="n">مجموع</th></tr>${docs.slice(0,300).map(d=>`<tr class="clk" onclick="docSheet('${d.doc}')"><td>${dNum(d.date)}</td><td>${T_NAME[d.type]}</td><td class="n">${d.no?fa(d.no):'—'}</td><td>${esc(d.party||'—')}</td><td class="n">${fa(d.items.length)}</td><td class="n ${d.type==='in'?'pos':'neg'}">${N(d.qty)}</td></tr>`).join('')||'<tr><td colspan="6" class="c muted">سندی نیست</td></tr>'}</table></div>`}
+ if(RP.tab==='low'){const l=db.products.filter(p=>['low','out','neg'].includes(status(p))).sort((a,b)=>ST[a.id].t-ST[b.id].t);
+  return`<div class="sect" style="margin-top:4px"><h3>${fa(l.length)} کالا نیاز به توجه دارد</h3><button class="btn sm noprint" onclick="exportCSV('low')">${ic('down',16)} اکسل</button></div>${l.length?`<div class="tw"><table class="tbl"><tr><th>کالا</th>${db.wh.map(w=>`<th class="n">${esc(w.name)}</th>`).join('')}<th class="n">جمع</th><th class="n">حداقل</th><th class="n">پیشنهاد سفارش</th></tr>${l.map(p=>{const s=ST[p.id],need=Math.max(0,Math.ceil((p.min>0?p.min*2:1)-s.t));return`<tr class="clk" onclick="productSheet('${p.id}')"><td><b>${esc(p.name)}</b></td>${db.wh.map(w=>`<td class="n ${(s.w[w.id]||0)<0?'neg':''}">${N(s.w[w.id]||0)}</td>`).join('')}<td class="n"><b>${N(s.t)}</b></td><td class="n muted">${p.min>0?N(p.min):'—'}</td><td class="n pos">${need?'+'+N(need):'—'}</td></tr>`}).join('')}</table></div>`:emptyBox('✅','همه‌چیز موجود است','کالایی زیر حداقل نیست.')}`}
+ if(RP.tab==='xfer'){const l=db.moves.filter(m=>PM[m.pid]&&m.type==='xfer'&&m.date>=f&&m.date<=e);const docs=groupDocs(l).sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts);
+  return`<div class="sect" style="margin-top:4px"><h3>${fa(docs.length)} انتقال · ${N(sum(l,m=>m.qty))} واحد</h3></div>${docs.length?`<div class="tw"><table class="tbl"><tr><th>تاریخ</th><th class="n">شماره</th><th>مسیر</th><th>اقلام</th><th class="n">مجموع</th></tr>${docs.map(d=>`<tr class="clk" onclick="docSheet('${d.doc}')"><td>${dNum(d.date)}</td><td class="n">${d.no?fa(d.no):'—'}</td><td>${esc(mvLabel(d))}</td><td>${esc(d.names.join('، '))}${d.items.length>3?' …':''}</td><td class="n">${N(d.qty)}</td></tr>`).join('')}</table></div>`:emptyBox('🔁','انتقالی ثبت نشده','')}`}
+ if(RP.tab==='counts'){const l=db.counts.filter(c=>c.status==='done').sort((a,b)=>b.ts-a.ts);
+  return`<div class="sect" style="margin-top:4px"><h3>سوابق انبارگردانی</h3></div>${l.length?`<div class="tw"><table class="tbl"><tr><th>تاریخ</th><th>انبار</th><th class="n">شمرده</th><th class="n">اختلاف</th><th class="n">مجموع اختلاف</th><th>ثبت‌کننده</th></tr>${l.map(c=>{const L=(c.lines||[]);return`<tr class="clk" onclick="go('count','${c.id}')"><td>${dNum(c.date)}</td><td>${esc(whName(c.wh))}</td><td class="n">${fa(L.length)}</td><td class="n">${fa(c.diffs||0)}</td><td class="n ${sum(L,x=>x.diff)<0?'neg':'pos'}">${N(sum(L,x=>x.diff))}</td><td>${esc(c.user||'')}</td></tr>`}).join('')}</table></div>`:emptyBox('📋','انبارگردانی ثبت نشده','')}`}
+ /* top */
+ const sold={};db.moves.filter(m=>m.type==='out'&&m.date>=f&&m.date<=e&&PM[m.pid]).forEach(m=>sold[m.pid]=(sold[m.pid]||0)+m.qty);const top=Object.entries(sold).sort((a,b)=>b[1]-a[1]).slice(0,10),tmax=top.length?top[0][1]:1;
+ const d30=addDays(todayISO(),-29),stale=db.products.filter(p=>ST[p.id].t>0&&ST[p.id].out30===0&&(ST[p.id].lastIn?ST[p.id].lastIn<d30:true)).slice(0,15);
+ return`<div class="sect" style="margin-top:4px"><h3>🏆 بیشترین خروج</h3></div><div class="card">${top.length?top.map(([id,v])=>`<div class="hb" onclick="productSheet('${id}')" style="cursor:pointer"><span class="n ellip">${esc(PM[id].name)}</span><div class="t"><i style="width:${v/tmax*100}%"></i></div><span class="vv">${N(v)}</span></div>`).join(''):'<div class="muted sm c">خروجی در این بازه نیست</div>'}</div>
+ <div class="sect"><h3>🕸 راکد (۳۰ روز بدون خروج)</h3></div><div class="card" style="padding:6px 12px">${stale.length?stale.map(p=>`<div class="row" style="padding:9px 0;cursor:pointer;border-top:1px dashed var(--line)" onclick="productSheet('${p.id}')"><span class="sp sm b ellip">${esc(p.name)}</span><span class="xs muted">موجودی ${N(ST[p.id].t)} · آخرین خروج ${ST[p.id].lastOut?rel(ST[p.id].lastOut):'—'}</span></div>`).join(''):'<div class="muted sm c" style="padding:10px">موردی نیست ✅</div>'}</div>`}
+function exportCSV(kind){let csv='﻿',name=kind;
+ if(kind==='moves'){const {f,e}=rpRange();csv+='تاریخ شمسی,ساعت,نوع,شماره,کالا,کد,بارکد,انبار/از,به,تعداد,علت,طرف حساب,شماره فاکتور,یادداشت,ثبت‌کننده\n';
+  db.moves.filter(m=>PM[m.pid]&&m.date>=f&&m.date<=e).sort((a,b)=>a.date.localeCompare(b.date)||a.ts-b.ts).forEach(m=>{const p=PM[m.pid];csv+=[dNum(m.date),hhmm(m.ts),T_NAME[m.type],m.no||'',p.name,p.code,p.barcode,whName(m.wh),m.type==='xfer'?whName(m.to):'',m.type==='adj'?m.delta:m.qty,(m.type==='in'?R_IN:R_OUT)[m.reason]||'',m.party,m.inv,m.note,m.user].map(csvq).join(',')+'\n'});name='harekat'}
+ else if(kind==='turn'){const {f,e}=rpRange();csv+='کالا,کد,ابتدا,ورود,خروج,انتقال,شمارش,انتها\n';turnRows(f,e,RP.wh).forEach(r=>{csv+=[r.p.name,r.p.code,r.open,r.in,r.out,r.xf,r.adj,r.close].map(csvq).join(',')+'\n'});name='gardesh'}
+ else if(kind==='low'){csv+='کالا,کد,'+db.wh.map(w=>w.name).join(',')+',جمع,حداقل\n';db.products.filter(p=>['low','out','neg'].includes(status(p))).forEach(p=>{const s=ST[p.id];csv+=[p.name,p.code,...db.wh.map(w=>s.w[w.id]||0),s.t,p.min].map(csvq).join(',')+'\n'});name='kam-mojoodi'}
+ else{csv+='کالا,کد,بارکد,دسته,'+db.wh.map(w=>w.name).join(',')+',جمع,حداقل,آخرین ورود,آخرین خروج\n';db.products.forEach(p=>{const s=ST[p.id];csv+=[p.name,p.code,p.barcode,catName(p.cat),...db.wh.map(w=>s.w[w.id]||0),s.t,p.min,s.lastIn?dNum(s.lastIn):'',s.lastOut?dNum(s.lastOut):''].map(csvq).join(',')+'\n'});name='mojoodi'}
+ download(name+'-'+todayISO()+'.csv',csv,'text/csv');toast('✓ فایل اکسل ساخته شد')}
+function exportCountCSV(id){const c=countRec(id);let csv='﻿کالا,سیستم,شمارش,اختلاف\n';(c.lines||[]).filter(x=>PM[x.pid]).forEach(x=>{csv+=[PM[x.pid].name,x.sys,x.real,x.diff].map(csvq).join(',')+'\n'});download('anbargardani-'+c.date+'.csv',csv,'text/csv')}
+
+/* ================= demo data ================= */
+function loadSample(){
+ const rnd=n=>Math.floor(Math.random()*n);
+ const cats=['لوازم جانبی موبایل','صوتی و تصویری','شارژ و کابل','باتری'].map(n=>touch({id:uid(),name:n}));db.cats.push(...cats);
+ const mk=(name,pre,cat,brand,min,unit)=>{const c=pre+String(Math.floor(Math.random()*1e8)).padStart(8,'0').slice(0,12-pre.length);const p=touch({id:uid(),name,code:nextCode(),barcode:c+eanCheck(c),cat:cats[cat].id,brand,unit:unit||'عدد',min,loc:'قفسه '+(1+rnd(9)),img:'',desc:'',alias:[],hits:0,created:Date.now()});db.products.push(p);return p};
+ const P=[mk('کابل شارژر تایپ‌سی','6260',2,'انکر',10),mk('کابل شارژر لایتنینگ','6260',2,'اپل',10),mk('هدفون بلوتوثی','6261',1,'هایلو',8),mk('موس بی‌سیم','6262',0,'لاجیتک',10),mk('باتری قلمی','6263',3,'انرجایزر',20,'بسته'),mk('پاوربانک ۱۰۰۰۰','6264',0,'شیائومی',6),mk('کیبورد بی‌سیم','6265',0,'ای‌فور',5),mk('هندزفری سیمی','6266',1,'سامسونگ',12),mk('قاب گوشی سیلیکونی','6267',0,'',15),mk('گلس محافظ صفحه','6268',0,'',25)];
+ const t=todayISO(),W=db.wh[0].id,S=(db.wh[1]||db.wh[0]).id;let k=0;
+ const mv=(pid,type,qty,ago,wh,x)=>{const ts=Date.now()-ago*864e5+(k++)*1000;db.moves.push({id:uid(),doc:uid(),no:0,pid,type,qty,wh,date:addDays(t,-ago),ts,reason:type==='in'?'buy':type==='out'?'sale':'',party:type==='in'?['تأمین‌کننده الف','بازرگانی ب'][rnd(2)]:'',inv:'',note:'',user:'',u:ts,...x})};
+ P.forEach((p,i)=>{mv(p.id,'in',120+rnd(60),28,W);mv(p.id,'xfer',70+rnd(10),24,W,{to:S});for(let d=22;d>=0;d--){if((d+i)%3!==0)mv(p.id,'out',1+rnd(4),d,S)}if(i%3===0)mv(p.id,'in',20+rnd(20),6,W)});
+ db.seq.in=3;db.seq.out=3;db.seq.xfer=2;
+ recalc();/* بعضی کالاها را کم‌موجودی کن */
+ [P[0],P[4],P[9]].forEach(p=>{let dec=ST[p.id].t-Math.max(1,Math.floor(p.min/2));for(const w of [S,W]){const take=Math.min(Math.max(0,stockAt(p.id,w)),dec);if(take>0){mv(p.id,'out',take,3,w,{reason:'waste',note:'خرابی'});dec-=take}}recalc()});
+ addLog('sample','بارگذاری داده نمونه');save();recalc();rerender();toast('✓ داده نمونه اضافه شد')}
+
+/* ================= smart assistant (Persian chat) ================= */
+const NUMW={'صفر':0,'یک':1,'یه':1,'دو':2,'سه':3,'چهار':4,'پنج':5,'شش':6,'شیش':6,'هفت':7,'هشت':8,'نه':9,'ده':10,'یازده':11,'دوازده':12,'سیزده':13,'چهارده':14,'پانزده':15,'شانزده':16,'هفده':17,'هجده':18,'نوزده':19,'بیست':20,'سی':30,'چهل':40,'پنجاه':50,'شصت':60,'هفتاد':70,'هشتاد':80,'نود':90,'صد':100,'دویست':200,'سیصد':300,'چهارصد':400,'پانصد':500,'ششصد':600,'هفتصد':700,'هشتصد':800,'نهصد':900};
+const STOP=new Set(('از به در رو را تا عدد عدده دونه تا چند چقدر چه چی چیه کدوم مونده مونده مانده باقی باقیمانده هست هستش هستن داریم دارم دارد داریم داره موجودی موجود کالا کالاها کالای محصول محصولات بزن بزنید ثبت کن کنید بکن بده بدید بگو بگید نشون نشان بده ببین ببینم اخرین کی وارد خارج ورود خروج فروش بفروش فروختم فروخته انتقال منتقل امروز دیروز انبار مغازه و یا هم یه یک این اون برای با من ما لطفا لطفاً الان الآن مثلا بود شد شده شدن اومد امد نیست نداریم کمه کم تموم تمام').split(' ').map(normFa));
+const AS={msgs:[],pend:{},seq:0};
+VIEWS.assistant={html(){return`<div class="card" style="padding:12px"><div class="row"><div class="bot-av" style="width:42px;height:42px;border-radius:14px">${ic('bot',22)}</div><div class="sp"><div class="b">دستیار هوشمند انبار</div><div class="xs muted">فارسی بنویس؛ موجودی بپرس یا ثبت کن — ثبت فقط بعد از تأیید تو</div></div></div></div>
+ <div class="chat" id="chat"></div>
+ <div class="chips" id="asChips" style="margin-top:4px">${['کم‌موجودی‌ها کدوماست؟','امروز چی فروش رفت؟','امروز چی وارد شد؟','خلاصهٔ وضعیت انبار','راهنما'].map(s=>`<button class="chip" onclick="asSend('${s}')">${s}</button>`).join('')}</div>
+ <div class="chatin"><input id="asIn" placeholder="مثلاً: از کابل شارژر چند عدد مونده؟" onkeydown="if(event.key==='Enter')asSend()" autocomplete="off"><button class="ibtn" id="asMic" style="display:none" onclick="asMic()">🎙</button><button class="btn pri" style="padding:10px 14px" onclick="asSend()">${ic('send',18)}</button></div>`},
+ after(){if(!AS.msgs.length)asSay(`سلام 👋 من دستیار انبارم. چند نمونه:<br>• «موجودی کابل شارژر چقدره؟»<br>• «۵ تا موس بفروش» (بعد از تأیید ثبت می‌شود)<br>• «ورود ۱۰ تا باتری به انبار»<br>• «۳ تا هدفون از انبار به مغازه منتقل کن»<br>• «کم‌موجودی‌ها» / «امروز چی فروش رفت؟»<br>• «کابل شارژر یعنی کابل تایپ‌سی» (برای یاد دادن اسم مستعار)`);else drawChat();
+  if('webkitSpeechRecognition' in window||'SpeechRecognition' in window)$('#asMic').style.display=''}};
+function drawChat(){const c=$('#chat');if(!c)return;c.innerHTML=AS.msgs.map(m=>`<div class="msg ${m.c}">${m.c==='bot'?`<div class="bot-av">${ic('bot',18)}</div>`:''}<div class="bub">${m.h}</div></div>`).join('');setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),30)}
+function asSay(h,c='bot'){AS.msgs.push({c,h});drawChat()}
+function asSend(text){const i=$('#asIn');const t=(typeof text==='string'?text:(i?i.value:'')).trim();if(!t)return;if(i)i.value='';asSay(esc(t),'u');setTimeout(()=>asReply(t),150)}
+function asMic(){try{const R=window.SpeechRecognition||window.webkitSpeechRecognition,r=new R();r.lang='fa-IR';r.onresult=e=>{const t=e.results[0][0].transcript;if(t)asSend(t)};r.onerror=()=>toast('تشخیص صدا کار نکرد');r.start();toast('بگو…')}catch(e){toast('تشخیص صدا در این مرورگر نیست')}}
+/* --- parsing --- */
+function extractNum(tokens){let qty=null;const rest=[];let cur=0,have=false,i=0;
+ for(;i<tokens.length;i++){const w=tokens[i];
+  if(/^\d+(\.\d+)?$/.test(w)){if(qty===null)qty=parseFloat(w);else rest.push(w);continue}
+  if(w==='هزار'){cur=(cur||1)*1000;have=true;continue}
+  if(w in NUMW){cur+=NUMW[w];have=true;continue}
+  if(w==='و'&&have&&i+1<tokens.length&&(tokens[i+1] in NUMW||tokens[i+1]==='هزار'))continue;
+  if(have&&qty===null){qty=cur;cur=0;have=false}rest.push(w)}
+ if(have&&qty===null)qty=cur;return{qty,rest}}
+function whMatch(tokens){/* returns [{id,idxs:[]}] by name tokens */
+ const res=[];for(const w of db.wh){const nt=normFa(w.name).split(' ').filter(x=>x.length>=3),idx=[];tokens.forEach((tk,i)=>{if(nt.includes(tk))idx.push(i)});if(idx.length)res.push({id:w.id,idx,score:idx.length})}
+ if(res.length>1){const mx=Math.max(...res.map(r=>r.score));const top=res.filter(r=>r.score===mx);if(top.length===1&&res.every(r=>r.score===mx||true)){/* keep all if distinct tokens */}}
+ return res}
+function resolveProducts(qTokens){if(!qTokens.length)return[];const out=[];
+ for(const p of db.products){const names=[p.name,...(p.alias||[]),p.brand?p.brand+' '+p.name:''].filter(Boolean);let best=0;
+  for(const nm of names){const pt=normFa(nm).split(' ').filter(Boolean);let s=0,hit=0;for(const q of qTokens){let b=0;for(const t of pt){const x=tokSim(q,t);if(x>b)b=x}s+=b;if(b>=.8)hit++}
+   s/=qTokens.length;if(hit===qTokens.length)s+=.1;s-=0.02*Math.max(0,pt.length-qTokens.length);if(s>best)best=s}
+  best+=Math.min(p.hits||0,10)*.004;if(best>=.55)out.push({p,s:best})}
+ return out.sort((a,b)=>b.s-a.s)}
+function confident(r){return r.length&&r[0].s>=.8&&(r.length===1||r[0].s-r[1].s>=.12)}
+function addAlias(p,phrase){const a=normFa(phrase);if(!a||a===normFa(p.name))return false;p.alias=p.alias||[];if(p.alias.map(normFa).includes(a))return false;p.alias.push(a);touch(p);save();return true}
+const stockLine=p=>{const s=ST[p.id],st=status(p);return`<div><b>${esc(p.name)}</b> ${STAT_PILL[st]}</div><div class="row2 row" style="justify-content:space-between"><span>موجودی کل</span><b>${N(s.t)} ${esc(p.unit||'')}</b></div>${p.min>0?`<div class="row2 row" style="justify-content:space-between"><span>حداقل مجاز</span><b>${N(p.min)}</b></div>`:''}${db.wh.map(w=>`<div class="row2 row" style="justify-content:space-between"><span>${esc(w.name)}</span><b>${N(s.w[w.id]||0)}</b></div>`).join('')}`};
+function asReply(raw){const t=normFa(raw);if(!t)return;let toks=t.split(' ');
+ const dayWord=/دیروز/.test(t)?'y':/امروز/.test(t)?'t':/هفته|هفت روز/.test(t)?'w':/ماه|سی روز/.test(t)?'m':'';
+ /* help */
+ if(/^(سلام|درود|کمک|راهنما|help|چیکار|چه کاری)/.test(t)&&toks.length<=4)return asSay('می‌توانم این کارها را بکنم:<br>• پرسیدن موجودی هر کالا و هر انبار<br>• «کم‌موجودی‌ها»، «امروز چی فروش رفت؟»، «خلاصهٔ وضعیت»<br>• ثبت خروج/فروش، ورود و انتقال — مثلاً «۵ تا موس بفروش»<br>• یاد گرفتن اسم‌های شما: «کابل شارژر یعنی کابل تایپ‌سی»<br>هر ثبتی فقط بعد از تأیید تو انجام می‌شود.');
+ /* teach alias */
+ let m=t.match(/^(.+?)\s+(?:یعنی|همون|همان|معادل)\s+(.+)$/);
+ if(m&&can('act')){const r=resolveProducts(extractNum(m[2].split(' ').filter(x=>!STOP.has(x))).rest);if(r.length&&confident(r)){const ok=addAlias(r[0].p,m[1]);return asSay(ok?`یاد گرفتم ✅ از این به بعد «${esc(m[1])}» یعنی «${esc(r[0].p.name)}».`:`این اسم قبلاً برای «${esc(r[0].p.name)}» ثبت بوده.`)}
+  return asSay('کالای دوم را مطمئن پیدا نکردم؛ اسمش را دقیق‌تر بنویس.')}
+ /* summary queries */
+ const isAct=/(بفروش|فروختم|فروش بزن|فروش کن|خروج بزن|خروج بده|خروج کن|کم کن|برداشتم|مصرف کردم|ورود بزن|وارد کن|وارد شد|اضافه کن|ورود کن|اوردم|خریدم|دریافت کردم|اومد|انتقال|منتقل|جابجا|ببر)/.test(t)||/^(ورود|خروج|فروش|وارد)\s/.test(t);
+ const {qty,rest}=extractNum(toks);
+ const whs=whMatch(rest);const whIdx=new Set(whs.flatMap(w=>w.idx));
+ const qT=rest.filter((x,i)=>!STOP.has(x)&&!whIdx.has(i)&&x.length>1);
+ const cand=resolveProducts(qT);
+ /* --- actions --- */
+ if(isAct&&qty>0&&cand.length){if(!can('act')&&!can('act.sale'))return asSay('برای این کار دسترسی نداری. فقط می‌توانم موجودی را بگویم.');
+  const isX=/(انتقال|منتقل|جابجا|ببر)/.test(t),isIn=!isX&&/(ورود|وارد|اضافه|اوردم|خریدم|دریافت|اومد)/.test(t)&&!/(بفروش|فروش)/.test(t),type=isX?'xfer':isIn?'in':'out';
+  if(!can('act')&&(type!=='out'||!can('act.sale')))return asSay('این کار برای نقش تو مجاز نیست.');
+  const intent={type,qty,reason:/فروش|فروختم/.test(t)?'sale':'other',qT:qT.join(' ')};
+  /* warehouses */
+  const before=(i)=>rest[i-1]||'';let from=null,to=null;
+  for(const w of whs){const i=w.idx[0];if(before(i)==='به'||before(i-1)==='به'&&false)to=to||w.id;else if(before(i)==='از')from=from||w.id}
+  const ordered=whs.map(w=>w.id);
+  if(type==='xfer'){if(!from&&!to&&ordered.length>=2){from=ordered[0];to=ordered[1]}else if(!from&&to)from=db.wh.find(w=>w.id!==to).id;else if(from&&!to)to=db.wh.find(w=>w.id!==from).id;else if(!from&&!to){from=db.prefs.defWh;to=db.wh.find(w=>w.id!==from).id}intent.wh=from;intent.to=to}
+  else intent.wh=from||to||ordered[0]||(type==='in'?db.prefs.defWh:db.prefs.saleWh);
+  if(!WM[intent.wh])intent.wh=db.wh[0].id;
+  if(confident(cand))return asAction(intent,cand[0].p);
+  return asAmbig(intent,cand,qT.join(' '))}
+ /* --- queries --- */
+ if(/(کم موجودی|کمبود|تموم|تمام شده|ته کشیده|نیاز به خرید|سفارش|کم شده|رو به اتمام|ناموجود|زیر حداقل)/.test(t)&&!confident(cand)){const l=db.products.filter(p=>['low','out','neg'].includes(status(p))).sort((a,b)=>ST[a.id].t-ST[b.id].t);
+  return asSay(l.length?`${fa(l.length)} کالا به حداقل رسیده یا تمام شده:<br>${l.slice(0,12).map(p=>`<div class="row2 row" style="justify-content:space-between"><span>${esc(p.name)}</span><b>${N(ST[p.id].t)}${p.min>0?' / '+N(p.min):''}</b></div>`).join('')}${l.length>12?`<div class="xs muted">و ${fa(l.length-12)} مورد دیگر…</div>`:''}<button class="btn sm blk" onclick="exportCSV('low')">${ic('down',16)} خروجی اکسل</button>`:'همهٔ کالاها بالاتر از حداقل موجودی هستند ✅')}
+ if(/(فروش|فروخت|خروج|خارج|رفت)/.test(t)&&dayWord&&!confident(cand))return asPeriod('out',dayWord);
+ if(/(ورود|وارد|اومد|امد|دریافت)/.test(t)&&dayWord&&!confident(cand))return asPeriod('in',dayWord);
+ if(/(خلاصه|وضعیت|گزارش|امار|کلی)/.test(t)&&!confident(cand)){const tot=sum(db.products,p=>Math.max(0,ST[p.id].t)),t0=todayISO();
+  return asSay(`📊 وضعیت کلی:<div class="row2 row" style="justify-content:space-between"><span>تعداد کالا</span><b>${N(db.products.length)}</b></div><div class="row2 row" style="justify-content:space-between"><span>موجودی کل</span><b>${N(tot)}</b></div>${db.wh.map(w=>`<div class="row2 row" style="justify-content:space-between"><span>${esc(w.name)}</span><b>${N(sum(db.products,p=>Math.max(0,stockAt(p.id,w.id))))}</b></div>`).join('')}<div class="row2 row" style="justify-content:space-between"><span>خروج امروز</span><b>${N(sum(db.moves.filter(m=>m.type==='out'&&m.date===t0&&PM[m.pid]),m=>m.qty))}</b></div><div class="row2 row" style="justify-content:space-between"><span>ورود امروز</span><b>${N(sum(db.moves.filter(m=>m.type==='in'&&m.date===t0&&PM[m.pid]),m=>m.qty))}</b></div><div class="row2 row" style="justify-content:space-between"><span>کم‌موجودی</span><b class="${lowCount()?'amber':''}">${fa(lowCount())}</b></div>`)}
+ if(!cand.length&&whs.length&&!qT.length){const w=whs[0].id,items=db.products.filter(p=>stockAt(p.id,w)>0);return asSay(`🏬 ${esc(whName(w))}: ${fa(items.length)} قلم کالا، جمعاً ${N(sum(items,p=>stockAt(p.id,w)))} واحد.`)}
+ if(cand.length){
+  if(/(اخرین|کی|چه وقت|تاریخ)/.test(t)&&/(ورود|وارد|خروج|فروش|خارج|رفت|اومد)/.test(t)&&confident(cand)){const p=cand[0].p,s=ST[p.id],isIn=/(ورود|وارد|اومد)/.test(t);const d=isIn?s.lastIn:s.lastOut;
+   return asSay(d?`آخرین ${isIn?'ورود':'خروج'} «${esc(p.name)}»: <b>${wday(d)} ${dFull(d)}</b> (${rel(d)})`:`برای «${esc(p.name)}» هنوز ${isIn?'ورودی':'خروجی'} ثبت نشده.`)}
+  if(confident(cand)){const p=cand[0].p;p.hits=(p.hits||0)+1;save();
+   return asSay(stockLine(p)+`<div class="chips" style="margin-top:8px;padding:0">${can('act')?`<button class="chip" onclick="asQuick('out','${p.id}')">ثبت خروج</button><button class="chip" onclick="asQuick('in','${p.id}')">ثبت ورود</button>`:''}<button class="chip" onclick="productSheet('${p.id}')">جزئیات</button></div>`)}
+  return asAmbig({type:'query'},cand,qT.join(' '))}
+ /* unknown */
+ asSay('متوجه نشدم 🤔 اسم کالا را دقیق‌تر بنویس یا «راهنما» را بزن.'+(qT.length?`<br><span class="xs muted">دنبال «${esc(qT.join(' '))}» گشتم و کالایی پیدا نکردم.</span>`:''))}
+function asPeriod(type,dw){const t0=todayISO(),f=dw==='y'?addDays(t0,-1):dw==='w'?addDays(t0,-6):dw==='m'?addDays(t0,-29):t0,e=dw==='y'?addDays(t0,-1):t0;
+ const l=db.moves.filter(m=>m.type===type&&m.date>=f&&m.date<=e&&PM[m.pid]),agg={};l.forEach(m=>agg[m.pid]=(agg[m.pid]||0)+m.qty);const arr=Object.entries(agg).sort((a,b)=>b[1]-a[1]);
+ const lbl={t:'امروز',y:'دیروز',w:'۷ روز اخیر',m:'۳۰ روز اخیر'}[dw];
+ asSay(arr.length?`${type==='in'?'ورودی':'خروجی'} ${lbl}: ${N(sum(arr,x=>x[1]))} واحد در ${fa(arr.length)} قلم<br>${arr.slice(0,12).map(([id,q])=>`<div class="row2 row" style="justify-content:space-between"><span>${esc(PM[id].name)}</span><b>${N(q)}</b></div>`).join('')}`:`${lbl} ${type==='in'?'ورودی':'خروجی'} ثبت نشده.`)}
+function asAmbig(intent,cand,q){const id='a'+(++AS.seq);AS.pend[id]={intent,q};
+ asSay(`منظورت کدام است؟${cand.slice(0,4).map(c=>`<button class="btn sm blk" style="justify-content:flex-start" onclick="asChoose('${id}','${c.p.id}')">${esc(c.p.name)} <span class="xs muted">(${N(ST[c.p.id].t)})</span></button>`).join('')}`)}
+function asChoose(id,pid){const o=AS.pend[id];if(!o)return;const p=PM[pid];asSay(esc(p.name),'u');
+ if(o.q&&addAlias(p,o.q))setTimeout(()=>asSay(`📚 یاد گرفتم: «${esc(o.q)}» = «${esc(p.name)}»`),250);
+ setTimeout(()=>{if(o.intent.type==='query'){p.hits=(p.hits||0)+1;save();asSay(stockLine(p))}else asAction(o.intent,p)},120)}
+function asQuick(type,pid){const p=PM[pid];asSay(`${T_NAME[type]} ${esc(p.name)}`,'u');asAction({type,qty:1,reason:type==='out'?'sale':'buy',wh:type==='in'?db.prefs.defWh:db.prefs.saleWh},p)}
+function asAction(intent,p){const id='a'+(++AS.seq);AS.pend[id]={intent:{...intent},pid:p.id};const I=AS.pend[id].intent,s=ST[p.id];
+ const lab=I.type==='out'?(I.reason==='sale'?'فروش':'خروج'):T_NAME[I.type];
+ asSay(`می‌خوای ثبت کنم؟<div class="card" style="margin:8px 0;padding:10px;box-shadow:none"><div class="b">${lab} ${N(I.qty)} ${esc(p.unit||'عدد')} «${esc(p.name)}»</div>
+ <div class="xs muted" style="margin:4px 0">${I.type==='xfer'?`از ${esc(whName(I.wh))} به ${esc(whName(I.to))}`:`${I.type==='in'?'به':'از'} ${esc(whName(I.wh))}`} · موجودی فعلی آن انبار: ${N(stockAt(p.id,I.wh))}</div>
+ <div class="chips" id="ch_${id}" style="padding:0">${I.type==='xfer'?'':db.wh.map(w=>`<button class="chip ${I.wh===w.id?'on':''}" onclick="asWh('${id}','${w.id}')">${esc(w.name)}</button>`).join('')}</div></div>
+ <div class="grid2"><button class="btn pri sm" onclick="asConfirm('${id}')">✅ تأیید و ثبت</button><button class="btn sm" onclick="asCancel('${id}')">لغو</button></div>`)}
+function asWh(id,w){const o=AS.pend[id];if(!o)return;o.intent.wh=w;const c=$('#ch_'+id);if(c)c.querySelectorAll('.chip').forEach((b,i)=>b.classList.toggle('on',db.wh[i].id===w))}
+function asCancel(id){delete AS.pend[id];asSay('لغو شد.')}
+function asConfirm(id){const o=AS.pend[id];if(!o)return asSay('این درخواست قبلاً انجام یا لغو شده.');const I=o.intent,p=PM[o.pid];delete AS.pend[id];
+ if(I.type!=='in'&&I.type!=='xfer'&&stockAt(p.id,I.wh)<I.qty)return asSay(`⚠️ موجودی ${esc(whName(I.wh))} فقط ${N(stockAt(p.id,I.wh))} است و کمتر از ${N(I.qty)}. انبار دیگری انتخاب کن یا اول موجودی را اصلاح کن.`);
+ if(I.type==='xfer'&&stockAt(p.id,I.wh)<I.qty)return asSay(`⚠️ موجودی ${esc(whName(I.wh))} کافی نیست (${N(stockAt(p.id,I.wh))}).`);
+ const r=commitDoc({type:I.type,wh:I.wh,to:I.to,date:todayISO(),reason:I.type==='in'?'buy':I.type==='out'?I.reason:'',note:'ثبت با دستیار',lines:[{pid:p.id,qty:I.qty}]});
+ if(!r)return asSay('ثبت نشد.');p.hits=(p.hits||0)+1;save();beep();const uid2='u'+(++AS.seq);AS.pend[uid2]={undo:r.moves.map(m=>m.id)};
+ asSay(`✅ ثبت شد. موجودی جدید «${esc(p.name)}»: <b>${N(ST[p.id].t)}</b> (${db.wh.map(w=>esc(w.name)+' '+N(stockAt(p.id,w.id))).join(' · ')})<br><button class="btn sm" style="margin-top:6px" onclick="asUndo('${uid2}')">بازگردانی</button>`)}
+function asUndo(id){const o=AS.pend[id];if(!o)return;delete AS.pend[id];delMoves(o.undo);asSay('↩️ بازگردانی شد.')}
+
+/* ================= settings / users / log / lock / sync ================= */
+function promptBox(title,val,cb,ph=''){sheet(`<h2>${esc(title)}</h2><input id="pbIn" class="inp" value="${esc(val||'')}" placeholder="${esc(ph)}"><div class="grid2" style="margin-top:12px"><button class="btn pri" id="pbOk">${ic('check')} ذخیره</button><button class="btn" onclick="closeSheet()">انصراف</button></div>`,'cen');
+ const go=()=>{const v=$('#pbIn').value.trim();if(!v)return;closeSheet();cb(v)};$('#pbOk').onclick=go;$('#pbIn').onkeydown=e=>{if(e.key==='Enter')go()};setTimeout(()=>$('#pbIn').focus(),200)}
+const P=(k,v)=>{db.prefs[k]=v;save()};
+VIEWS.settings={html(){const S=db.settings,p=db.prefs;
+ return`<div class="card"><div class="b" style="margin-bottom:10px">⚙️ عمومی</div>
+ <div class="fld"><label>نام کسب‌وکار / برنامه</label><input class="inp" value="${esc(S.name)}" onchange="db.settings.name=this.value.trim()||'انباریار پرو';db.settings.su=Date.now();save();layout()"></div>
+ <div class="grid2"><div class="fld"><label>انبار پیش‌فرض ورود</label><select class="inp" onchange="P('defWh',this.value)">${db.wh.map(w=>`<option value="${w.id}" ${p.defWh===w.id?'selected':''}>${esc(w.name)}</option>`).join('')}</select></div>
+ <div class="fld"><label>انبار پیش‌فرض فروش/خروج</label><select class="inp" onchange="P('saleWh',this.value)">${db.wh.map(w=>`<option value="${w.id}" ${p.saleWh===w.id?'selected':''}>${esc(w.name)}</option>`).join('')}</select></div></div>
+ <div class="fld"><label>دوربین پیش‌فرض</label><div class="segctl" style="grid-template-columns:1fr 1fr">${[['environment','پشت'],['user','جلو']].map(([k,t])=>`<button class="${p.cam===k?'on':''}" onclick="P('cam','${k}');rerender()">${t}</button>`).join('')}</div></div>
+ <div class="grid2"><button class="chip ${p.sound?'on':''}" style="justify-content:center" onclick="P('sound',!db.prefs.sound);rerender()">🔊 صدا ${p.sound?'روشن':'خاموش'}</button><button class="chip ${p.vib?'on':''}" style="justify-content:center" onclick="P('vib',!db.prefs.vib);rerender()">📳 لرزش ${p.vib?'روشن':'خاموش'}</button></div>
+ <div class="grid2" style="margin-top:8px"><button class="chip ${p.autoCam!==false?'on':''}" style="justify-content:center" onclick="P('autoCam',db.prefs.autoCam===false);rerender()">📷 روشن‌شدن خودکار دوربین</button></div>
+ <div class="fld" style="margin-top:12px"><label>پوسته</label><div class="segctl" style="grid-template-columns:repeat(3,1fr)">${[['auto','خودکار'],['light','روشن'],['dark','تیره']].map(t=>`<button class="${p.theme===t[0]?'on':''}" onclick="P('theme','${t[0]}');applyTheme();rerender()">${t[1]}</button>`).join('')}</div></div></div>
+ <div class="card"><div class="row" style="margin-bottom:8px"><div class="b sp">🏬 انبارها</div><button class="btn sm pri" onclick="promptBox('نام انبار جدید','',v=>{db.wh.push(touch({id:uid(),name:v}));save();recalc();rerender()},'مثلاً انبار شمال')">${ic('plus',16)} انبار جدید</button></div>
+ ${db.wh.map(w=>`<div class="row" style="padding:8px 0;border-top:1px dashed var(--line)"><span class="sp b sm">${esc(w.name)}</span><span class="xs muted">${fa(db.products.filter(x=>stockAt(x.id,w.id)>0).length)} قلم</span><button class="btn sm" onclick="promptBox('تغییر نام انبار','${esc(w.name)}',v=>{w.name=v;touch(w);save();recalc();rerender()})">${ic('edit',15)}</button><button class="btn sm" style="color:var(--red)" onclick="delWh('${w.id}')">${ic('trash',15)}</button></div>`).join('')}</div>
+ <div class="card"><div class="row" style="margin-bottom:8px"><div class="b sp">🏷 دستهٔ کالاها</div><button class="btn sm pri" onclick="promptBox('نام دستهٔ جدید','',v=>{db.cats.push(touch({id:uid(),name:v}));save();recalc();rerender()})">${ic('plus',16)} دستهٔ جدید</button></div>
+ ${db.cats.length?db.cats.map(c=>`<div class="row" style="padding:8px 0;border-top:1px dashed var(--line)"><span class="sp b sm">${esc(c.name)}</span><span class="xs muted">${fa(db.products.filter(x=>x.cat===c.id).length)} کالا</span><button class="btn sm" onclick="promptBox('تغییر نام دسته','${esc(c.name)}',v=>{c.name=v;touch(c);save();recalc();rerender()})">${ic('edit',15)}</button><button class="btn sm" style="color:var(--red)" onclick="delCat('${c.id}')">${ic('trash',15)}</button></div>`).join(''):'<div class="muted sm">هنوز دسته‌ای نساخته‌ای. هنگام ثبت کالا هم می‌توانی دسته بسازی.</div>'}</div>
+ <div class="card"><div class="b" style="margin-bottom:8px">💾 پشتیبان‌گیری و داده‌ها</div>
+ <div class="grid2"><button class="btn" onclick="exportJSON()">${ic('down',18)} پشتیبان JSON</button><button class="btn" onclick="importJSON()">${ic('up',18)} بازیابی از فایل</button><button class="btn" onclick="exportCSV('stock')">${ic('list',18)} اکسل موجودی</button><button class="btn" onclick="RP.range='all';exportCSV('moves')">${ic('list',18)} اکسل حرکت‌ها</button></div>
+ <div class="hint">آخرین پشتیبان فایل: ${p.lastBackup?dFull(isoOf(new Date(p.lastBackup))):'هرگز'} · داده‌ها روی همین گوشی در مرورگر ذخیره می‌شوند؛ هر روز یک نسخهٔ خودکار هم نگه داشته می‌شود.</div>
+ <div id="bkList" class="hint"></div><div id="stoUse" class="hint"></div>
+ <div class="grid2" style="margin-top:10px"><button class="btn" onclick="loadSample()">داده نمونه</button><button class="btn" style="color:var(--red)" onclick="clearAll()">${ic('trash',18)} پاک‌سازی همه</button></div></div>
+ ${syncCard()}
+ <div class="card"><div class="b" style="margin-bottom:8px">📲 نصب به‌صورت برنامه</div>${isStandalone()?'<div class="hint">نصب شده است ✓</div>':DEFERRED?`<button class="btn pri blk" onclick="installApp()">${ic('down',18)} نصب روی این گوشی</button>`:'<div class="hint">از منوی ⋮ در Chrome گزینهٔ «Install app» یا «Add to Home screen» را بزن.</div>'}</div>
+ <div class="card"><div class="b" style="margin-bottom:6px">🧾 گزارش فعالیت</div>${logHtml(30)}${db.log.length>30?`<button class="btn blk sm" onclick="go('users')">همهٔ فعالیت‌ها</button>`:''}</div>
+ <div class="hint c" style="margin:14px 0">انباریار پرو · نسخه ${APP_VER}</div>`},
+ after(){bkInfo()}};
+async function bkInfo(){const el=$('#bkList');if(!el)return;const ks=(await IDB.keys()).filter(k=>String(k).startsWith('bk-')).sort().reverse();
+ el.innerHTML=ks.length?'نسخه‌های خودکار: '+ks.map(k=>`<a class="brandc" style="cursor:pointer;margin-left:8px" onclick="restoreBk('${k}')">${dNum(String(k).slice(3))}</a>`).join(''):'';
+ try{const e=await navigator.storage.estimate();$('#stoUse').textContent='فضای مصرف‌شده: '+fa((e.usage/1048576).toFixed(1))+' مگابایت'}catch(x){}}
+function restoreBk(k){confirmBox('داده‌ها به این نسخهٔ خودکار برگردند؟','بازگردانی',async()=>{const s=await IDB.get(k);try{await IDB.set('pre-restore',JSON.stringify(db));db=normalize(JSON.parse(s));recalc();save();rerender();toast('✓ بازگردانی شد')}catch(e){toast('نسخه خراب است')}},false,'نسخهٔ فعلی قبلش به‌عنوان «pre-restore» نگه داشته می‌شود.')}
+function delWh(id){if(db.wh.length<=1)return toast('حداقل یک انبار لازم است');if(db.moves.some(m=>m.wh===id||m.to===id))return toast('این انبار حرکت دارد؛ حذف نمی‌شود (می‌توانی نامش را عوض کنی)');
+ confirmBox('این انبار حذف شود؟','حذف',()=>{db.wh=db.wh.filter(w=>w.id!==id);db.dead[id]=Date.now();if(db.prefs.defWh===id)db.prefs.defWh=db.wh[0].id;if(db.prefs.saleWh===id)db.prefs.saleWh=db.wh[0].id;save();recalc();rerender()})}
+function delCat(id){confirmBox('این دسته حذف شود؟ (کالاها بدون دسته می‌شوند)','حذف',()=>{db.cats=db.cats.filter(c=>c.id!==id);db.dead[id]=Date.now();db.products.forEach(p=>{if(p.cat===id){p.cat='';touch(p)}});save();recalc();rerender()})}
+function exportJSON(){download('anbaryar-backup-'+todayISO()+'.json',JSON.stringify({app:'anbaryar-pro',...db},null,1),'application/json');db.prefs.lastBackup=Date.now();save();toast('✓ فایل پشتیبان ساخته شد')}
+function importJSON(){const i=document.createElement('input');i.type='file';i.accept='.json,application/json';i.onchange=e=>{const r=new FileReader();r.onload=ev=>{try{let d=JSON.parse(ev.target.result);if(d.app==='scan-anbar'||(d.products&&d.moves&&d.v===1))d=migrateV1(d);if(!d.products||!d.moves)throw 0;
+ confirmBox('داده‌های فعلی با این فایل جایگزین شود؟','جایگزین کن',()=>{const pf=db.prefs;db=normalize(d);db.prefs={...db.prefs,...pf};recalc();save();applyTheme();rerender();toast('✓ بازیابی شد')},false)}catch(e){toast('فایل نامعتبر است')}};r.readAsText(e.target.files[0])};i.click()}
+function clearAll(){confirmBox('همهٔ کالاها و حرکت‌ها برای همیشه پاک شود؟','پاک کن',()=>confirmBox('مطمئنی؟ قابل بازگشت نیست (مگر با فایل پشتیبان).','بله، پاک شود',()=>{const t=Date.now();const keep=db.prefs,name=db.settings.name;const dead={...db.dead};[...db.products,...db.moves,...db.cats,...db.counts].forEach(x=>dead[x.id]=t);db={...blank(),dead,settings:{name,su:t},wh:db.wh,users:db.users};db.prefs={...DEFPREF,...keep};recalc();save();rerender()}))}
+let DEFERRED=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();DEFERRED=e});addEventListener('appinstalled',()=>{DEFERRED=null;toast('✓ برنامه نصب شد')});
+const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+async function installApp(){if(!DEFERRED)return;DEFERRED.prompt();await DEFERRED.userChoice.catch(()=>{});DEFERRED=null;rerender()}
+function logHtml(n){const l=db.log.slice().sort((a,b)=>b.ts-a.ts).slice(0,n);return l.length?l.map(x=>`<div class="row" style="padding:7px 0;border-top:1px dashed var(--line)"><span class="sp sm">${esc(x.txt)}</span><span class="xs muted" style="text-align:left">${esc(x.user||'')}<br>${dShort(isoOf(new Date(x.ts)))} ${hhmm(x.ts)}</span></div>`).join(''):'<div class="muted sm">فعالیتی ثبت نشده</div>'}
+
+/* ---------------- users & roles ---------------- */
+async function sha(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=5381;for(const c of s)h=((h<<5)+h+c.charCodeAt(0))>>>0;return'x'+h.toString(16)}}
+const pinHash=(id,pin)=>sha('anbaryar|'+id+'|'+pin);
+VIEWS.users={html(){return`<div class="card"><div class="row"><div class="tic t-adj" style="width:44px;height:44px;border-radius:14px">${ic('users',22)}</div><div class="sp"><div class="b">کاربران و دسترسی‌ها</div><div class="xs muted">${db.users.length?'قفل ورود با رمز ۴ رقمی فعال است':'تا وقتی کاربری نسازی، برنامه بدون رمز باز می‌شود'}</div></div><button class="btn sm pri" onclick="userForm()">${ic('plus',16)} کاربر</button></div></div>
+ <div class="hint" style="margin:8px 4px"><b>مدیر:</b> همه‌چیز · <b>انباردار:</b> کالا، ورود/خروج/انتقال، انبارگردانی، گزارش · <b>فروشنده:</b> فقط فروش (خروج) و دیدن موجودی. این قفل فقط روی همین گوشی اعمال می‌شود.</div>
+ ${db.users.map(u=>`<div class="item" onclick="userForm('${u.id}')"><div class="av" style="background:linear-gradient(135deg,hsl(${hue(u.name)} 65% 52%),hsl(${(hue(u.name)+40)%360} 65% 44%))">${esc(u.name.charAt(0))}</div><div class="sp"><div class="b">${esc(u.name)}</div><div class="xs muted">${ROLES[u.role]}${CUR&&CUR.id===u.id?' · شما':''}</div></div>${ic('chev',18)}</div>`).join('')}
+ <div class="sect"><h3>گزارش فعالیت</h3></div><div class="card">${logHtml(80)}</div>`}};
+function userForm(id){const u=id?db.users.find(x=>x.id===id):null;
+ sheet(`<h2>${u?'ویرایش کاربر':'کاربر جدید'}</h2><div class="fld"><label>نام</label><input id="ufName" class="inp" value="${esc(u?u.name:'')}"></div>
+ <div class="fld"><label>نقش</label><select id="ufRole" class="inp">${Object.entries(ROLES).map(([k,v])=>`<option value="${k}" ${u&&u.role===k||(!u&&!db.users.length&&k==='admin')?'selected':''}>${v}</option>`).join('')}</select></div>
+ <div class="fld"><label>رمز ۴ رقمی ${u?'(خالی = بدون تغییر)':''}</label><input id="ufPin" class="inp ltr" inputmode="numeric" maxlength="4" placeholder="••••" style="letter-spacing:8px;text-align:center;font-size:20px"></div>
+ ${!db.users.length?'<div class="banner">با ساخت اولین کاربر، قفل برنامه فعال می‌شود. اولین کاربر باید «مدیر» باشد و رمزش را فراموش نکن.</div>':''}
+ <div class="grid2"><button class="btn pri" onclick="userSave('${id||''}')">${ic('check')} ذخیره</button>${u?`<button class="btn" style="color:var(--red)" onclick="userDel('${id}')">${ic('trash',16)} حذف</button>`:'<button class="btn" onclick="closeSheet()">انصراف</button>'}</div>`)}
+async function userSave(id){const name=$('#ufName').value.trim(),role=$('#ufRole').value,pin=en($('#ufPin').value).trim();if(!name)return toast('نام را بنویس');
+ let u=id?db.users.find(x=>x.id===id):null;if(!u&&!/^\d{4}$/.test(pin))return toast('رمز باید ۴ رقم باشد');if(pin&&!/^\d{4}$/.test(pin))return toast('رمز باید ۴ رقم باشد');
+ if(db.users.some(x=>x.id!==id&&x.name===name))return toast('این نام قبلاً هست');
+ if(!db.users.length&&role!=='admin')return toast('اولین کاربر باید مدیر باشد');
+ if(u&&u.role==='admin'&&role!=='admin'&&db.users.filter(x=>x.role==='admin').length<=1)return toast('باید حداقل یک مدیر بماند');
+ const first=!db.users.length;
+ if(!u){u=touch({id:uid(),name,role,pin:''});db.users.push(u)}else{u.name=name;u.role=role}
+ if(pin)u.pin=await pinHash(u.id,pin);touch(u);addLog('user','کاربر «'+name+'» ('+ROLES[role]+') ذخیره شد');
+ if(first){CUR=u;sessSet(u)}else if(CUR&&CUR.id===u.id)CUR=u;
+ save();closeSheet();layout();rerender();toast('✓ ذخیره شد')}
+function userDel(id){const u=db.users.find(x=>x.id===id);if(u.role==='admin'&&db.users.filter(x=>x.role==='admin').length<=1)return toast('باید حداقل یک مدیر بماند');
+ confirmBox(`کاربر «${u.name}» حذف شود؟`,'حذف',()=>{db.users=db.users.filter(x=>x.id!==id);db.dead[id]=Date.now();addLog('user','حذف کاربر «'+u.name+'»');if(CUR&&CUR.id===id){CUR=null;sessSet(null)}save();closeSheet();if(db.users.length&&!CUR)showLock();else{layout();rerender()}})}
+function sessSet(u){try{if(u)localStorage.setItem('anb_sess',JSON.stringify({id:u.id,t:Date.now()}));else localStorage.removeItem('anb_sess')}catch(e){}}
+function sessGet(){try{return JSON.parse(localStorage.getItem('anb_sess')||'null')}catch(e){return null}}
+function logout(){CUR=null;sessSet(null);if(db.users.length)showLock();else{layout();rerender()}}
+function showLock(sel){const root=$('#lockRoot');let pick=sel||(db.users.find(u=>u.id===(sessGet()||{}).id)||db.users[0]||{}).id,pin='';
+ function draw(){root.innerHTML=`<div class="lock"><div class="logo">${ic('cube',34)}</div><div class="b" style="font-size:20px">${esc(db.settings.name)}</div><div class="ulist">${db.users.map(u=>`<button class="${u.id===pick?'on':''}" onclick="window.__lk.pick('${u.id}')">${esc(u.name)}</button>`).join('')}</div>
+  <div style="opacity:.8;font-size:13px">رمز ۴ رقمی را وارد کن</div><div class="pins">${[0,1,2,3].map(i=>`<i class="${i<pin.length?'f':''}"></i>`).join('')}</div>
+  <div class="pad">${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k=>`<button ${k===''?'style="visibility:hidden"':''} onclick="window.__lk.key('${k}')">${k}</button>`).join('')}</div></div>`}
+ window.__lk={pick(id){pick=id;pin='';draw()},async key(k){if(k==='⌫')pin=pin.slice(0,-1);else if(pin.length<4)pin+=k;draw();
+   if(pin.length===4){const u=db.users.find(x=>x.id===pick);if(u&&await pinHash(u.id,pin)===u.pin){CUR=u;sessSet(u);root.innerHTML='';addLog('login','ورود به برنامه');save();layout();render();beep()}else{beep('warn');pin='';setTimeout(draw,150);toast('رمز اشتباه است')}}}};
+ draw()}
+
+/* ---------------- sync ---------------- */
+const SY={url:'',key:'',on:false,state:'off',rev:-1,err:'',last:0,applying:false,tp:null,tq:null,info:null};
+function sySaveCfg(){try{localStorage.setItem('anb_sync',JSON.stringify({url:SY.url,key:SY.key,on:SY.on}))}catch(e){}}
+function syLoad(){try{Object.assign(SY,JSON.parse(localStorage.getItem('anb_sync')||'{}'))}catch(e){}}
+const slim=()=>{const o={v:2,dead:db.dead,seq:db.seq,settings:db.settings};for(const c of COLS)o[c]=db[c];return o};
+async function syFetch(path,opt={}){const url=(SY.url||'').replace(/\/+$/,'')+path;const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),20000);
+ try{const r=await fetch(url,{...opt,signal:ctl.signal,headers:{'X-Key':SY.key,'Content-Type':'application/json'}});if(r.status===401)throw new Error('کد همگام‌سازی اشتباه است');if(!r.ok)throw new Error('خطای سرور '+r.status);return await r.json()}finally{clearTimeout(to)}}
+function applyRemote(remote){const local=slim(),m=mergeDb(local,remote);
+ const changed=JSON.stringify(m)!==JSON.stringify(mergeDb(local,local));
+ SY.applying=true;try{for(const c of COLS)db[c]=m[c];db.dead=m.dead;db.seq={...db.seq,...m.seq};db.settings={...db.settings,...m.settings};recalc();if(changed)save()}finally{SY.applying=false}
+ return changed}
+async function syNow(){if(!SY.on)return;try{SY.state='sync';syUi();const r=await syFetch('/api/sync',{method:'POST',body:JSON.stringify({db:slim()})});const ch=applyRemote(r.db);SY.rev=r.rev;SY.state='ok';SY.err='';SY.last=Date.now();if(ch)uiRefresh()}catch(e){SY.state='err';SY.err=e.name==='AbortError'?'پاسخی از سرور نیامد':(e.message==='Failed to fetch'?'سرور در دسترس نیست':e.message)}syUi()}
+async function syPoll(){if(!SY.on||SY.state==='sync')return;try{const r=await syFetch('/api/rev');if(r.rev!==SY.rev){const d=await syFetch('/api/db');const ch=applyRemote(d.db);SY.rev=d.rev;SY.last=Date.now();if(ch){uiRefresh();await syNow()}}SY.state='ok';SY.err=''}catch(e){SY.state='err';SY.err=e.message==='Failed to fetch'?'سرور در دسترس نیست':e.message}syUi()}
+function syQueue(){if(!SY.on||SY.applying)return;clearTimeout(SY.tq);SY.tq=setTimeout(syNow,1500)}
+dirtyHook=syQueue;
+function uiRefresh(){if(document.querySelector('.scanfull')||$('#sheetRoot').innerHTML||document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))return;if(R.id==='settings'){syUi();return}if(['dash','products','stock','docs','reports'].includes(R.id))rerender();else layout()}
+function syStart(){clearInterval(SY.tp);if(SY.on){syNow();SY.tp=setInterval(syPoll,10000)}}
+function syUi(){const el=$('#syStat');if(!el)return;const S={off:['p-gray','خاموش'],ok:['p-green','متصل'],sync:['p-blue','در حال همگام‌سازی…'],err:['p-red','قطع']}[SY.state]||['p-gray',''];
+ el.innerHTML=`<span class="pill ${S[0]}">${S[1]}</span>${SY.err?` <span class="xs red">${esc(SY.err)}</span>`:''}${SY.last?` <span class="xs muted">آخرین: ${hhmm(SY.last)}</span>`:''}`}
+function syncCard(){return`<div class="card"><div class="row" style="margin-bottom:8px"><div class="b sp">☁️ همگام‌سازی چند گوشی</div><span id="syStat"></span></div>
+ <div class="fld"><label>آدرس سرور ${location.protocol==='http:'||location.protocol==='https:'?'(خالی = همین آدرس)':''}</label><input id="syUrl" class="inp ltr" value="${esc(SY.url)}" placeholder="http://192.168.1.20:8090"></div>
+ <div class="fld"><label>کد همگام‌سازی (اگر سرور کد دارد)</label><input id="syKey" class="inp ltr" value="${esc(SY.key)}" placeholder="مثلاً 1234"></div>
+ <div class="grid2"><button class="btn pri" onclick="syConnect()">${SY.on?'ذخیره و اتصال مجدد':'اتصال'}</button>${SY.on?`<button class="btn" onclick="syOff()">قطع</button>`:`<button class="btn" onclick="syHelp()">راهنما</button>`}</div>
+ ${SY.on?`<button class="btn blk sm" onclick="syNow()">${ic('flip',16)} همین حالا همگام کن</button>`:''}
+ <div class="hint">گوشی اصلی را با <b class="ltr">python serve.py 8090 --key 1234</b> روشن کن. گوشی‌های دیگر هم می‌توانند همین برنامه را روی localhost خودشان اجرا کنند و آدرس گوشی اصلی را اینجا بزنند.</div></div>`}
+function syHelp(){sheet(`<h2>راهنمای همگام‌سازی</h2><div class="sm" style="line-height:2">۱) روی گوشی اصلی در Termux:<br><b class="ltr">cd ~/anbaryar && python serve.py 8090 --key 1234</b><br>۲) هر دو گوشی به یک Wi-Fi وصل باشند. آدرس IP گوشی اصلی در خروجی دستور چاپ می‌شود (مثل ۱۹۲٫۱۶۸٫۱٫۲۰).<br>۳) روی گوشی دوم: همین برنامه را اجرا کن (ترجیحاً با <b class="ltr">localhost</b> تا دوربین کار کند) و در تنظیمات → همگام‌سازی، آدرس <b class="ltr">http://IP:8090</b> و کد را بزن.<br>۴) از آن به بعد تغییرات هر دو گوشی خودکار ادغام می‌شود؛ بدون اینترنت هم کار می‌کنند و بعداً هماهنگ می‌شوند.</div><button class="btn blk" onclick="closeSheet()">متوجه شدم</button>`)}
+async function syConnect(){SY.url=$('#syUrl').value.trim();SY.key=$('#syKey').value.trim();if(SY.url&&!/^https?:\/\//.test(SY.url))SY.url='http://'+SY.url;
+ try{const p=await syFetch('/api/ping');if(p.app!=='anbaryar')throw new Error('این آدرس سرور انباریار نیست');await syFetch('/api/rev')}catch(e){SY.on=false;SY.state='err';SY.err=e.message==='Failed to fetch'?'سرور در دسترس نیست':e.message;sySaveCfg();syUi();return toast('اتصال نشد')}
+ SY.on=true;SY.state='sync';SY.err='';sySaveCfg();syStart();rerender();toast('✓ متصل شد')}
+function syOff(){SY.on=false;SY.state='off';clearInterval(SY.tp);sySaveCfg();rerender();toast('همگام‌سازی قطع شد')}
+
+/* ================= init ================= */
+(async function(){
+ const had=await loadDB();syLoad();applyTheme();
+ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>{if(db.prefs.theme==='auto')applyTheme()});
+ if(db.users.length){const s=sessGet(),u=s&&db.users.find(x=>x.id===s.id);if(u)CUR=u;}
+ $('#shell').classList.remove('hide');
+ if(db.users.length&&!CUR){layout();showLock()}else render();
+ if(SY.on){SY.state='sync';syStart()}
+ autoBackup();try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+ if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{}));
+ window.__ready=true;
+})();
+
+</script>
+</body>
+</html>
