@@ -1171,7 +1171,7 @@ function resolveProducts(qTokens){if(!qTokens.length)return[];const out=[];
  return out.sort((a,b)=>b.s-a.s)}
 function confident(r){return r.length&&r[0].s>=.8&&(r.length===1||r[0].s-r[1].s>=.12)}
 function addAlias(p,phrase){const a=normFa(phrase);if(!a||a===normFa(p.name))return false;p.alias=p.alias||[];if(p.alias.map(normFa).includes(a))return false;p.alias.push(a);touch(p);save();return true}
-const stockLine=p=>{const s=ST[p.id],st=status(p);return`<div><b>${esc(p.name)}</b> ${STAT_PILL[st]}</div><div class="row2 row" style="justify-content:space-between"><span>موجودی کل</span><b>${N(s.t)} ${esc(p.unit||'')}</b></div>${p.min>0?`<div class="row2 row" style="justify-content:space-between"><span>حداقل مجاز</span><b>${N(p.min)}</b></div>`:''}${db.wh.map(w=>`<div class="row2 row" style="justify-content:space-between"><span>${esc(w.name)}</span><b>${N(s.w[w.id]||0)}</b></div>`).join('')}`};
+const stockLine=p=>{const s=ST[p.id],st=status(p);return`<div><b>${esc(p.name)}</b> ${STAT_PILL[st]}</div>${p.sell>0?`<div class="row2 row" style="justify-content:space-between"><span>قیمت فروش</span><b>${money(p.sell)}</b></div>`:''}<div class="row2 row" style="justify-content:space-between"><span>موجودی کل</span><b>${N(s.t)} ${esc(p.unit||'')}</b></div>${p.min>0?`<div class="row2 row" style="justify-content:space-between"><span>حداقل مجاز</span><b>${N(p.min)}</b></div>`:''}${db.wh.map(w=>`<div class="row2 row" style="justify-content:space-between"><span>${esc(w.name)}</span><b>${N(s.w[w.id]||0)}</b></div>`).join('')}`};
 function asReply(raw){const t=normFa(raw);if(!t)return;let toks=t.split(' ');
  const dayWord=/دیروز/.test(t)?'y':/امروز/.test(t)?'t':/هفته|هفت روز/.test(t)?'w':/ماه|سی روز/.test(t)?'m':'';
  /* help */
@@ -1299,13 +1299,14 @@ function asLineShort(l){const p=PM[l.pid];if(!p||DOC.type!=='out')return false;i
 function asCardHtml(){const t=DOC.type,out=t==='out',tot=docSum(DOC),disc=out?Math.min(DOC.disc||0,tot):0,sale=out&&DOC.reason==='sale';
  let prof='';if(sale&&can('profit')){const k=DOC.lines.filter(l=>PM[l.pid]&&PM[l.pid].buy>0),r=sum(k,l=>l.qty*(l.pr||0)),c=sum(k,l=>l.qty*PM[l.pid].buy);if(k.length)prof=`<div class="row2 row" style="justify-content:space-between"><span class="muted">سود تقریبی</span><b class="${r-c>=0?'green':'red'}">${money(r-c-(tot?disc*r/tot:0))}</b></div>`}
  return`<div class="card" style="margin:6px 0;padding:10px;box-shadow:none"><div class="b" style="margin-bottom:6px">${out?'🧾 فاکتور فروش':'📦 بار رسید'}${DOC.party?' — '+esc(DOC.party):''} <span class="xs muted">${esc(whName(DOC.wh))}</span></div>
- ${DOC.lines.length?DOC.lines.map((l,i)=>{const p=PM[l.pid];if(!p)return'';return`<div class="row2 row" style="justify-content:space-between;align-items:center;gap:6px;border-top:1px dashed var(--line);padding:5px 0"><span class="sp sm ${asLineShort(l)?'red':''}">${esc(p.name)}${p.auto?' <span class="pill p-amber">جدید</span>':''}<br><span class="xs muted">${N(l.qty)} ${esc(p.unit||'')}${l.pr>0?' × '+N(l.pr):''}${asLineShort(l)?' · موجودی '+N(stockAt(l.pid,DOC.wh)):''}</span></span><b class="sm">${l.pr>0?N(Math.round(l.qty*l.pr)):''}</b><button class="ibtn" style="width:30px;height:30px" onclick="asInvDel(${i})">${ic('x',14)}</button></div>`}).join(''):'<div class="muted sm">هنوز قلمی نیست؛ بنویس مثلاً «دو تا پاستیل، یک کیلو گوجه».</div>'}
+ ${DOC.lines.length?DOC.lines.map((l,i)=>{const p=PM[l.pid];if(!p)return'';return`<div class="row2 row" style="justify-content:space-between;align-items:center;gap:6px;border-top:1px dashed var(--line);padding:5px 0"><span class="sp sm ${asLineShort(l)?'red':''}">${esc(p.name)}${p.auto?' <span class="pill p-amber">جدید</span>':''}<br><span class="xs muted">${N(l.qty)} ${esc(p.unit||'')}${l.pr>0?' × '+N(l.pr):(out?' · <span class="red">بدون قیمت</span>':'')}${asLineShort(l)?' · موجودی '+N(stockAt(l.pid,DOC.wh)):''}</span></span><b class="sm">${l.pr>0?N(Math.round(l.qty*l.pr)):''}</b><button class="ibtn" style="width:30px;height:30px" onclick="asInvDel(${i})">${ic('x',14)}</button></div>`}).join(''):'<div class="muted sm">هنوز قلمی نیست؛ بنویس مثلاً «دو تا پاستیل، یک کیلو گوجه».</div>'}
  ${tot>0?`<div class="row2 row" style="justify-content:space-between;border-top:1px solid var(--line);padding-top:6px;margin-top:4px"><span class="b">${out?'جمع':'جمع خرید'}</span><b>${money(tot)}</b></div>`:''}${disc>0?`<div class="row2 row" style="justify-content:space-between"><span class="muted">تخفیف</span><b>−${money(disc)}</b></div><div class="row2 row" style="justify-content:space-between"><span class="b">قابل پرداخت</span><b>${money(tot-disc)}</b></div>`:''}${prof}</div>
  <div class="grid2"><button class="btn pri sm" onclick="asInvCommit()">✅ ${out?'ثبت فاکتور':'ثبت رسید'}</button><button class="btn sm" onclick="asInvCancel()">لغو</button></div>
  <button class="btn sm blk" style="margin-top:6px" onclick="go('${t}')">باز کردن در فرم کامل</button>`}
 function asCard(pre){AS.lastCtx='inv';AS.msgs=AS.msgs.filter(m=>m.k!=='card');AS.msgs.push({c:'bot',h:(pre?pre+'<br>':'')+asCardHtml(),k:'card'});drawChat()}
 function asReport(R,extra){let h='';
- if(R.added.length)h+=`✅ اضافه شد: ${R.added.map(a=>`<b>${N(a.q)}</b> ${esc(a.p.name)}`).join('، ')}`;
+ if(R.added.length)h+=`✅ اضافه شد: ${R.added.map(a=>{const l=DOC.lines.find(x=>x.pid===a.p.id);return`<b>${N(a.q)}</b> ${esc(a.p.name)}${l&&l.pr>0?' ('+N(l.pr)+')':''}`}).join('، ')}`;
+ if(docSum(DOC)>0)h+=`<br>💰 جمع تا اینجا: <b>${money(docSum(DOC))}</b>`;
  if(R.made.length)h+=`<br>🆕 کالای جدید ساخته شد: ${R.made.map(esc).join('، ')} <span class="xs muted">(موجودی‌اش را بعداً ثبت کن)</span>`;
  if(R.unknown.length)h+=`<br>❓ پیدا نکردم و اجازهٔ ساخت نداری: ${R.unknown.map(esc).join('، ')}`;
  R.guess.forEach(g=>{const id='g'+(++AS.seq);AS.pend[id]=g;h+=`<div class="xs" style="margin-top:6px">«${esc(g.raw)}» را «${esc(PM[g.pid].name)}» گرفتم. اگر منظورت چیز دیگری بود:</div><div class="chips" style="padding:0">${g.alts.filter(a=>a!==g.pid).slice(0,3).map(a=>`<button class="chip" onclick="asFix('${id}','${a}')">${esc(PM[a].name)}</button>`).join('')}</div>`});
@@ -1368,6 +1369,12 @@ function asSmart(raw){let t=asPre(raw);if(!t)return false;if(typeof asConfirmFlo
  /* awaiting a quantity */
  if(AS.await){const aw=AS.await;AS.await=null;const tk=asToks(t),r=readNum(tk,0);
   if(active&&isNumTok(tk[0])&&r.val>0&&r.next>=tk.length-1&&!r.mult){const l=DOC.lines.find(x=>x.pid===aw.pid);if(l){l.qty=r.val;asCard(`تعداد «${esc(PM[aw.pid].name)}» شد ${N(r.val)}.`);return true}}}
+ /* price query: "قیمت شامپو چنده؟" */
+ if(/(قیمت|چند تومان|چند تومن|چنده|چقدره|چند تومنه)/.test(t)&&!/\d/.test(t)&&!/(سود|درامد|فروش امروز|فروش دیروز|فروش این|جمع فروش)/.test(t)&&!/(کن|بذار|بزار|بشه)$/.test(t)&&!asToks(t).some(w=>(w in NUMW)||w==='هزار'||w==='میلیون')){
+  const buy=/قیمت خرید|خریدش/.test(t),body=t.replace(/(?:^|\s)(قیمت|فروش|خرید|خریدش|فروشش|چنده|چقدره|چقدر|چند تومان|چند تومن|چند تومنه|چند|تومان|تومنه|تومانه|هست|است|رو|را|الان|فعلا)(?=\s|$)/g,' ').replace(/\s+/g,' ').trim();
+  const parts=body.split(/\s+و\s+/).map(x=>x.split(' ').filter(w=>!STOP.has(w)&&w.length>1)).filter(a=>a.length);const rows=[];
+  for(const pt of parts){const c=resolveProducts(pt);if(c.length&&c[0].s>=.7)rows.push(c[0].p)}
+  if(rows.length){const pf=can('profit'),pb=can('price');asSay('💰 '+rows.map(p=>`<div style="margin-top:4px"><b>${esc(p.name)}</b>: `+(p.sell>0?`فروش <b>${money(p.sell)}</b>`:'<span class="red">قیمت فروش ثبت نشده</span>')+(pb&&p.buy>0?` · خرید ${money(p.buy)}`:'')+(pf&&p.sell>0&&p.buy>0?` · سود هر واحد ${money(p.sell-p.buy)}`:'')+'</div>').join('')+(rows.some(p=>!(p.sell>0))&&can('price')?'<div class="xs muted" style="margin-top:6px">برای ثبت قیمت بنویس: «قیمت شامپو رو ۱۵ هزار کن»</div>':''));rows.forEach(p=>{p.hits=(p.hits||0)+1});save();return true}}
  /* money queries */
  const dw=/دیروز/.test(t)?'y':/هفته|هفت روز/.test(t)?'w':/ماه|سی روز/.test(t)?'m':/امروز|الان|تا حالا/.test(t)?'t':'';
  if(/(سود|فایده|درامد|پول)/.test(t)&&!/(قیمت)/.test(t)&&!/\d/.test(t)){if(!can('reports')&&!can('profit')&&!/فروش/.test(t)){asSay('این گزارش برای نقش تو در دسترس نیست.');return true}asMoney(dw||'t');return true}
@@ -1613,7 +1620,7 @@ const HELP=[['🧾 فاکتور فروش',['فاکتور جدید','فاکتور
  ['↔️ ورود/خروج/انتقال یک کالا',['ده عدد روغن رسید','پنج تا نوشابه از مغازه خارج کن','۵ تا موس بفروش','۳ تا هدفون از انبار به مغازه منتقل کن']],
  ['🏷️ کالا',['کالای جدید ثبت کن','نام قیچی را قیچی بزرگ کن','بارکد ماست را ۶۲۶۰۱۲۳۴۵۶ کن','واحد روغن را لیتر کن','دسته جدید بساز نوشیدنی','روغن را حذف کن','کالاهای بدون بارکد']],
  ['🔢 شمارش و اصلاح موجودی',['موجودی واقعی ماست ۱۲ عدد است','انبارگردانی']],
- ['💰 قیمت، فروش و سود',['سود امروز','فروش دیروز','سود این ماه','قیمت پاستیل رو ۱۵ هزار کن','قیمت خرید پاستیل رو ۸ هزار کن']],
+ ['💰 قیمت، فروش و سود',['قیمت شامپو چنده؟','قیمت شامپو و صابون','جمع','سود امروز','فروش دیروز','سود این ماه','قیمت پاستیل رو ۱۵ هزار کن','قیمت خرید پاستیل رو ۸ هزار کن']],
  ['📊 گزارش',['امروز چی فروش رفت؟','امروز چی وارد شد؟','گزارش این ماه','تاریخچه تغییرات روغن','خلاصهٔ وضعیت انبار']],
  ['📷 بارکد',['اسکن کالا','بارکد ۶۲۶۰۱۲۳۴۵۶۷۸۶ را پیدا کن']],
  ['📚 یادگیری',['چی یاد گرفتی؟','کابل شارژر یعنی کابل تایپ‌سی','وقتی گفتم ف۱ یعنی فاکتور جدید']],
