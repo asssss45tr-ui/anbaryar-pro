@@ -1142,9 +1142,9 @@ const AS={msgs:[],pend:{},seq:0,lastCtx:'',lastAct:null};
 ['رسید','رسیده','رسیدند','اوردیم','گرفتیم','افزایش','برداشت','ارسال','مصرف','موجودیه','کنم','کردن','باشه','بشه','اینو','اینم','همین','این','رو','تعریف','جدید','جنس','محصول','قلم','فهرست','لیست','دنبال','گردم','میگردم','می','فعلی','باقی','مانده','باقیمانده','مقدار','تعداد','وضعیت','بررسی','کد','نام','پیدا','جستجو','جست','وجو','موردنظر','مربوط','چیست','نتیجه','سیستم','فرق','دارد','داره','محموله','واقعی','واقعا','شمارش','مغایرت','حذف','پاک','غیرفعال','بایگانی','حذفش','فعال','تغییر','عوض','اصلاح'].forEach(w=>STOP.add(normFa(w)));
 VIEWS.assistant={html(){return`<div class="card" style="padding:12px"><div class="row"><div class="bot-av" style="width:42px;height:42px;border-radius:14px">${ic('bot',22)}</div><div class="sp"><div class="b">دستیار هوشمند انبار</div><div class="xs muted">فارسی بنویس؛ فاکتور باز کن، اقلام را یک‌جا بگو، بار رسید ثبت کن، موجودی و سود بپرس</div></div></div></div>
  <div class="chat" id="chat"></div>
- <div class="chips" id="asChips" style="margin-top:4px">${['فاکتور جدید','بار رسید','سود امروز','کم‌موجودی‌ها کدوماست؟','امروز چی فروش رفت؟','چی یاد گرفتی؟','راهنما'].map(s=>`<button class="chip" onclick="asSend('${s}')">${s}</button>`).join('')}</div>
+ <div class="chips" id="asChips" style="margin-top:4px">${['دستورات','فاکتور جدید','بار رسید','سود امروز','کم‌موجودی‌ها کدوماست؟','امروز چی فروش رفت؟','چی یاد گرفتی؟'].map(s=>`<button class="chip" onclick="asSend('${s}')">${s}</button>`).join('')}</div>
  <div class="chatin"><input id="asIn" placeholder="مثلاً: از کابل شارژر چند عدد مونده؟" onkeydown="if(event.key==='Enter')asSend()" autocomplete="off"><button class="ibtn" id="asMic" style="display:none" onclick="asMic()">🎙</button><button class="btn pri" style="padding:10px 14px" onclick="asSend()">${ic('send',18)}</button></div>`},
- after(){if(!AS.msgs.length)asSay(`سلام 👋 من دستیار انبارم. بیشتر کارهای روزمره را می‌توانی از همین‌جا انجام بدهی:<br>• «فاکتور جدید برای آقای رضایی» و بعد «دو تا پاستیل، سه تا سس خرسی، یک کیلو گوجه، نیم کیلو خیار ۳۰ هزار تومان» و «ثبت»<br>• «بار رسید» و بعد «۲۴ تا ماست، ۱۲ تا دوغ» (اگر نگویی چه آمده، حدس می‌زنم)<br>• «سود امروز» / «قیمت پاستیل رو ۱۵ هزار کن»<br>• «وقتی گفتم ف۱ یعنی فاکتور جدید» (میانبر شخصی)<br>چند نمونهٔ دیگر:<br>• «موجودی کابل شارژر چقدره؟»<br>• «۵ تا موس بفروش» (بعد از تأیید ثبت می‌شود)<br>• «ورود ۱۰ تا باتری به انبار»<br>• «۳ تا هدفون از انبار به مغازه منتقل کن»<br>• «کم‌موجودی‌ها» / «امروز چی فروش رفت؟»<br>• «کابل شارژر یعنی کابل تایپ‌سی» (برای یاد دادن اسم مستعار)`);else drawChat();
+ after(){if(!AS.msgs.length)asSay(`سلام 👋 من دستیار انبارم. برای دیدن همهٔ دستورها بنویس <b>دستورات</b> یا روی دکمهٔ «دستورات» بزن.<br>بیشتر کارهای روزمره را می‌توانی از همین‌جا انجام بدهی:<br>• «فاکتور جدید برای آقای رضایی» و بعد «دو تا پاستیل، سه تا سس خرسی، یک کیلو گوجه، نیم کیلو خیار ۳۰ هزار تومان» و «ثبت»<br>• «بار رسید» و بعد «۲۴ تا ماست، ۱۲ تا دوغ» (اگر نگویی چه آمده، حدس می‌زنم)<br>• «سود امروز» / «قیمت پاستیل رو ۱۵ هزار کن»<br>• «وقتی گفتم ف۱ یعنی فاکتور جدید» (میانبر شخصی)<br>چند نمونهٔ دیگر:<br>• «موجودی کابل شارژر چقدره؟»<br>• «۵ تا موس بفروش» (بعد از تأیید ثبت می‌شود)<br>• «ورود ۱۰ تا باتری به انبار»<br>• «۳ تا هدفون از انبار به مغازه منتقل کن»<br>• «کم‌موجودی‌ها» / «امروز چی فروش رفت؟»<br>• «کابل شارژر یعنی کابل تایپ‌سی» (برای یاد دادن اسم مستعار)`);else drawChat();
   if('webkitSpeechRecognition' in window||'SpeechRecognition' in window)$('#asMic').style.display=''}};
 function drawChat(){const c=$('#chat');if(!c)return;c.innerHTML=AS.msgs.map(m=>`<div class="msg ${m.c}">${m.c==='bot'?`<div class="bot-av">${ic('bot',18)}</div>`:''}<div class="bub">${m.h}</div></div>`).join('');setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),30)}
 function asSay(h,c='bot'){AS.msgs.push({c,h});drawChat()}
@@ -1502,6 +1502,7 @@ function asHistory(p){const l=db.moves.filter(m=>m.pid===p.id).sort((a,b)=>b.dat
 /* ---- main intent router ---- */
 const _noRe=/^(نه|نخیر|خیر)$/;
 function asIntent(raw){let t=asPre(raw);if(!t)return false;t=applyMacros(t);if(!can('assistant'))return false;
+ if(/^(راهنما|دستورات|دستورها|دستور ها|کمک|help|چه کارایی بلدی|چه کارهایی بلدی|چیکار میتونی بکنی|لیست دستورات|فهرست دستورات|دستورات رو نشون بده)$/.test(t)){asHelp();return true}
  if(AS.ask){const a=AS.ask;AS.ask=null;if(asAnswer(a,t))return true}
  const tk=asToks(t),ex=extractNum(tk),q=ex.qty;let m;
  /* ambiguous / risky one-liners (training §16) */
@@ -1604,6 +1605,20 @@ function asTrainParse(txt){const D={};let intent=null,n=0;const MAP=[[/ورود 
 function asTrainImport(){const i=document.createElement('input');i.type='file';i.accept='.txt,text/plain';i.onchange=async()=>{try{const{D,n}=asTrainParse(await i.files[0].text());if(!n)throw 0;const ex=db.prefs.phrases||(db.prefs.phrases={});let add=0;
   for(const k in D){const cur=new Set((ex[k]||[]).map(normFa).concat((TRAIN[k]||[]).map(normFa)));for(const p of D[k]){const np=normFa(p);if(np&&!cur.has(np)){(ex[k]=ex[k]||[]).push(p);cur.add(np);add++}}}
   save();trCompile();asSay(`📚 آموزش بارگذاری شد: ${fa(n)} عبارت خوانده شد، ${fa(add)} عبارت جدید یاد گرفتم.`)}catch(e){toast('فایل آموزشی خوانده نشد')}};i.click()}
+
+/* ---- full command list (tap to send) ---- */
+const HELP=[['🧾 فاکتور فروش',['فاکتور جدید','فاکتور جدید برای آقای رضایی','دو تا پاستیل، سه تا سس خرسی، یک کیلو گوجه، نیم کیلو خیار ۳۰ هزار تومان','سه تا ماست هر کدوم ۲۰ هزار تومان','تخفیف ۵ هزار','حذف گوجه','جمع','ثبت','لغو فاکتور']],
+ ['📦 بار رسید (ورود)',['بار رسید','۲۴ تا ماست، ۱۲ تا دوغ','ثبت']],
+ ['🔎 موجودی و کمبود',['موجودی ماست چقدره؟','فهرست موجودی','کم‌موجودی‌ها کدوماست؟','این کالا صفر شده؟']],
+ ['↔️ ورود/خروج/انتقال یک کالا',['ده عدد روغن رسید','پنج تا نوشابه از مغازه خارج کن','۵ تا موس بفروش','۳ تا هدفون از انبار به مغازه منتقل کن']],
+ ['🏷️ کالا',['کالای جدید ثبت کن','نام قیچی را قیچی بزرگ کن','بارکد ماست را ۶۲۶۰۱۲۳۴۵۶ کن','واحد روغن را لیتر کن','دسته جدید بساز نوشیدنی','روغن را حذف کن','کالاهای بدون بارکد']],
+ ['🔢 شمارش و اصلاح موجودی',['موجودی واقعی ماست ۱۲ عدد است','انبارگردانی']],
+ ['💰 قیمت، فروش و سود',['سود امروز','فروش دیروز','سود این ماه','قیمت پاستیل رو ۱۵ هزار کن','قیمت خرید پاستیل رو ۸ هزار کن']],
+ ['📊 گزارش',['امروز چی فروش رفت؟','امروز چی وارد شد؟','گزارش این ماه','تاریخچه تغییرات روغن','خلاصهٔ وضعیت انبار']],
+ ['📷 بارکد',['اسکن کالا','بارکد ۶۲۶۰۱۲۳۴۵۶۷۸۶ را پیدا کن']],
+ ['📚 یادگیری',['چی یاد گرفتی؟','کابل شارژر یعنی کابل تایپ‌سی','وقتی گفتم ف۱ یعنی فاکتور جدید']],
+ ['✅ تأیید',['بله','نه']]];
+function asHelp(){asSay('📖 دستورها — روی هر مورد بزن تا ارسال شود (بعضی را باید نام کالای خودت را جایش بگذاری):'+HELP.map(g=>`<details style="margin-top:6px"><summary class="b sm">${g[0]}</summary><div class="chips" style="padding:4px 0 0;flex-wrap:wrap">${g[1].map(x=>`<button class="chip" onclick="asSend(this.dataset.t)" data-t="${esc(x)}">${esc(x.length>46?x.slice(0,44)+'…':x)}</button>`).join('')}</div></details>`).join('')+'<div class="xs muted" style="margin-top:8px">هر کاری که موجودی یا اطلاعات را عوض کند، اول پیش‌نمایش می‌دهد و فقط با «بله/ثبت» اجرا می‌شود.</div>')}
 
 /* ================= settings / users / log / lock / sync ================= */
 function promptBox(title,val,cb,ph=''){sheet(`<h2>${esc(title)}</h2><input id="pbIn" class="inp" value="${esc(val||'')}" placeholder="${esc(ph)}"><div class="grid2" style="margin-top:12px"><button class="btn pri" id="pbOk">${ic('check')} ذخیره</button><button class="btn" onclick="closeSheet()">انصراف</button></div>`,'cen');
