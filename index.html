@@ -230,6 +230,9 @@ svg.ch{width:100%;height:auto;display:block}svg.ch text{font-family:inherit;font
 #lockRoot{position:relative;z-index:200}
 #shell.hide{visibility:hidden}
 svg.ch{direction:ltr}
+.lnw+.lnw{margin-top:8px}.lnw .ln+.ln{margin-top:0}
+.lnp{display:flex;align-items:center;gap:8px;padding:6px 12px 8px;margin:-6px 8px 0;background:var(--surface2);border:1px solid var(--line);border-top:0;border-radius:0 0 14px 14px}
+.lnp .inp{width:110px;padding:7px 10px}.lnp span{flex:1}
 
 </style>
 </head>
@@ -391,14 +394,14 @@ const cleanCode=c=>String(c||'').replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.in
 const bkey=c=>{c=cleanCode(c);return /^\d+$/.test(c)?(c.replace(/^0+/,'')||'0'):c.toLowerCase()};
 
 /* ================= store ================= */
-const APP_VER='۱٫۰';
+const APP_VER='۲٫۰';
 const UNITS=['عدد','کارتن','بسته','کیلوگرم','متر','لیتر','جفت','دست'];
 const R_IN={buy:'خرید',ret:'برگشت از مشتری',prod:'تولید / مونتاژ',gift:'هدیه / نمونه',other:'سایر'};
 const R_OUT={sale:'فروش',use:'مصرف داخلی',waste:'ضایعات / خرابی',ret:'برگشت به تأمین‌کننده',gift:'هدیه / نمونه',other:'سایر'};
 const T_NAME={in:'ورود',out:'خروج',xfer:'انتقال',adj:'شمارش'};
 const T_IC={in:'down',out:'up',xfer:'swap',adj:'clip'};
 const ROLES={admin:'مدیر',keeper:'انباردار',seller:'فروشنده'};
-const PERM={admin:'*',keeper:['view','prod.add','prod.edit','in','out','xfer','count','reports','scan','assistant','act'],seller:['view','out.sale','scan.sale','assistant','act.sale']};
+const PERM={admin:'*',keeper:['view','price','prod.add','prod.edit','in','out','xfer','count','reports','scan','assistant','act'],seller:['view','out.sale','scan.sale','assistant','act.sale']};
 const DKEY='anbaryar_pro_v2',LEGACY='scan_anbar_v1';
 let db=null,PM={},BM={},ST={},WM={},CM={},CUR=null;
 
@@ -411,7 +414,7 @@ const IDB={d:null,
 };
 
 function blank(){return{v:2,products:[],moves:[],wh:[{id:'wh',name:'انبار مرکزی',u:0},{id:'shop',name:'مغازه',u:0}],cats:[],users:[],counts:[],log:[],dead:{},seq:{p:0,in:0,out:0,xfer:0,cnt:0},
- settings:{name:'انباریار پرو',su:0},prefs:{}}}
+ settings:{name:'انباریار پرو',su:0,cur:'تومان'},prefs:{}}}
 const DEFPREF={defWh:'wh',saleWh:'shop',sound:true,vib:true,cam:'environment',theme:'auto',lastBackup:0,autoCam:true};
 function normalize(d){const b=blank();d=d||{};
  for(const k of ['products','moves','wh','cats','users','counts','log'])d[k]=Array.isArray(d[k])&&(k!=='wh'||d[k].length)?d[k]:b[k];
@@ -467,14 +470,18 @@ const curName=()=>CUR?CUR.name:'';
 /* ---- documents ---- */
 function nextCode(){db.seq.p++;return'P'+String(db.seq.p).padStart(4,'0')}
 function makeInternal(){let c;do{c='29'+String(Math.floor(Math.random()*1e10)).padStart(10,'0');c+=eanCheck(c)}while(BM[bkey(c)]);return c}
-function commitDoc(d){/* d:{type,wh,to,date,party,inv,reason,note,lines:[{pid,qty}]} */
+function commitDoc(d){/* d:{type,wh,to,date,party,inv,reason,note,disc,lines:[{pid,qty,pr}]} */
  const doc=uid(),no=++db.seq[d.type],ts=Date.now(),out=[];let k=0;
- for(const l of d.lines){if(!(l.qty>0)||!PM[l.pid])continue;
+ const money=d.type==='in'||d.type==='out',gross=sum(d.lines,l=>l.qty>0&&PM[l.pid]?l.qty*(+l.pr||0):0),fac=(d.type==='out'&&d.disc>0&&gross>0)?Math.max(0,1-d.disc/gross):1;
+ for(const l of d.lines){if(!(l.qty>0)||!PM[l.pid])continue;const p=PM[l.pid];
   const m={id:uid(),doc,no,pid:l.pid,type:d.type,qty:l.qty,wh:d.wh,date:d.date||todayISO(),ts:ts+(k++),reason:d.reason||'',party:d.party||'',inv:d.inv||'',note:d.note||'',user:curName(),u:ts+k};
+  if(money){const pr=Math.round((+l.pr||0)*fac*100)/100;m.pr=pr;
+   if(d.type==='out'){m.cost=p.buy||0;if(pr>0&&!p.sell&&(d.reason||'sale')==='sale'){p.sell=Math.round((+l.pr||0));touch(p)}}
+   else if(pr>0&&(d.reason||'buy')==='buy'){p.buy=pr;touch(p)}}
   if(d.type==='xfer')m.to=d.to;out.push(m)}
  if(!out.length)return null;
  db.moves.push(...out);
- addLog(d.type,T_NAME[d.type]+' #'+fa(no)+' — '+fa(out.length)+' قلم'+(d.party?' — '+d.party:''));
+ addLog(d.type,T_NAME[d.type]+' #'+fa(no)+' — '+fa(out.length)+' قلم'+(d.party?' — '+d.party:'')+(money&&gross>0?' — '+N(Math.round(gross*fac))+' '+((db.settings&&db.settings.cur)||'تومان'):''));
  save();recalc();return{doc,no,moves:out}}
 function commitAdj(wh,pid,counted,o={}){const cur=stockAt(pid,wh),delta=Math.round((counted-cur)*1000)/1000;if(!delta)return null;
  const ts=Date.now(),m={id:uid(),doc:o.doc||uid(),no:o.no||0,pid,type:'adj',wh,delta,counted,sys:cur,qty:Math.abs(delta),date:o.date||todayISO(),ts,reason:o.reason||'count',party:'',inv:'',note:o.note||'',user:curName(),u:ts};
@@ -701,7 +708,7 @@ function productSheet(id){const p=PM[id];if(!p)return;const s=ST[id],st=status(p
  sheet(`<div class="row" style="margin-bottom:12px">${avatar(p,54)}<div class="sp"><div class="b" style="font-size:17px">${esc(p.name)}</div><div class="xs muted">${esc(p.code||'')}${p.cat&&catName(p.cat)?' · '+esc(catName(p.cat)):''}${p.brand?' · '+esc(p.brand):''}</div><div class="xs muted ltr" style="text-align:right">${esc(p.barcode||'بدون بارکد')}</div></div>${STAT_PILL[st]}</div>
  <div class="stat2"><div class="card"><div class="xs muted">موجودی کل</div><div class="big ${s.t<0?'red':st==='low'?'amber':''}">${N(s.t)}</div><div class="xs muted">${esc(p.unit||'')}${p.min>0?' · حداقل '+N(p.min):''}</div></div>
  <div class="card" style="padding:8px 10px">${db.wh.map(w=>`<div class="row2 row" style="justify-content:space-between;padding:3px 0"><span class="xs muted">${esc(w.name)}</span><b class="${(s.w[w.id]||0)<0?'red':''}">${N(s.w[w.id]||0)}</b></div>`).join('')}</div></div>
- <div class="grid3" style="margin-top:10px"><div class="card c" style="padding:10px"><div class="xs muted">آخرین ورود</div><div class="sm b">${s.lastIn?dShort(s.lastIn):'—'}</div></div><div class="card c" style="padding:10px"><div class="xs muted">آخرین خروج</div><div class="sm b">${s.lastOut?dShort(s.lastOut):'—'}</div></div><div class="card c" style="padding:10px"><div class="xs muted">خروج ۳۰ روز</div><div class="sm b">${N(s.out30)}</div></div></div>
+ ${priceRow(p)}<div class="grid3" style="margin-top:10px"><div class="card c" style="padding:10px"><div class="xs muted">آخرین ورود</div><div class="sm b">${s.lastIn?dShort(s.lastIn):'—'}</div></div><div class="card c" style="padding:10px"><div class="xs muted">آخرین خروج</div><div class="sm b">${s.lastOut?dShort(s.lastOut):'—'}</div></div><div class="card c" style="padding:10px"><div class="xs muted">خروج ۳۰ روز</div><div class="sm b">${N(s.out30)}</div></div></div>
  ${p.loc||p.desc?`<div class="card sm" style="margin-top:10px">${p.loc?`<div><b>محل نگهداری:</b> ${esc(p.loc)}</div>`:''}${p.desc?`<div class="muted">${esc(p.desc)}</div>`:''}</div>`:''}
  <div class="chips" style="margin-top:10px">${can('in')?`<button class="chip" onclick="closeSheet();docNew('in',{pid:'${id}'})">${ic('down',15)} ورود</button>`:''}${canOut()?`<button class="chip" onclick="closeSheet();docNew('out',{pid:'${id}'})">${ic('up',15)} خروج</button>`:''}${can('xfer')?`<button class="chip" onclick="closeSheet();docNew('xfer',{pid:'${id}'})">${ic('swap',15)} انتقال</button>`:''}${can('count')?`<button class="chip" onclick="closeSheet();quickCount('${id}')">${ic('clip',15)} شمارش</button>`:''}</div>
  ${canEAN(p.barcode||'')?`<div class="bcbox">${eanSVG(p.barcode,{h:56})}</div>`:''}
@@ -718,7 +725,7 @@ function imgResize(file,max=160){return new Promise((ok,no)=>{const fr=new FileR
 let PF={};
 function productForm(o){
  const ex=o.id?PM[o.id]:null;
- PF={id:o.id||null,name:'',code:'',barcode:'',cat:'',brand:'',unit:'عدد',min:'',loc:'',desc:'',img:'',init:{},after:o.after,...(ex?{name:ex.name,code:ex.code||'',barcode:ex.barcode||'',cat:ex.cat||'',brand:ex.brand||'',unit:ex.unit||'عدد',min:ex.min||'',loc:ex.loc||'',desc:ex.desc||'',img:ex.img||''}:{}),...(o.keep||{}),...(o.barcode?{barcode:o.barcode}:{}),...(o.name?{name:o.name}:{})};
+ PF={id:o.id||null,name:'',code:'',barcode:'',cat:'',brand:'',unit:'عدد',min:'',loc:'',desc:'',img:'',init:{},buy:'',sell:'',after:o.after,...(ex?{buy:ex.buy||'',sell:ex.sell||'',name:ex.name,code:ex.code||'',barcode:ex.barcode||'',cat:ex.cat||'',brand:ex.brand||'',unit:ex.unit||'عدد',min:ex.min||'',loc:ex.loc||'',desc:ex.desc||'',img:ex.img||''}:{}),...(o.keep||{}),...(o.barcode?{barcode:o.barcode}:{}),...(o.name?{name:o.name}:{})};
  drawProductForm()}
 function drawProductForm(){const edit=!!PF.id;
  const units=UNITS.includes(PF.unit)?UNITS:[...UNITS,PF.unit];
@@ -732,6 +739,8 @@ function drawProductForm(){const edit=!!PF.id;
  <div style="margin-top:6px"><button class="btn sm" onclick="pfRead();PF.barcode=makeInternal();drawProductForm()">ساخت بارکد داخلی (کالای بدون بارکد)</button></div></div>
  <div class="grid2"><div class="fld"><label>دستهٔ کالا</label><select id="pfCat" class="inp" onchange="pfCatCh()"><option value="">— بدون دسته —</option>${db.cats.map(c=>`<option value="${c.id}" ${PF.cat===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}<option value="__new">➕ دستهٔ جدید…</option></select><input id="pfNewCat" class="inp" style="display:none;margin-top:6px" placeholder="نام دستهٔ جدید"></div>
  <div class="fld"><label>واحد شمارش</label><select id="pfUnit" class="inp">${units.map(u=>`<option ${PF.unit===u?'selected':''}>${esc(u)}</option>`).join('')}</select></div></div>
+ ${can('price')?`<div class="grid2"><div class="fld"><label>قیمت خرید (${esc(db.settings.cur||'تومان')})</label><input id="pfBuy" class="inp ltr" inputmode="decimal" value="${PF.buy||''}" placeholder="برای محاسبهٔ سود"></div>
+ <div class="fld"><label>قیمت فروش (${esc(db.settings.cur||'تومان')})</label><input id="pfSell" class="inp ltr" inputmode="decimal" value="${PF.sell||''}" placeholder="قیمت پیش‌فرض فاکتور"></div></div>`:''}
  <div class="grid2"><div class="fld"><label>حداقل موجودی (هشدار)</label><input id="pfMin" class="inp ltr" inputmode="decimal" value="${PF.min||''}" placeholder="اختیاری"></div>
  <div class="fld"><label>محل نگهداری</label><input id="pfLoc" class="inp" value="${esc(PF.loc)}" placeholder="قفسه / راهرو"></div></div>
  <div class="fld"><label>توضیحات</label><textarea id="pfDesc" class="inp" placeholder="مشخصات کامل کالا">${esc(PF.desc)}</textarea></div>
@@ -739,7 +748,7 @@ function drawProductForm(){const edit=!!PF.id;
  <div class="grid2"><button class="btn pri" onclick="pfSave()">${ic('check')} ذخیره</button><button class="btn" onclick="closeSheet()">انصراف</button></div>`);
  setTimeout(()=>{const n=$('#pfName');if(n&&!PF.name)n.focus()},250)}
 function pfCatCh(){$('#pfNewCat').style.display=$('#pfCat').value==='__new'?'':'none'}
-function pfRead(){PF.name=$('#pfName').value.trim();PF.code=$('#pfCode').value.trim();PF.brand=$('#pfBrand').value.trim();PF.barcode=en($('#pfBar').value).trim();PF.cat=$('#pfCat').value;PF.unit=$('#pfUnit').value;PF.min=$('#pfMin').value;PF.loc=$('#pfLoc').value.trim();PF.desc=$('#pfDesc').value.trim();PF.newCat=($('#pfNewCat')||{}).value||'';
+function pfRead(){PF.name=$('#pfName').value.trim();PF.code=$('#pfCode').value.trim();PF.brand=$('#pfBrand').value.trim();PF.barcode=en($('#pfBar').value).trim();PF.cat=$('#pfCat').value;PF.unit=$('#pfUnit').value;PF.min=$('#pfMin').value;PF.loc=$('#pfLoc').value.trim();PF.desc=$('#pfDesc').value.trim();if($('#pfBuy')){PF.buy=$('#pfBuy').value;PF.sell=$('#pfSell').value}PF.newCat=($('#pfNewCat')||{}).value||'';
  PF.init={};document.querySelectorAll('.pfInit').forEach(i=>{if(i.value)PF.init[i.dataset.w]=i.value})}
 function pfPhoto(){pfRead();const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=async()=>{const f=i.files&&i.files[0];if(!f)return;try{PF.img=await imgResize(f)}catch(e){toast('عکس خوانده نشد')}drawProductForm()};i.click()}
 function pfScan(){pfRead();const keep={...PF};closeSheet();openScanner({title:'اسکن بارکد کالا',handle:(code,src,ctl)=>{keep.barcode=code;ctl.close();beep();productForm({id:keep.id,keep})}})}
@@ -747,7 +756,7 @@ function pfSave(){pfRead();if(!PF.name){$('#pfName').focus();return toast('نا�
  PF.barcode=cleanCode(PF.barcode);const dup=PF.barcode&&BM[bkey(PF.barcode)];if(dup&&dup!==PF.id)return toast('این بارکد برای «'+PM[dup].name+'» ثبت شده');
  if(PF.code){const d2=db.products.find(p=>p.id!==PF.id&&(p.code||'').toLowerCase()===PF.code.toLowerCase());if(d2)return toast('این کد برای «'+d2.name+'» ثبت شده')}
  let cat=PF.cat;if(cat==='__new'){const nm=PF.newCat.trim();if(nm){let c=db.cats.find(x=>x.name===nm);if(!c){c=touch({id:uid(),name:nm});db.cats.push(c)}cat=c.id}else cat=''}
- const min=numv(PF.min),data={name:PF.name,code:PF.code||(PF.id?(PM[PF.id].code||nextCode()):nextCode()),barcode:PF.barcode,cat,brand:PF.brand,unit:PF.unit,min:min>0?min:0,loc:PF.loc,desc:PF.desc,img:PF.img};
+ const min=numv(PF.min),data={name:PF.name,code:PF.code||(PF.id?(PM[PF.id].code||nextCode()):nextCode()),barcode:PF.barcode,cat,brand:PF.brand,unit:PF.unit,min:min>0?min:0,loc:PF.loc,desc:PF.desc,img:PF.img,...(can('price')?{buy:numv(PF.buy)>0?numv(PF.buy):0,sell:numv(PF.sell)>0?numv(PF.sell):0}:{})};
  let id=PF.id;
  if(id){Object.assign(PM[id],data);touch(PM[id]);addLog('prod.edit','ویرایش کالا: '+data.name)}
  else{const p=touch({id:uid(),created:Date.now(),alias:[],hits:0,...data});db.products.push(p);id=p.id;recalc();addLog('prod.add','کالای جدید: '+p.name);
@@ -760,8 +769,9 @@ const DOC_META={in:{t:'ورود کالا',ic:'down',col:'green',btn:'grn',go:'ث
 function newDoc(type){const w=db.wh.map(x=>x.id),def=w.includes(db.prefs.defWh)?db.prefs.defWh:w[0];
  const from=type==='out'&&w.includes(db.prefs.saleWh)?db.prefs.saleWh:def;
  return{type,wh:from,to:w.find(x=>x!==from)||from,date:todayISO(),party:'',inv:'',reason:type==='in'?'buy':type==='out'?'sale':'',note:'',lines:[]}}
-function docNew(type,o={}){DOC=newDoc(type);if(o.pid)DOC.lines.push({pid:o.pid,qty:o.qty||1});go(type)}
-function docAdd(pid,q=1){const l=DOC.lines.find(x=>x.pid===pid);if(l)l.qty=Math.round((l.qty+q)*1000)/1000;else DOC.lines.push({pid,qty:q});return l?l.qty:q}
+function defPr(pid,type){const p=PM[pid];return p?(type==='out'?(p.sell||0):type==='in'?(p.buy||0):0):0}
+function docNew(type,o={}){DOC=newDoc(type);if(o.pid)DOC.lines.push({pid:o.pid,qty:o.qty||1,pr:defPr(o.pid,type)});go(type)}
+function docAdd(pid,q=1,pr){const l=DOC.lines.find(x=>x.pid===pid);if(l){l.qty=Math.round((l.qty+q)*1000)/1000;if(pr>0)l.pr=pr}else DOC.lines.push({pid,qty:q,pr:pr>0?pr:defPr(pid,DOC.type)});return l?l.qty:q}
 const docHtmlFor=type=>()=>{if(!DOC||DOC.type!==type)DOC=newDoc(type);return docHtml()};
 VIEWS.in={html:docHtmlFor('in'),after:docAfter};VIEWS.out={html:docHtmlFor('out'),after:docAfter};VIEWS.xfer={html:docHtmlFor('xfer'),after:docAfter};
 function suppliers(){const s=new Set();db.moves.forEach(m=>{if(m.type==='in'&&m.party)s.add(m.party)});return[...s].slice(0,60)}
@@ -775,13 +785,13 @@ function docHtml(){const t=DOC.type,M=DOC_META[t],whOpts=(sel,ex)=>db.wh.filter(
  <div class="fld"><label>تاریخ</label>${dateBtn(DOC.date,"pickDate(DOC.date,v=>{DOC.date=v;rerender()})")}</div>
  ${t==='in'?`<div class="fld"><label>تأمین‌کننده</label><input class="inp" list="dlSup" value="${esc(DOC.party)}" oninput="DOC.party=this.value" placeholder="نام تأمین‌کننده"><datalist id="dlSup">${suppliers().map(s=>`<option value="${esc(s)}">`).join('')}</datalist></div>
  <div class="fld"><label>شمارهٔ فاکتور</label><input class="inp ltr" value="${esc(DOC.inv)}" oninput="DOC.inv=this.value"></div>
- <div class="fld"><label>علت ورود</label><select class="inp" onchange="DOC.reason=this.value">${Object.entries(R_IN).map(([k,v])=>`<option value="${k}" ${DOC.reason===k?'selected':''}>${v}</option>`).join('')}</select></div>`:''}
- ${t==='out'?`<div class="fld"><label>علت خروج</label><select class="inp" ${sellerOnly?'disabled':''} onchange="DOC.reason=this.value">${Object.entries(R_OUT).map(([k,v])=>`<option value="${k}" ${DOC.reason===k?'selected':''}>${v}</option>`).join('')}</select></div>
+ <div class="fld"><label>علت ورود</label><select class="inp" onchange="DOC.reason=this.value;drawDocLines()">${Object.entries(R_IN).map(([k,v])=>`<option value="${k}" ${DOC.reason===k?'selected':''}>${v}</option>`).join('')}</select></div>`:''}
+ ${t==='out'?`<div class="fld"><label>علت خروج</label><select class="inp" ${sellerOnly?'disabled':''} onchange="DOC.reason=this.value;drawDocLines()">${Object.entries(R_OUT).map(([k,v])=>`<option value="${k}" ${DOC.reason===k?'selected':''}>${v}</option>`).join('')}</select></div>
  <div class="fld"><label>تحویل‌گیرنده / مشتری</label><input class="inp" list="dlRec" value="${esc(DOC.party)}" oninput="DOC.party=this.value" placeholder="اختیاری"><datalist id="dlRec">${recipients().map(s=>`<option value="${esc(s)}">`).join('')}</datalist></div>
  <div class="fld"><label>شمارهٔ حواله / فاکتور</label><input class="inp ltr" value="${esc(DOC.inv)}" oninput="DOC.inv=this.value"></div>`:''}
  </div><div class="fld"><label>یادداشت</label><input class="inp" value="${esc(DOC.note)}" oninput="DOC.note=this.value" placeholder="اختیاری"></div></div>
  <div class="sect"><h3>اقلام سند <span class="muted xs" id="docSum"></span></h3><div class="row" style="gap:8px"><button class="btn sm" onclick="docPick()">${ic('plus',16)} افزودن</button><button class="btn sm pri" onclick="docScan()">${ic('bar',16)} اسکن</button></div></div>
- <div id="docLines"></div>
+ <div id="docLines"></div><div id="docTot"></div>
  <div class="sticky-act"><button class="btn ${M.btn} blk" style="margin:0;padding:15px" onclick="docSubmit()">${ic('check',20)} ${M.go}</button></div>`}
 function docAfter(){drawDocLines();window.onCode=(code)=>docCode(code)}
 function docCode(code,ctl){const p=findProduct(code);if(!p){if(ctl)ctl.close();unknownCode(code,{use:pid=>{docAdd(pid,1);drawDocLines()}});return}
@@ -791,10 +801,17 @@ function docScan(){openScanner({title:DOC_META[DOC.type].t+' — اسکن اقل
 function drawDocLines(){const box=$('#docLines');if(!box||!DOC)return;const t=DOC.type,src=DOC.wh;
  DOC.lines=DOC.lines.filter(l=>PM[l.pid]);
  box.innerHTML=DOC.lines.length?DOC.lines.map((l,i)=>{const p=PM[l.pid],have=stockAt(p.id,src),bad=(t==='out'||t==='xfer')&&l.qty>have+1e-9;
-  return`<div class="ln ${bad?'warn':''}">${avatar(p,40)}<div class="sp"><div class="b sm ellip">${esc(p.name)}</div><div class="xs ${bad?'red':'muted'}">${t==='in'?'موجودی فعلی':'موجودی '+esc(whName(src))}: ${N(have)} ${esc(p.unit||'')}${bad?' — کمبود':''}</div></div>
-  <div class="stepper"><button onclick="docQty(${i},-1)">−</button><input class="inp" inputmode="decimal" value="${l.qty}" onchange="docQtySet(${i},this.value)"><button onclick="docQty(${i},1)">+</button></div><button class="ibtn" style="width:36px;height:36px;border-radius:11px;color:var(--red)" onclick="DOC.lines.splice(${i},1);drawDocLines()">${ic('x',16)}</button></div>`}).join(''):`<div class="card empty" style="padding:22px"><div class="muted sm">کالا را با «افزودن» یا «اسکن» وارد کن.<br>اسکنر بلوتوثی هم کار می‌کند: بارکد را بزن، خودکار اضافه می‌شود.</div></div>`;
- const s=$('#docSum');if(s)s.textContent=DOC.lines.length?`· ${fa(DOC.lines.length)} قلم، جمع ${N(sum(DOC.lines,l=>l.qty))}`:''}
-function docQty(i,d){const l=DOC.lines[i];l.qty=Math.max(1,Math.round((l.qty+d)*1000)/1000);drawDocLines()}
+  const showPr=DOC.type==='in'||(DOC.type==='out'&&DOC.reason==='sale');
+  return`<div class="lnw"><div class="ln ${bad?'warn':''}">${avatar(p,40)}<div class="sp"><div class="b sm ellip">${esc(p.name)}</div><div class="xs ${bad?'red':'muted'}">${t==='in'?'موجودی فعلی':'موجودی '+esc(whName(src))}: ${N(have)} ${esc(p.unit||'')}${bad?' — کمبود':''}</div></div>
+  <div class="stepper"><button onclick="docQty(${i},-1)">−</button><input class="inp" inputmode="decimal" value="${l.qty}" onchange="docQtySet(${i},this.value)"><button onclick="docQty(${i},1)">+</button></div><button class="ibtn" style="width:36px;height:36px;border-radius:11px;color:var(--red)" onclick="DOC.lines.splice(${i},1);drawDocLines()">${ic('x',16)}</button></div>${showPr?`<div class="lnp"><span class="xs muted">${DOC.type==='in'?'قیمت خرید':'قیمت فروش'} هر واحد</span><input class="inp ltr" inputmode="decimal" value="${l.pr||''}" placeholder="۰" onchange="docPrSet(${i},this.value)"><b class="sm">= ${money((l.pr||0)*l.qty)}</b></div>`:''}</div>`}).join(''):`<div class="card empty" style="padding:22px"><div class="muted sm">کالا را با «افزودن» یا «اسکن» وارد کن.<br>اسکنر بلوتوثی هم کار می‌کند: بارکد را بزن، خودکار اضافه می‌شود.</div></div>`;
+ drawDocTot();const s=$('#docSum');if(s)s.textContent=DOC.lines.length?`· ${fa(DOC.lines.length)} قلم، جمع ${N(sum(DOC.lines,l=>l.qty))}`:''}
+function docQty(i,d){const l=DOC.lines[i];let q=Math.round((l.qty+d)*1000)/1000;if(q<=0)q=l.qty;l.qty=q;drawDocLines()}
+function docPrSet(i,v){const x=numv(v);DOC.lines[i].pr=x>0?x:0;drawDocLines()}
+function docSum(d){return sum(d.lines.filter(l=>PM[l.pid]),l=>l.qty*(l.pr||0))}
+function drawDocTot(){const b=$('#docTot');if(!b||!DOC)return;const t=DOC.type,sale=t==='out'&&DOC.reason==='sale';if(!(t==='in'||sale)||!DOC.lines.length){b.innerHTML='';return}
+ const tot=docSum(DOC),disc=sale?Math.min(DOC.disc||0,tot):0,net=tot-disc;let prof='';
+ if(sale&&can('profit')){const c=sum(DOC.lines.filter(l=>PM[l.pid]&&PM[l.pid].buy>0),l=>l.qty*PM[l.pid].buy),r=sum(DOC.lines.filter(l=>PM[l.pid]&&PM[l.pid].buy>0),l=>l.qty*(l.pr||0))-(tot?disc*(sum(DOC.lines.filter(l=>PM[l.pid]&&PM[l.pid].buy>0),l=>l.qty*(l.pr||0))/tot):0);prof=`<div class="row2 row" style="justify-content:space-between"><span class="muted">سود تقریبی</span><b class="${r-c>=0?'green':'red'}">${money(r-c)}</b></div>`}
+ b.innerHTML=`<div class="card" style="margin-top:10px"><div class="row2 row" style="justify-content:space-between"><span class="muted">${t==='in'?'جمع خرید':'جمع اقلام'}</span><b>${money(tot)}</b></div>${sale?`<div class="row2 row" style="justify-content:space-between;align-items:center"><span class="muted">تخفیف</span><input class="inp ltr" style="width:130px" inputmode="decimal" value="${DOC.disc||''}" placeholder="۰" onchange="DOC.disc=numv(this.value)||0;drawDocTot()"></div><div class="row2 row" style="justify-content:space-between"><span class="b">قابل پرداخت</span><b class="b" style="font-size:18px">${money(net)}</b></div>`:''}${prof}</div>`}
 function docQtySet(i,v){const x=numv(v);DOC.lines[i].qty=x>0?x:1;drawDocLines()}
 function docSubmit(){if(!DOC.lines.length)return toast('اول کالا اضافه کن');
  const t=DOC.type;if(t==='xfer'&&DOC.wh===DOC.to)return toast('مبدأ و مقصد باید فرق کنند');
@@ -810,7 +827,7 @@ function mvLabel(m){return m.type==='xfer'?`${whName(m.wh)} ← ${whName(m.to)}`
 function mvRow(m,showDate){const p=PM[m.pid];if(!p)return'';
  const sign=m.type==='in'?'+':m.type==='xfer'?'':m.type==='adj'?(m.delta>=0?'+':'−'):'−',qv=m.type==='adj'?Math.abs(m.delta):m.qty,col=m.type==='in'||(m.type==='adj'&&m.delta>=0)?'green':m.type==='out'||m.type==='adj'?'red':'blue';
  return`<div class="mv" onclick="docSheet('${m.doc}')"><div class="tic t-${m.type}">${ic(T_IC[m.type],18)}</div><div class="sp"><div class="b sm ellip">${esc(p.name)}</div><div class="xs muted ellip">${T_NAME[m.type]}${m.no?' #'+fa(m.no):''} · ${esc(mvLabel(m))}${showDate?' · '+dShort(m.date):''} · ${hhmm(m.ts)}${m.party?' · '+esc(m.party):''}</div></div><div class="b ${col}" style="font-size:16px">${sign}${N(qv)}</div></div>`}
-function docSheet(id){const ms=db.moves.filter(m=>m.doc===id&&PM[m.pid]);if(!ms.length)return;const m0=ms[0],t=m0.type;
+function docSheet(id){const ms=db.moves.filter(m=>m.doc===id&&PM[m.pid]);if(!ms.length)return;const m0=ms[0],t=m0.type,hasPr=(t==='in'||t==='out')&&ms.some(m=>m.pr>0);
  const rs=(t==='in'?R_IN:R_OUT)[m0.reason]||(t==='adj'?'انبارگردانی':'');
  sheet(`<div class="row" style="margin-bottom:10px"><div class="tic t-${t}" style="width:44px;height:44px">${ic(T_IC[t],22)}</div><div class="sp"><div class="b" style="font-size:17px">${T_NAME[t]}${m0.no?' شمارهٔ '+fa(m0.no):''}</div><div class="xs muted">${wday(m0.date)}، ${dFull(m0.date)} · ${hhmm(m0.ts)}</div></div></div>
  <div class="card sm"><div class="row2 row" style="justify-content:space-between"><span class="muted">${t==='xfer'?'مسیر':'انبار'}</span><b>${esc(mvLabel(m0))}</b></div>
@@ -819,11 +836,11 @@ function docSheet(id){const ms=db.moves.filter(m=>m.doc===id&&PM[m.pid]);if(!ms.
  ${m0.inv?`<div class="row2 row" style="justify-content:space-between"><span class="muted">شمارهٔ فاکتور/حواله</span><b class="ltr">${esc(m0.inv)}</b></div>`:''}
  ${m0.user?`<div class="row2 row" style="justify-content:space-between"><span class="muted">ثبت‌کننده</span><b>${esc(m0.user)}</b></div>`:''}
  ${m0.note?`<div class="row2 row" style="justify-content:space-between"><span class="muted">یادداشت</span><b>${esc(m0.note)}</b></div>`:''}</div>
- <div class="tw" style="margin-top:10px"><table class="tbl" style="min-width:0"><tr><th>کالا</th><th class="n">${t==='adj'?'سیستم':'تعداد'}</th>${t==='adj'?'<th class="n">شمارش</th><th class="n">اختلاف</th>':''}</tr>${ms.map(m=>`<tr class="clk" onclick="closeSheet();productSheet('${m.pid}')"><td>${esc(PM[m.pid].name)}</td><td class="n">${t==='adj'?N(m.sys??'')+'':N(m.qty)}</td>${t==='adj'?`<td class="n">${N(m.counted)}</td><td class="n ${m.delta>=0?'pos':'neg'}">${m.delta>0?'+':''}${N(m.delta)}</td>`:''}</tr>`).join('')}</table></div>
+ <div class="tw" style="margin-top:10px"><table class="tbl" style="min-width:0"><tr><th>کالا</th><th class="n">${t==='adj'?'سیستم':'تعداد'}</th>${hasPr?'<th class="n">قیمت</th><th class="n">جمع</th>':''}${t==='adj'?'<th class="n">شمارش</th><th class="n">اختلاف</th>':''}</tr>${ms.map(m=>`<tr class="clk" onclick="closeSheet();productSheet('${m.pid}')"><td>${esc(PM[m.pid].name)}</td><td class="n">${t==='adj'?N(m.sys??'')+'':N(m.qty)}</td>${hasPr?`<td class="n">${N(m.pr||0)}</td><td class="n">${N((m.pr||0)*m.qty)}</td>`:''}${t==='adj'?`<td class="n">${N(m.counted)}</td><td class="n ${m.delta>=0?'pos':'neg'}">${m.delta>0?'+':''}${N(m.delta)}</td>`:''}</tr>`).join('')}</table></div>${hasPr?docTotals(ms):''}
  <div class="grid2" style="margin-top:12px"><button class="btn" onclick="printDoc('${id}')">${ic('print',18)} چاپ</button>${can('move.del')?`<button class="btn" style="color:var(--red)" onclick="askDelDoc('${id}')">${ic('trash',18)} حذف سند</button>`:'<span></span>'}</div>`)}
 function askDelDoc(id){const n=db.moves.filter(m=>m.doc===id).length;confirmBox(`این سند (${fa(n)} قلم) حذف شود؟`,'حذف',()=>{const g=delMoves(db.moves.filter(m=>m.doc===id).map(m=>m.id));addLog('doc.del','حذف سند ('+fa(g.length)+' قلم)');closeSheet();rerender();toast('سند حذف شد',()=>{restoreMoves(g);rerender()})},true,'موجودی‌ها دوباره محاسبه می‌شوند.')}
-function printDoc(id){const ms=db.moves.filter(m=>m.doc===id&&PM[m.pid]),m0=ms[0],t=m0.type;
- const html=`<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>سند</title><style>body{font-family:Tahoma,sans-serif;padding:24px}table{width:100%;border-collapse:collapse;margin-top:14px}td,th{border:1px solid #999;padding:6px 10px;text-align:right}h2{margin:0}p{margin:4px 0;color:#333}</style></head><body><h2>${esc(db.settings.name)} — سند ${T_NAME[t]}${m0.no?' شمارهٔ '+fa(m0.no):''}</h2><p>تاریخ: ${dFull(m0.date)} · ${esc(mvLabel(m0))}</p>${m0.party?`<p>${t==='in'?'تأمین‌کننده':'تحویل‌گیرنده'}: ${esc(m0.party)}</p>`:''}${m0.inv?`<p>شمارهٔ: ${esc(m0.inv)}</p>`:''}<table><tr><th>#</th><th>کالا</th><th>کد</th><th>تعداد</th></tr>${ms.map((m,i)=>`<tr><td>${fa(i+1)}</td><td>${esc(PM[m.pid].name)}</td><td>${esc(PM[m.pid].code||'')}</td><td>${N(t==='adj'?m.delta:m.qty)}</td></tr>`).join('')}</table><p style="margin-top:40px">امضا: ____________</p></body></html>`;
+function printDoc(id){const ms=db.moves.filter(m=>m.doc===id&&PM[m.pid]),m0=ms[0],t=m0.type,hasP=(t==='in'||t==='out')&&ms.some(m=>m.pr>0);
+ const html=`<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>سند</title><style>body{font-family:Tahoma,sans-serif;padding:24px}table{width:100%;border-collapse:collapse;margin-top:14px}td,th{border:1px solid #999;padding:6px 10px;text-align:right}h2{margin:0}p{margin:4px 0;color:#333}</style></head><body><h2>${esc(db.settings.name)} — سند ${T_NAME[t]}${m0.no?' شمارهٔ '+fa(m0.no):''}</h2><p>تاریخ: ${dFull(m0.date)} · ${esc(mvLabel(m0))}</p>${m0.party?`<p>${t==='in'?'تأمین‌کننده':'تحویل‌گیرنده'}: ${esc(m0.party)}</p>`:''}${m0.inv?`<p>شمارهٔ: ${esc(m0.inv)}</p>`:''}<table><tr><th>#</th><th>کالا</th><th>کد</th><th>تعداد</th>${hasP?'<th>قیمت</th><th>جمع</th>':''}</tr>${ms.map((m,i)=>`<tr><td>${fa(i+1)}</td><td>${esc(PM[m.pid].name)}</td><td>${esc(PM[m.pid].code||'')}</td><td>${N(t==='adj'?m.delta:m.qty)}</td>${hasP?`<td>${N(m.pr||0)}</td><td>${N((m.pr||0)*m.qty)}</td>`:''}</tr>`).join('')}</table>${hasP?`<p style="margin-top:12px"><b>جمع کل: ${money(sum(ms,m=>(m.pr||0)*m.qty))}</b></p>`:''}<p style="margin-top:40px">امضا: ____________</p></body></html>`;
  const f=document.createElement('iframe');f.style.cssText='position:fixed;right:-9999px;width:0;height:0';document.body.appendChild(f);f.contentDocument.open();f.contentDocument.write(html);f.contentDocument.close();setTimeout(()=>{f.contentWindow.focus();f.contentWindow.print();setTimeout(()=>f.remove(),3000)},300)}
 
 /* ---- documents history ---- */
@@ -866,7 +883,7 @@ function manSubmit(){const i=$('#manCode'),v=en(i.value).trim();if(!v)return;i.v
 function quickCode(raw,src){const code=String(raw||'').trim();if(!code)return;const p=findProduct(code);
  if(!p){Cam.flash(false);unknownCode(code,{use:pid=>quickMove(pid)});return}
  quickMove(p.id)}
-function quickDoc(pid,wh){const m=SQ.mode,d={type:m==='sale'||m==='out'?'out':m,wh,date:todayISO(),reason:m==='sale'?'sale':m==='out'?'other':m==='in'?'buy':'',lines:[{pid,qty:SQ.qty>0?SQ.qty:1}]};if(m==='xfer')d.to=SQ.to;return d}
+function quickDoc(pid,wh){const m=SQ.mode,d={type:m==='sale'||m==='out'?'out':m,wh,date:todayISO(),reason:m==='sale'?'sale':m==='out'?'other':m==='in'?'buy':'',lines:[{pid,qty:SQ.qty>0?SQ.qty:1,pr:defPr(pid,m==='sale'||m==='out'?'out':m)}]};if(m==='xfer')d.to=SQ.to;return d}
 function quickMove(pid,force,whOverride){const d=quickDoc(pid,whOverride||SQ.wh),dec=d.type==='out'||d.type==='xfer';
  if(dec&&!force&&stockAt(pid,d.wh)<d.lines[0].qty-1e-9){return shortSheet(d)}
  const p=PM[pid];p.hits=(p.hits||0)+1;const r=commitDoc(d);if(!r)return;
@@ -915,6 +932,7 @@ VIEWS.dash={html(){
  <div class="kc green" onclick="go('stock')"><div class="t">موجودی کل</div><div class="v">${N(total)}</div><div class="s">واحد در ${fa(db.wh.length)} انبار</div><div class="ki">${ic('layers')}</div></div>
  <div class="kc amber" onclick="HS.type='in';go('docs')"><div class="t">ورود امروز</div><div class="v">${N(tIn)}</div><div class="s">واحد</div><div class="ki">${ic('down')}</div></div>
  <div class="kc red" onclick="HS.type='out';go('docs')"><div class="t">خروج امروز</div><div class="v">${N(tOut)}</div><div class="s">واحد</div><div class="ki">${ic('up')}</div></div></div>
+ ${moneyCards()}
  <div class="qa" style="margin-top:12px">
  ${can('in')?`<button onclick="docNew('in')"><span class="qi t-in">${ic('down',20)}</span>ورود</button>`:'<span></span>'}${canOut()?`<button onclick="docNew('out')"><span class="qi t-out">${ic('up',20)}</span>خروج</button>`:'<span></span>'}${can('xfer')?`<button onclick="docNew('xfer')"><span class="qi t-xfer">${ic('swap',20)}</span>انتقال</button>`:'<span></span>'}${can('count')?`<button onclick="go('count')"><span class="qi t-adj">${ic('clip',20)}</span>انبارگردانی</button>`:'<span></span>'}<button onclick="go('scan')"><span class="qi" style="background:var(--bluebg);color:var(--brand)">${ic('bar',20)}</span>اسکن</button></div>
  <div class="dgrid" style="margin-top:14px"><div><div class="sect" style="margin-top:6px"><h3>نمودار گردش کالا</h3><span class="xs muted"><b class="green">●</b> ورود &nbsp;<b class="red">●</b> خروج</span></div>
@@ -1025,7 +1043,7 @@ function turnRows(f,e,wh){/* opening must be net of earlier in/out/adj/xfer: rec
   else if(m.type==='xfer'&&wh!=='all'){const d=(m.to===wh?m.qty:0)-(m.wh===wh?m.qty:0);if(before)r.open+=d;else r.xf+=d}}
  return Object.values(R).map(r=>({...r,close:Math.round((r.open+r.in-r.out+r.adj+r.xf)*1000)/1000,open:Math.round(r.open*1000)/1000})).filter(r=>r.open||r.in||r.out||r.adj||r.xf||r.close)}
 VIEWS.reports={html(){if(!db.products.length)return emptyBox('📊','گزارشی نیست','اول چند کالا و حرکت ثبت کن.');
- const {f,e}=rpRange(),T=[['turn','گردش کالا'],['io','ورود و خروج'],['low','کم‌موجودی'],['xfer','انتقال‌ها'],['counts','انبارگردانی‌ها'],['top','پرتحرک و راکد']];
+ const {f,e}=rpRange(),T=[['turn','گردش کالا'],['io','ورود و خروج'],['low','کم‌موجودی'],['xfer','انتقال‌ها'],['counts','انبارگردانی‌ها'],['top','پرتحرک و راکد']];if(moneyUsed())T.splice(1,0,['sales','فروش و سود']);
  const RG=[['7','۷ روز'],['30','۳۰ روز'],['month','این ماه'],['90','۹۰ روز'],['all','همه'],['custom','بازهٔ دلخواه']];
  const needRange=!['low','counts'].includes(RP.tab);
  return`<div class="chips">${T.map(x=>`<button class="chip ${RP.tab===x[0]?'on':''}" onclick="RP.tab='${x[0]}';rerender()">${x[1]}</button>`).join('')}</div>
@@ -1034,6 +1052,7 @@ VIEWS.reports={html(){if(!db.products.length)return emptyBox('📊','گزارش�
  ${['turn','io'].includes(RP.tab)&&db.wh.length>1?`<div class="chips"><button class="chip ${RP.wh==='all'?'on':''}" onclick="RP.wh='all';rerender()">همهٔ انبارها</button>${db.wh.map(w=>`<button class="chip ${RP.wh===w.id?'on':''}" onclick="RP.wh='${w.id}';rerender()">${esc(w.name)}</button>`).join('')}</div>`:''}
  ${rpTab(f,e)}`}};
 function rpTab(f,e){const wh=RP.wh;
+ if(RP.tab==='sales')return rpSales(f,e);
  if(RP.tab==='turn'){const rows=turnRows(f,e,wh).sort((a,b)=>(b.in+b.out)-(a.in+a.out)),S=series(Math.min(120,diffDays(f,e)+1)),tin=sum(rows,r=>r.in),tout=sum(rows,r=>r.out);
   return`<div class="grid3"><div class="kpi"><div class="t">ورود</div><div class="v green">${N(tin)}</div></div><div class="kpi"><div class="t">خروج</div><div class="v red">${N(tout)}</div></div><div class="kpi"><div class="t">خالص</div><div class="v">${N(tin-tout)}</div></div></div>
   <div class="card" style="margin-top:12px">${dualBars(S.labels,S.a,S.b)}</div>
@@ -1072,23 +1091,59 @@ function loadSample(){
  const cats=['لوازم جانبی موبایل','صوتی و تصویری','شارژ و کابل','باتری'].map(n=>touch({id:uid(),name:n}));db.cats.push(...cats);
  const mk=(name,pre,cat,brand,min,unit)=>{const c=pre+String(Math.floor(Math.random()*1e8)).padStart(8,'0').slice(0,12-pre.length);const p=touch({id:uid(),name,code:nextCode(),barcode:c+eanCheck(c),cat:cats[cat].id,brand,unit:unit||'عدد',min,loc:'قفسه '+(1+rnd(9)),img:'',desc:'',alias:[],hits:0,created:Date.now()});db.products.push(p);return p};
  const P=[mk('کابل شارژر تایپ‌سی','6260',2,'انکر',10),mk('کابل شارژر لایتنینگ','6260',2,'اپل',10),mk('هدفون بلوتوثی','6261',1,'هایلو',8),mk('موس بی‌سیم','6262',0,'لاجیتک',10),mk('باتری قلمی','6263',3,'انرجایزر',20,'بسته'),mk('پاوربانک ۱۰۰۰۰','6264',0,'شیائومی',6),mk('کیبورد بی‌سیم','6265',0,'ای‌فور',5),mk('هندزفری سیمی','6266',1,'سامسونگ',12),mk('قاب گوشی سیلیکونی','6267',0,'',15),mk('گلس محافظ صفحه','6268',0,'',25)];
- const t=todayISO(),W=db.wh[0].id,S=(db.wh[1]||db.wh[0]).id;let k=0;
- const mv=(pid,type,qty,ago,wh,x)=>{const ts=Date.now()-ago*864e5+(k++)*1000;db.moves.push({id:uid(),doc:uid(),no:0,pid,type,qty,wh,date:addDays(t,-ago),ts,reason:type==='in'?'buy':type==='out'?'sale':'',party:type==='in'?['تأمین‌کننده الف','بازرگانی ب'][rnd(2)]:'',inv:'',note:'',user:'',u:ts,...x})};
+ const t=todayISO(),W=db.wh[0].id,S=(db.wh[1]||db.wh[0]).id;let k=0;const PRm={};P.forEach(p=>{p.buy=(5+rnd(40))*10000;p.sell=Math.round(p.buy*(1.2+Math.random()*.3)/1000)*1000;PRm[p.id]=p});
+ const mv=(pid,type,qty,ago,wh,x)=>{const ts=Date.now()-ago*864e5+(k++)*1000;db.moves.push({id:uid(),doc:uid(),no:0,pid,type,qty,wh,date:addDays(t,-ago),ts,reason:type==='in'?'buy':type==='out'?'sale':'',party:type==='in'?['تأمین‌کننده الف','بازرگانی ب'][rnd(2)]:'',inv:'',note:'',user:'',u:ts,...(type==='in'?{pr:PRm[pid].buy}:type==='out'?{pr:(x&&x.reason==='waste')?0:PRm[pid].sell,cost:PRm[pid].buy}:{}),...x})};
  P.forEach((p,i)=>{mv(p.id,'in',120+rnd(60),28,W);mv(p.id,'xfer',70+rnd(10),24,W,{to:S});for(let d=22;d>=0;d--){if((d+i)%3!==0)mv(p.id,'out',1+rnd(4),d,S)}if(i%3===0)mv(p.id,'in',20+rnd(20),6,W)});
  db.seq.in=3;db.seq.out=3;db.seq.xfer=2;
  recalc();/* بعضی کالاها را کم‌موجودی کن */
  [P[0],P[4],P[9]].forEach(p=>{let dec=ST[p.id].t-Math.max(1,Math.floor(p.min/2));for(const w of [S,W]){const take=Math.min(Math.max(0,stockAt(p.id,w)),dec);if(take>0){mv(p.id,'out',take,3,w,{reason:'waste',note:'خرابی'});dec-=take}}recalc()});
  addLog('sample','بارگذاری داده نمونه');save();recalc();rerender();toast('✓ داده نمونه اضافه شد')}
 
+/* ================= money: prices, invoices totals, profit ================= */
+const money=n=>N(Math.round(+n||0))+' '+((db&&db.settings&&db.settings.cur)||'تومان');
+const moneyUsed=()=>db.moves.some(m=>m.pr>0)||db.products.some(p=>p.sell>0||p.buy>0);
+function saleStats(f,e){const S={rev:0,cost:0,profit:0,noCost:0,waste:0,buy:0,days:{},prods:{},docs:{}};
+ for(const m of db.moves){if(!PM[m.pid]||m.date<f||m.date>e)continue;
+  if(m.type==='out'&&m.reason==='sale'){const r=(m.pr||0)*m.qty;if(!(r>0))continue;S.rev+=r;
+   const d=S.days[m.date]||(S.days[m.date]={rev:0,profit:0,n:0}),p=S.prods[m.pid]||(S.prods[m.pid]={q:0,rev:0,profit:0}),dc=S.docs[m.doc]||(S.docs[m.doc]={doc:m.doc,no:m.no,date:m.date,ts:m.ts,party:m.party,rev:0,profit:0});
+   d.rev+=r;p.q+=m.qty;p.rev+=r;dc.rev+=r;
+   if(m.cost>0){const g=r-m.cost*m.qty;S.cost+=m.cost*m.qty;S.profit+=g;d.profit+=g;p.profit+=g;dc.profit+=g}else S.noCost+=r}
+  else if(m.type==='out'&&(m.reason==='waste'||m.reason==='use')&&m.cost>0)S.waste+=m.cost*m.qty;
+  else if(m.type==='in'&&m.pr>0)S.buy+=m.pr*m.qty}
+ return S}
+function priceRow(p){if(!(p.sell>0||p.buy>0))return'';
+ return`<div class="card" style="margin-top:10px;padding:10px 12px"><div class="row2 row" style="justify-content:space-between"><span class="muted">قیمت فروش</span><b>${p.sell>0?money(p.sell):'—'}</b></div>${can('price')?`<div class="row2 row" style="justify-content:space-between"><span class="muted">قیمت خرید</span><b>${p.buy>0?money(p.buy):'—'}</b></div>`:''}${can('profit')&&p.sell>0&&p.buy>0?`<div class="row2 row" style="justify-content:space-between"><span class="muted">سود هر واحد</span><b class="${p.sell>=p.buy?'green':'red'}">${money(p.sell-p.buy)} (${fa(Math.round((p.sell-p.buy)/p.buy*100))}٪)</b></div>`:''}</div>`}
+function docTotals(ms){const t=ms[0].type,tot=sum(ms,m=>(m.pr||0)*m.qty);let h=`<div class="card" style="margin-top:10px;padding:10px 12px"><div class="row2 row" style="justify-content:space-between"><span class="b">${t==='in'?'جمع خرید':'جمع فاکتور'}</span><b style="font-size:17px">${money(tot)}</b></div>`;
+ if(t==='out'&&ms[0].reason==='sale'&&can('profit')){const k=ms.filter(m=>m.cost>0&&m.pr>0),g=sum(k,m=>(m.pr-m.cost)*m.qty);if(k.length)h+=`<div class="row2 row" style="justify-content:space-between"><span class="muted">سود</span><b class="${g>=0?'green':'red'}">${money(g)}</b></div>`}
+ return h+'</div>'}
+function moneyCards(){if(!moneyUsed())return'';const t=todayISO(),j=toJ(t),mf=fromJ(j.jy,j.jm,1),a=saleStats(t,t),b=saleStats(mf,t),pf=can('profit');
+ return`<div class="grid${pf?3:2}" style="margin-top:10px"><div class="kpi" onclick="RP.tab='sales';RP.range='7';go('reports')" style="cursor:pointer"><div class="t">فروش امروز</div><div class="v" style="font-size:18px">${N(Math.round(a.rev))}</div><div class="s">${esc(db.settings.cur||'تومان')}</div></div>
+ ${pf?`<div class="kpi" onclick="RP.tab='sales';RP.range='7';go('reports')" style="cursor:pointer"><div class="t">سود امروز</div><div class="v ${a.profit<0?'red':'green'}" style="font-size:18px">${N(Math.round(a.profit))}</div><div class="s">${esc(db.settings.cur||'تومان')}</div></div>`:''}
+ <div class="kpi" onclick="RP.tab='sales';RP.range='month';go('reports')" style="cursor:pointer"><div class="t">فروش این ماه</div><div class="v" style="font-size:18px">${N(Math.round(b.rev))}</div><div class="s">${pf?'سود '+N(Math.round(b.profit)):esc(db.settings.cur||'تومان')}</div></div></div>`}
+function rpSales(f,e){const S=saleStats(f,e),pf=can('profit'),days=Object.entries(S.days).sort((a,b)=>b[0].localeCompare(a[0])),prods=Object.entries(S.prods).sort((a,b)=>b[1].rev-a[1].rev),docs=Object.values(S.docs).sort((a,b)=>b.ts-a.ts);
+ if(!days.length&&!S.buy)return emptyBox('💰','فروشی با قیمت ثبت نشده','قیمت فروش کالاها را در فرم کالا بنویس یا موقع ثبت فاکتور وارد کن.');
+ return`<div class="grid2"><div class="kpi"><div class="t">جمع فروش</div><div class="v" style="font-size:19px">${N(Math.round(S.rev))}</div><div class="s">${esc(db.settings.cur||'تومان')}</div></div>
+ ${pf?`<div class="kpi"><div class="t">سود</div><div class="v ${S.profit<0?'red':'green'}" style="font-size:19px">${N(Math.round(S.profit))}</div><div class="s">${S.rev>0&&S.cost>0?'حاشیه '+fa(Math.round(S.profit/(S.profit+S.cost)*100))+'٪':''}</div></div>`:`<div class="kpi"><div class="t">تعداد فاکتور</div><div class="v">${fa(docs.length)}</div></div>`}</div>
+ ${pf&&(S.noCost>0||S.waste>0||S.buy>0)?`<div class="hint" style="margin:8px 4px">${S.noCost>0?`فروش ${money(S.noCost)} قیمت خرید نداشت و در سود حساب نشد. `:''}${S.waste>0?`ارزش ضایعات و مصرف داخلی: ${money(S.waste)}. `:''}${S.buy>0?`جمع خرید این بازه: ${money(S.buy)}.`:''}</div>`:''}
+ <div class="sect"><h3>روزانه</h3><button class="btn sm noprint" onclick="exportSalesCSV()">${ic('down',16)} اکسل</button></div>
+ <div class="tw"><table class="tbl"><tr><th>روز</th><th class="n">فروش</th>${pf?'<th class="n">سود</th>':''}</tr>${days.map(([d,x])=>`<tr><td>${wday(d)} ${dShort(d)}</td><td class="n">${N(Math.round(x.rev))}</td>${pf?`<td class="n ${x.profit<0?'neg':'pos'}">${N(Math.round(x.profit))}</td>`:''}</tr>`).join('')}</table></div>
+ <div class="sect"><h3>به تفکیک کالا</h3></div>
+ <div class="tw"><table class="tbl"><tr><th>کالا</th><th class="n">تعداد</th><th class="n">فروش</th>${pf?'<th class="n">سود</th>':''}</tr>${prods.slice(0,40).map(([id,x])=>`<tr class="clk" onclick="productSheet('${id}')"><td>${esc(PM[id].name)}</td><td class="n">${N(x.q)}</td><td class="n">${N(Math.round(x.rev))}</td>${pf?`<td class="n ${x.profit<0?'neg':'pos'}">${N(Math.round(x.profit))}</td>`:''}</tr>`).join('')}</table></div>
+ <div class="sect"><h3>فاکتورها</h3></div>${docs.slice(0,30).map(x=>`<div class="mv" onclick="docSheet('${x.doc}')"><div class="tic t-out">${ic('up',18)}</div><div class="sp"><div class="b sm ellip">فاکتور ${x.no?'#'+fa(x.no):''}${x.party?' · '+esc(x.party):''}</div><div class="xs muted">${dShort(x.date)} · ${hhmm(x.ts)}</div></div><div class="b">${N(Math.round(x.rev))}</div></div>`).join('')}`}
+function exportSalesCSV(){const {f,e}=rpRange(),S=saleStats(f,e),pf=can('profit');let csv='﻿روز,فروش'+(pf?',سود':'')+'\n';
+ Object.entries(S.days).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([d,x])=>{csv+=[dNum(d),Math.round(x.rev)].concat(pf?[Math.round(x.profit)]:[]).map(csvq).join(',')+'\n'});
+ csv+='\nکالا,تعداد,فروش'+(pf?',سود':'')+'\n';Object.entries(S.prods).forEach(([id,x])=>{csv+=[PM[id].name,x.q,Math.round(x.rev)].concat(pf?[Math.round(x.profit)]:[]).map(csvq).join(',')+'\n'});
+ download('forosh-sood-'+todayISO()+'.csv',csv,'text/csv')}
+
 /* ================= smart assistant (Persian chat) ================= */
 const NUMW={'صفر':0,'یک':1,'یه':1,'دو':2,'سه':3,'چهار':4,'پنج':5,'شش':6,'شیش':6,'هفت':7,'هشت':8,'نه':9,'ده':10,'یازده':11,'دوازده':12,'سیزده':13,'چهارده':14,'پانزده':15,'شانزده':16,'هفده':17,'هجده':18,'نوزده':19,'بیست':20,'سی':30,'چهل':40,'پنجاه':50,'شصت':60,'هفتاد':70,'هشتاد':80,'نود':90,'صد':100,'دویست':200,'سیصد':300,'چهارصد':400,'پانصد':500,'ششصد':600,'هفتصد':700,'هشتصد':800,'نهصد':900};
 const STOP=new Set(('از به در رو را تا عدد عدده دونه تا چند چقدر چه چی چیه کدوم مونده مونده مانده باقی باقیمانده هست هستش هستن داریم دارم دارد داریم داره موجودی موجود کالا کالاها کالای محصول محصولات بزن بزنید ثبت کن کنید بکن بده بدید بگو بگید نشون نشان بده ببین ببینم اخرین کی وارد خارج ورود خروج فروش بفروش فروختم فروخته انتقال منتقل امروز دیروز انبار مغازه و یا هم یه یک این اون برای با من ما لطفا لطفاً الان الآن مثلا بود شد شده شدن اومد امد نیست نداریم کمه کم تموم تمام').split(' ').map(normFa));
 const AS={msgs:[],pend:{},seq:0};
-VIEWS.assistant={html(){return`<div class="card" style="padding:12px"><div class="row"><div class="bot-av" style="width:42px;height:42px;border-radius:14px">${ic('bot',22)}</div><div class="sp"><div class="b">دستیار هوشمند انبار</div><div class="xs muted">فارسی بنویس؛ موجودی بپرس یا ثبت کن — ثبت فقط بعد از تأیید تو</div></div></div></div>
+VIEWS.assistant={html(){return`<div class="card" style="padding:12px"><div class="row"><div class="bot-av" style="width:42px;height:42px;border-radius:14px">${ic('bot',22)}</div><div class="sp"><div class="b">دستیار هوشمند انبار</div><div class="xs muted">فارسی بنویس؛ فاکتور باز کن، اقلام را یک‌جا بگو، بار رسید ثبت کن، موجودی و سود بپرس</div></div></div></div>
  <div class="chat" id="chat"></div>
- <div class="chips" id="asChips" style="margin-top:4px">${['کم‌موجودی‌ها کدوماست؟','امروز چی فروش رفت؟','امروز چی وارد شد؟','خلاصهٔ وضعیت انبار','راهنما'].map(s=>`<button class="chip" onclick="asSend('${s}')">${s}</button>`).join('')}</div>
+ <div class="chips" id="asChips" style="margin-top:4px">${['فاکتور جدید','بار رسید','سود امروز','کم‌موجودی‌ها کدوماست؟','امروز چی فروش رفت؟','چی یاد گرفتی؟','راهنما'].map(s=>`<button class="chip" onclick="asSend('${s}')">${s}</button>`).join('')}</div>
  <div class="chatin"><input id="asIn" placeholder="مثلاً: از کابل شارژر چند عدد مونده؟" onkeydown="if(event.key==='Enter')asSend()" autocomplete="off"><button class="ibtn" id="asMic" style="display:none" onclick="asMic()">🎙</button><button class="btn pri" style="padding:10px 14px" onclick="asSend()">${ic('send',18)}</button></div>`},
- after(){if(!AS.msgs.length)asSay(`سلام 👋 من دستیار انبارم. چند نمونه:<br>• «موجودی کابل شارژر چقدره؟»<br>• «۵ تا موس بفروش» (بعد از تأیید ثبت می‌شود)<br>• «ورود ۱۰ تا باتری به انبار»<br>• «۳ تا هدفون از انبار به مغازه منتقل کن»<br>• «کم‌موجودی‌ها» / «امروز چی فروش رفت؟»<br>• «کابل شارژر یعنی کابل تایپ‌سی» (برای یاد دادن اسم مستعار)`);else drawChat();
+ after(){if(!AS.msgs.length)asSay(`سلام 👋 من دستیار انبارم. بیشتر کارهای روزمره را می‌توانی از همین‌جا انجام بدهی:<br>• «فاکتور جدید برای آقای رضایی» و بعد «دو تا پاستیل، سه تا سس خرسی، یک کیلو گوجه، نیم کیلو خیار ۳۰ هزار تومان» و «ثبت»<br>• «بار رسید» و بعد «۲۴ تا ماست، ۱۲ تا دوغ» (اگر نگویی چه آمده، حدس می‌زنم)<br>• «سود امروز» / «قیمت پاستیل رو ۱۵ هزار کن»<br>• «وقتی گفتم ف۱ یعنی فاکتور جدید» (میانبر شخصی)<br>چند نمونهٔ دیگر:<br>• «موجودی کابل شارژر چقدره؟»<br>• «۵ تا موس بفروش» (بعد از تأیید ثبت می‌شود)<br>• «ورود ۱۰ تا باتری به انبار»<br>• «۳ تا هدفون از انبار به مغازه منتقل کن»<br>• «کم‌موجودی‌ها» / «امروز چی فروش رفت؟»<br>• «کابل شارژر یعنی کابل تایپ‌سی» (برای یاد دادن اسم مستعار)`);else drawChat();
   if('webkitSpeechRecognition' in window||'SpeechRecognition' in window)$('#asMic').style.display=''}};
 function drawChat(){const c=$('#chat');if(!c)return;c.innerHTML=AS.msgs.map(m=>`<div class="msg ${m.c}">${m.c==='bot'?`<div class="bot-av">${ic('bot',18)}</div>`:''}<div class="bub">${m.h}</div></div>`).join('');setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),30)}
 function asSay(h,c='bot'){AS.msgs.push({c,h});drawChat()}
@@ -1185,6 +1240,184 @@ function asConfirm(id){const o=AS.pend[id];if(!o)return asSay('این درخوا
  if(!r)return asSay('ثبت نشد.');p.hits=(p.hits||0)+1;save();beep();const uid2='u'+(++AS.seq);AS.pend[uid2]={undo:r.moves.map(m=>m.id)};
  asSay(`✅ ثبت شد. موجودی جدید «${esc(p.name)}»: <b>${N(ST[p.id].t)}</b> (${db.wh.map(w=>esc(w.name)+' '+N(stockAt(p.id,w.id))).join(' · ')})<br><button class="btn sm" style="margin-top:6px" onclick="asUndo('${uid2}')">بازگردانی</button>`)}
 function asUndo(id){const o=AS.pend[id];if(!o)return;delete AS.pend[id];delMoves(o.undo);asSay('↩️ بازگردانی شد.')}
+
+/* ================= assistant v2: live invoices, multi-item parsing, receipts, learning ================= */
+const UNITW={'کیلو':'کیلوگرم','کیلوگرم':'کیلوگرم','گرم':'g','تا':'','عدد':'','دونه':'','بسته':'بسته','پاکت':'بسته','کارتن':'کارتن','جعبه':'کارتن','لیتر':'لیتر','متر':'متر','جفت':'جفت','دست':'دست','بطری':'','قوطی':'','کیسه':'کیسه','شاخه':''};
+const PRICEW=new Set(['تومان','تومن','تومنی','تومانی','ریال']);
+const FILLW=new Set('و هم رو را اینا اینارو اینها ایناها برام لطفا بنویس بذار بزار بزن اضافه کن کنید کنین بده بدین به فاکتور جاری جدید باز تو توی در داخل بعد بعدش همچنین وسایل وسیله اقلام مشتری قیمت مبلغ معادل هر هرکدوم هرکدام ثبت دوباره باشه خب خوب ممنون اینم ایناهم'.split(' '));
+const NUMX={'نیم':.5,'ربع':.25};
+const isNumTok=w=>/^\d+(?:x\d+)?$/.test(w)||(w in NUMW)||(w in NUMX)||w==='هزار'||w==='میلیون';
+function asPre(raw){let s=en(String(raw||'')).replace(/(\d)[,٬،](?=\d{3}(?!\d))/g,'$1').replace(/(\d)[.٫](?=\d)/g,'$1x');
+ s=s.replace(/(\d)(?=[؀-ۿ])/g,'$1 ').replace(/([؀-ۿ])(?=\d)/g,'$1 ');return normFa(s)}
+function asToks(t){t=t.replace(/(?:^|\s)هر\s*(?:کدوم|کدام|یک|یکی|عدد|دونه|تا)(?=\s|$)/g,' هر');const out=[];for(const w of t.split(' ').filter(Boolean)){const m=w.match(/^(.+?)(تا|دونه)$/);if(m&&(m[1] in NUMW)){out.push(m[1],m[2])}else out.push(w)}return out}
+function readNum(toks,i){let total=0,cur=0,j=i,mult=false,got=false,dig=false;
+ for(;j<toks.length;j++){const w=toks[j];
+  if(/^\d+(?:x\d+)?$/.test(w)){if(got&&dig&&cur>0)break;cur+=parseFloat(w.replace('x','.'));got=true;dig=true;continue}
+  if(w==='هزار'||w==='میلیون'){const k=w==='هزار'?1e3:1e6;total+=(cur||1)*k;cur=0;mult=true;got=true;dig=false;continue}
+  if(w in NUMX){cur+=NUMX[w];got=true;continue}
+  if(w in NUMW){if(got&&!dig&&NUMW[w]<10&&cur%10!==0&&cur>0)break;cur+=NUMW[w];got=true;dig=false;continue}
+  if(w==='و'&&got&&j+1<toks.length&&isNumTok(toks[j+1])&&toks[j+1]!=='هزار'){continue}
+  break}
+ return{val:total+cur,next:j,mult}}
+function parseItems(toks){const items=[],fresh=()=>({qty:null,unit:'',name:[],price:null,per:false});let cur=fresh(),i=0;
+ const fi=toks.findIndex(x=>!FILLW.has(x)),qf=fi>=0&&isNumTok(toks[fi]);
+ while(i<toks.length){const w=toks[i];
+  if(isNumTok(w)){const r=readNum(toks,i);let j=r.next;if(j===i){i++;continue}const nx=toks[j];let isPrice=false;
+   if(nx&&PRICEW.has(nx)){isPrice=true;j++}else if(r.mult||(r.val>=1000&&!(nx in UNITW)))isPrice=true;
+   if(isPrice){let v=r.val;if(nx==='ریال')v/=10;const pv=toks[i-1]||'',per=['هر','هرکدوم','هرکدام'].includes(pv)||(pv.length>3&&/یی$/.test(pv));
+    const tgt=(cur.name.length||cur.qty!==null)?cur:items[items.length-1];if(tgt){tgt.price=v;tgt.per=per}i=j;continue}
+   let unit='';if(toks[j] in UNITW){unit=UNITW[toks[j]];j++}let q=r.val;if(unit==='g'){q=q/1000;unit='کیلوگرم'}
+   if(qf){if(cur.name.length){items.push(cur);cur=fresh()}cur.qty=q;cur.unit=unit}
+   else{if(cur.name.length&&cur.qty===null){cur.qty=q;cur.unit=unit}else{if(cur.name.length){items.push(cur);cur=fresh()}cur.qty=q;cur.unit=unit}}
+   i=j;continue}
+  if(FILLW.has(w)){i++;continue}
+  if(!qf&&cur.qty!==null){items.push(cur);cur=fresh()}
+  cur.name.push(w);i++}
+ if(cur.name.length)items.push(cur);return items}
+/* ---------- invoice state ---------- */
+AS.parked=[];AS.await=null;
+const asActive=()=>!!(DOC&&DOC.asist&&(DOC.type==='out'||DOC.type==='in'));
+function asStartDoc(type,party){if(asActive()&&DOC.lines.length){AS.parked.push(DOC);if(AS.parked.length>3)AS.parked.shift()}
+ DOC=newDoc(type);DOC.asist=true;DOC.newPids=[];if(party)DOC.party=party;return DOC}
+function asNewProduct(name,unit,pr){if(!can('prod.add'))return null;const nm=name.replace(/\s+/g,' ').trim();if(!nm)return null;
+ const p=touch({id:uid(),created:Date.now(),alias:[],hits:0,name:nm,code:nextCode(),barcode:'',cat:'',brand:'',unit:unit||'عدد',min:0,loc:'',desc:'',img:'',auto:true});
+ if(pr>0){if(DOC.type==='out')p.sell=Math.round(pr);else p.buy=Math.round(pr)}
+ db.products.push(p);addLog('prod.add','کالای جدید (دستیار): '+nm);save();recalc();(DOC.newPids=DOC.newPids||[]).push(p.id);return p}
+function asAddItems(items){const R={added:[],made:[],guess:[],unknown:[],priceDiff:[]};
+ for(const it of items){const toks=it.name.filter(x=>!STOP.has(x)&&x.length>1),raw=toks.join(' ');if(!raw)continue;
+  const q=it.qty>0?it.qty:1,cand=resolveProducts(toks);let p=null,guess=false;
+  if(cand.length&&cand[0].s>=.75){p=cand[0].p;guess=!confident(cand)}else if(cand.length){p=cand[0].p;guess=true}
+  if(!p){p=asNewProduct(raw,it.unit,it.price>0?(it.per?it.price:it.price/q):0);if(!p){R.unknown.push(raw);continue}R.made.push(p.name)}
+  let unitPr;if(it.price>0)unitPr=Math.round(it.per?it.price:it.price/q);
+  const exist=DOC.lines.find(l=>l.pid===p.id);
+  if(DOC.type==='out'&&unitPr>0&&p.sell>0&&Math.abs(p.sell-unitPr)>1&&!R.made.includes(p.name))R.priceDiff.push({pid:p.id,pr:unitPr});
+  docAdd(p.id,q,unitPr);const l=DOC.lines.find(x=>x.pid===p.id);if(guess&&!exist){l.raw=raw;R.guess.push({pid:p.id,raw,alts:cand.slice(0,4).map(c=>c.p.id)})}
+  p.hits=(p.hits||0)+1;R.added.push({p,q})}
+ save();return R}
+function asLineShort(l){const p=PM[l.pid];if(!p||DOC.type!=='out')return false;if(p.auto&&!db.moves.some(m=>m.pid===p.id))return false;return l.qty>stockAt(l.pid,DOC.wh)+1e-9}
+function asCardHtml(){const t=DOC.type,out=t==='out',tot=docSum(DOC),disc=out?Math.min(DOC.disc||0,tot):0,sale=out&&DOC.reason==='sale';
+ let prof='';if(sale&&can('profit')){const k=DOC.lines.filter(l=>PM[l.pid]&&PM[l.pid].buy>0),r=sum(k,l=>l.qty*(l.pr||0)),c=sum(k,l=>l.qty*PM[l.pid].buy);if(k.length)prof=`<div class="row2 row" style="justify-content:space-between"><span class="muted">سود تقریبی</span><b class="${r-c>=0?'green':'red'}">${money(r-c-(tot?disc*r/tot:0))}</b></div>`}
+ return`<div class="card" style="margin:6px 0;padding:10px;box-shadow:none"><div class="b" style="margin-bottom:6px">${out?'🧾 فاکتور فروش':'📦 بار رسید'}${DOC.party?' — '+esc(DOC.party):''} <span class="xs muted">${esc(whName(DOC.wh))}</span></div>
+ ${DOC.lines.length?DOC.lines.map((l,i)=>{const p=PM[l.pid];if(!p)return'';return`<div class="row2 row" style="justify-content:space-between;align-items:center;gap:6px;border-top:1px dashed var(--line);padding:5px 0"><span class="sp sm ${asLineShort(l)?'red':''}">${esc(p.name)}${p.auto?' <span class="pill p-amber">جدید</span>':''}<br><span class="xs muted">${N(l.qty)} ${esc(p.unit||'')}${l.pr>0?' × '+N(l.pr):''}${asLineShort(l)?' · موجودی '+N(stockAt(l.pid,DOC.wh)):''}</span></span><b class="sm">${l.pr>0?N(Math.round(l.qty*l.pr)):''}</b><button class="ibtn" style="width:30px;height:30px" onclick="asInvDel(${i})">${ic('x',14)}</button></div>`}).join(''):'<div class="muted sm">هنوز قلمی نیست؛ بنویس مثلاً «دو تا پاستیل، یک کیلو گوجه».</div>'}
+ ${tot>0?`<div class="row2 row" style="justify-content:space-between;border-top:1px solid var(--line);padding-top:6px;margin-top:4px"><span class="b">${out?'جمع':'جمع خرید'}</span><b>${money(tot)}</b></div>`:''}${disc>0?`<div class="row2 row" style="justify-content:space-between"><span class="muted">تخفیف</span><b>−${money(disc)}</b></div><div class="row2 row" style="justify-content:space-between"><span class="b">قابل پرداخت</span><b>${money(tot-disc)}</b></div>`:''}${prof}</div>
+ <div class="grid2"><button class="btn pri sm" onclick="asInvCommit()">✅ ${out?'ثبت فاکتور':'ثبت رسید'}</button><button class="btn sm" onclick="asInvCancel()">لغو</button></div>
+ <button class="btn sm blk" style="margin-top:6px" onclick="go('${t}')">باز کردن در فرم کامل</button>`}
+function asCard(pre){AS.msgs=AS.msgs.filter(m=>m.k!=='card');AS.msgs.push({c:'bot',h:(pre?pre+'<br>':'')+asCardHtml(),k:'card'});drawChat()}
+function asReport(R,extra){let h='';
+ if(R.added.length)h+=`✅ اضافه شد: ${R.added.map(a=>`<b>${N(a.q)}</b> ${esc(a.p.name)}`).join('، ')}`;
+ if(R.made.length)h+=`<br>🆕 کالای جدید ساخته شد: ${R.made.map(esc).join('، ')} <span class="xs muted">(موجودی‌اش را بعداً ثبت کن)</span>`;
+ if(R.unknown.length)h+=`<br>❓ پیدا نکردم و اجازهٔ ساخت نداری: ${R.unknown.map(esc).join('، ')}`;
+ R.guess.forEach(g=>{const id='g'+(++AS.seq);AS.pend[id]=g;h+=`<div class="xs" style="margin-top:6px">«${esc(g.raw)}» را «${esc(PM[g.pid].name)}» گرفتم. اگر منظورت چیز دیگری بود:</div><div class="chips" style="padding:0">${g.alts.filter(a=>a!==g.pid).slice(0,3).map(a=>`<button class="chip" onclick="asFix('${id}','${a}')">${esc(PM[a].name)}</button>`).join('')}</div>`});
+ R.priceDiff.forEach(d=>{const id='g'+(++AS.seq);AS.pend[id]=d;h+=`<div class="xs" style="margin-top:6px">قیمت «${esc(PM[d.pid].name)}» ${money(d.pr)} شد (ثبت‌شده: ${money(PM[d.pid].sell)}). <button class="chip" onclick="asSetSell('${id}')">به‌روزرسانی قیمت فروش</button></div>`});
+ asCard(h+(extra||''))}
+function asFix(id,pid){const g=AS.pend[id];if(!g)return;delete AS.pend[id];if(!asActive())return;const l=DOC.lines.find(x=>x.pid===g.pid);if(!l)return;
+ const np=PM[pid];asSay(esc(np.name),'u');const ex=DOC.lines.find(x=>x.pid===pid);if(ex){ex.qty+=l.qty;DOC.lines=DOC.lines.filter(x=>x!==l)}else{l.pid=pid;l.pr=defPr(pid,DOC.type)||l.pr;delete l.raw}
+ const learned=addAlias(np,g.raw);asCard(learned?`📚 یاد گرفتم: «${esc(g.raw)}» = «${esc(np.name)}»`:'')}
+function asSetSell(id){const d=AS.pend[id];if(!d)return;delete AS.pend[id];const p=PM[d.pid];if(!p||!can('price'))return;p.sell=d.pr;touch(p);save();asSay(`قیمت فروش «${esc(p.name)}» شد ${money(d.pr)} ✅`)}
+function asInvDel(i){if(!asActive())return;const l=DOC.lines[i];if(!l)return;DOC.lines.splice(i,1);asCard('')}
+function asDropNew(){(DOC.newPids||[]).forEach(id=>{const p=PM[id];if(p&&p.auto&&!db.moves.some(m=>m.pid===id)&&!DOC.lines.some(l=>l.pid===id)){db.products=db.products.filter(x=>x.id!==id);db.dead[id]=Date.now()}});recalc();save()}
+function asInvCancel(){if(!asActive())return asSay('فاکتور بازی نیست.');const n=DOC.lines.length;DOC.lines=[];asDropNew();DOC=newDoc(DOC.type);AS.msgs=AS.msgs.filter(m=>m.k!=='card');asSay(`فاکتور لغو شد${n?` (${fa(n)} قلم دور ریخته شد)`:''}.`)}
+function asInvCommit(force){if(!asActive())return asSay('فاکتور بازی نیست.');if(!DOC.lines.length)return asSay('فاکتور خالی است.');
+ const t=DOC.type;if(t==='out'&&!can('out')&&!can('out.sale'))return asSay('این کار برای نقش تو مجاز نیست.');if(t==='in'&&!can('in'))return asSay('ثبت ورود برای نقش تو مجاز نیست.');
+ const short=t==='out'?DOC.lines.filter(asLineShort):[];
+ if(short.length&&!force){return asSay(`⚠️ موجودی ${esc(whName(DOC.wh))} برای ${short.map(l=>'«'+esc(PM[l.pid].name)+'»').slice(0,3).join('، ')} کافی نیست.<div class="grid2" style="margin-top:6px"><button class="btn red sm" onclick="asInvCommit(true)">با موجودی منفی ثبت شود</button><button class="btn sm" onclick="asCard('')">ویرایش</button></div>`)}
+ const d={...DOC,lines:DOC.lines.map(l=>({pid:l.pid,qty:l.qty,pr:l.pr}))},tot=docSum(DOC),disc=t==='out'?Math.min(DOC.disc||0,tot):0;
+ const r=commitDoc(d);if(!r)return asSay('چیزی ثبت نشد.');(DOC.newPids||[]).forEach(id=>{if(PM[id])PM[id].auto=false});save();beep();
+ const uid2='u'+(++AS.seq);AS.pend[uid2]={undo:r.moves.map(m=>m.id)};const wasT=t;DOC=newDoc(wasT);AS.msgs=AS.msgs.filter(m=>m.k!=='card');
+ let g='';if(t==='out'&&can('profit')){const k=r.moves.filter(m=>m.cost>0&&m.pr>0);if(k.length)g=`<br>سود: <b>${money(sum(k,m=>(m.pr-m.cost)*m.qty))}</b>`}
+ asSay(`✅ ${t==='out'?'فاکتور':'رسید'} شمارهٔ ${fa(r.no)} ثبت شد — ${fa(r.moves.length)} قلم${tot>0?`، مبلغ <b>${money(tot-disc)}</b>`:''}.${g}<br><span class="xs muted">موجودی ${t==='out'?'کم':'زیاد'} شد.</span><div class="grid2" style="margin-top:6px"><button class="btn sm" onclick="asUndo('${uid2}')">بازگردانی</button><button class="btn sm" onclick="docSheet('${r.doc}')">دیدن/چاپ</button></div>`)}
+/* ---------- receipts: guess what arrived ---------- */
+function asSuggest(){const t=todayISO(),d90=addDays(t,-90),d3=addDays(t,-3),score={};
+ for(const p of db.products){const s=ST[p.id];let sc=0;const st=status(p);if(st==='out'||st==='neg')sc+=5;else if(st==='low')sc+=4;
+  const ins=db.moves.filter(m=>m.pid===p.id&&m.type==='in'&&m.date>=d90);sc+=Math.min(ins.length,4)*.6;if(ins.some(m=>m.date>=d3))sc-=3;sc+=Math.min(s.out30||0,20)*.05;if(sc>0)score[p.id]=sc}
+ return Object.entries(score).sort((a,b)=>b[1]-a[1]).slice(0,8).map(x=>PM[x[0]])}
+function asLastInQty(pid){const m=db.moves.filter(x=>x.pid===pid&&x.type==='in').sort((a,b)=>b.ts-a.ts)[0];return m?m.qty:0}
+function asPickRcpt(pid){if(!asActive()||DOC.type!=='in')return;const p=PM[pid],q=asLastInQty(pid)||1;asSay(esc(p.name),'u');docAdd(pid,q);AS.await={pid};
+ asCard(`«${esc(p.name)}» را با ${N(q)} ${esc(p.unit||'')} گذاشتم${asLastInQty(pid)?' (مثل آخرین ورود)':''}. اگر تعداد دیگری آمد فقط عدد را بنویس.`)}
+function asRcptHint(){const s=asSuggest();return s.length?`<div class="xs" style="margin-top:6px">حدسم از روی کم‌موجودی‌ها و ورودهای قبلی:</div><div class="chips" style="padding:0">${s.map(p=>`<button class="chip" onclick="asPickRcpt('${p.id}')">${esc(p.name)}</button>`).join('')}</div>`:''}
+/* ---------- money questions ---------- */
+function asMoney(dw){const t0=todayISO(),f=dw==='y'?addDays(t0,-1):dw==='w'?addDays(t0,-6):dw==='m'?addDays(t0,-29):t0,e=dw==='y'?addDays(t0,-1):t0,S=saleStats(f,e),lbl={t:'امروز',y:'دیروز',w:'۷ روز اخیر',m:'۳۰ روز اخیر'}[dw||'t'];
+ if(!(S.rev>0))return asSay(`${lbl} فروشی با قیمت ثبت نشده.`);const top=Object.entries(S.prods).sort((a,b)=>b[1].rev-a[1].rev).slice(0,3);
+ asSay(`💰 ${lbl}: فروش <b>${money(S.rev)}</b> در ${fa(Object.keys(S.docs).length)} فاکتور${can('profit')?`<br>سود: <b class="${S.profit<0?'red':'green'}">${money(S.profit)}</b>${S.noCost>0?`<br><span class="xs muted">${money(S.noCost)} از فروش قیمت خرید نداشت و در سود نیست.</span>`:''}`:''}<br><span class="xs muted">پرفروش: ${top.map(([id,x])=>esc(PM[id].name)).join('، ')}</span>`)}
+/* ---------- knowledge: macros + export/import ---------- */
+function asMacros(){return db.prefs.macros||(db.prefs.macros=[])}
+function applyMacros(t){for(const m of asMacros()){if(t===m.a||t.startsWith(m.a+' '))return(m.b+t.slice(m.a.length)).trim()}return t}
+function asKnowExport(){const k={app:'anbaryar-know',v:1,aliases:db.products.filter(p=>(p.alias||[]).length).map(p=>({name:p.name,alias:p.alias})),macros:asMacros()};download('anbaryar-knowledge-'+todayISO()+'.json',JSON.stringify(k,null,1),'application/json');toast('دانش دستیار ذخیره شد')}
+function asKnowImport(){const i=document.createElement('input');i.type='file';i.accept='.json,application/json';i.onchange=async()=>{try{const k=JSON.parse(await i.files[0].text());if(k.app!=='anbaryar-know')throw 0;let na=0,nm=0;
+  for(const a of k.aliases||[]){const p=db.products.find(x=>normFa(x.name)===normFa(a.name));if(p)for(const al of a.alias||[])if(addAlias(p,al))na++}
+  for(const m of k.macros||[]){if(m.a&&m.b&&!asMacros().some(x=>x.a===m.a)){asMacros().push({a:m.a,b:m.b});nm++}}
+  save();asSay(`📚 دانش بارگذاری شد: ${fa(na)} اسم مستعار و ${fa(nm)} میانبر جدید.`)}catch(e){toast('این فایل دانش انباریار نیست')}};i.click()}
+function asKnowList(){const al=db.products.reduce((s,p)=>s+(p.alias||[]).length,0),ms=asMacros();
+ asSay(`📚 تا الان یاد گرفته‌ام:<br>• ${fa(al)} اسم مستعار برای کالاها<br>• ${fa(ms.length)} میانبر${ms.length?':<br>'+ms.slice(-6).map(m=>`«${esc(m.a)}» ← «${esc(m.b)}»`).join('<br>'):''}<br>• قیمت و واحد کالاهایی که در فاکتور گفته‌ای<div class="grid2" style="margin-top:6px"><button class="btn sm" onclick="asKnowExport()">${ic('down',16)} دانلود دانش</button><button class="btn sm" onclick="asKnowImport()">${ic('up',16)} بارگذاری دانش</button></div><div class="xs muted" style="margin-top:6px">برای یاد دادن: «وقتی گفتم <b>فاکتور بعدی</b> یعنی <b>فاکتور جدید</b>» یا «پاستیل یعنی پاستیل میوه‌ای».</div>`)}
+function extractParty(toks){const i=toks.findIndex(w=>w==='برای'||w==='مشتری'||w==='اسم');if(i<0)return{party:'',toks};
+ let j=i+1;if(toks[j]==='اسم')j++;while(toks[j]&&/^(اقای|اقا|خانم|دکتر|مهندس|حاج|حاجی)$/.test(toks[j]))j++;
+ const nm=[];while(toks[j]&&nm.length<2&&!isNumTok(toks[j])&&!(toks[j] in UNITW)&&!FILLW.has(toks[j])){if(nm.length===1&&resolveProducts([toks[j]]).length)break;nm.push(toks[j]);j++}
+ if(!nm.length)return{party:'',toks};return{party:nm.join(' '),toks:[...toks.slice(0,i),...toks.slice(j)]}}
+/* ---------- main entry ---------- */
+const _asReplyBase=asReply;
+asReply=function(raw){let handled=false;try{handled=asSmart(raw)}catch(e){console.error(e);handled=false}if(!handled)_asReplyBase(raw)};
+function asSmart(raw){let t=asPre(raw);if(!t)return false;t=applyMacros(t).replace(/(?:^|\s)هر\s*(?:کدوم|کدام|یک|یکی|عدد|دونه|تا)(?=\s|$)/g,' هر').trim();
+ if(!can('assistant'))return false;
+ let m;
+ /* teach macro */
+ m=t.match(/^(?:وقتی|هر وقت|هروقت)\s+(?:گفتم\s+)?(.+?)\s+(?:یعنی|معنیش|معنی)\s+(.+)$/);
+ if(m&&can('act')){const a=m[1].trim(),b=m[2].trim();asMacros().push({a,b});save();asSay(`یاد گرفتم ✅ از این به بعد «${esc(a)}» یعنی «${esc(b)}».`);return true}
+ if(/(چی|چه چیز|چیا|چه چیزایی)\s+(یاد گرفتی|بلدی|یادگرفتی)/.test(t)||/^(دانش|یادگیری|حافظه)/.test(t)){asKnowList();return true}
+ const active=asActive();
+ /* awaiting a quantity */
+ if(AS.await){const aw=AS.await;AS.await=null;const tk=asToks(t),r=readNum(tk,0);
+  if(active&&isNumTok(tk[0])&&r.val>0&&r.next>=tk.length-1&&!r.mult){const l=DOC.lines.find(x=>x.pid===aw.pid);if(l){l.qty=r.val;asCard(`تعداد «${esc(PM[aw.pid].name)}» شد ${N(r.val)}.`);return true}}}
+ /* money queries */
+ const dw=/دیروز/.test(t)?'y':/هفته|هفت روز/.test(t)?'w':/ماه|سی روز/.test(t)?'m':/امروز|الان|تا حالا/.test(t)?'t':'';
+ if(/(سود|فایده|درامد|پول)/.test(t)&&!/(قیمت)/.test(t)&&!/\d/.test(t)){if(!can('reports')&&!can('profit')&&!/فروش/.test(t)){asSay('این گزارش برای نقش تو در دسترس نیست.');return true}asMoney(dw||'t');return true}
+ if(/فروش/.test(t)&&/(چند تومان|چقدر پول|مبلغ|چقدر فروخت|چقدر فروش|فروش چقدر|درامد|جمع فروش)/.test(t)&&!/\d/.test(t)){asMoney(dw||'t');return true}
+ /* set product price: "قیمت پاستیل رو ۱۵ هزار کن" */
+ m=t.match(/^قیمت\s+(خرید\s+)?(.+?)\s+(?:رو\s+|را\s+)?((?:\d|نیم|یک|دو|سه|چهار|پنج|شش|هفت|هشت|نه|ده|بیست|سی|چهل|پنجاه|شصت|هفتاد|هشتاد|نود|صد).*)$/);
+ if(m&&can('price')){const tk=asToks(m[3].replace(/\s*(?:رو|را)?\s*(?:کن|بذار|بزار|بشه|باشه)$/,'')),r=readNum(tk,0);let v=r.val;if(tk[r.next]==='ریال')v/=10;
+  const nm=m[2].split(' ').filter(x=>!STOP.has(x)&&x.length>1),c=resolveProducts(nm);
+  if(v>0&&c.length&&c[0].s>=.7){const p=c[0].p,buy=!!m[1];if(buy)p.buy=Math.round(v);else p.sell=Math.round(v);touch(p);
+   if(active&&!buy){const l=DOC.lines.find(x=>x.pid===p.id);if(l)l.pr=Math.round(v)}save();
+   if(active)asCard(`قیمت ${buy?'خرید':'فروش'} «${esc(p.name)}» شد ${money(v)} ✅`);else asSay(`قیمت ${buy?'خرید':'فروش'} «${esc(p.name)}» شد ${money(v)} ✅`);return true}}
+ /* parked invoice back */
+ if(/(فاکتور قبلی|فاکتور قبل|برگردون فاکتور|فاکتور قبلیه)/.test(t)){if(!AS.parked.length){asSay('فاکتور نگه‌داشته‌شده‌ای نیست.');return true}if(active&&DOC.lines.length)AS.parked.unshift(DOC);DOC=AS.parked.pop();asCard('فاکتور قبلی برگشت.');return true}
+ const hasQuestion=/(موجودی|چقدر|چنده|چند تاست|چند تا مونده|مونده|داریم|کی |چه وقت|کدوم|چیه)/.test(t)&&!/(اضافه|بذار|بزن|فاکتور|رسید)/.test(t);
+ const wantsRcpt=/(بار|محموله|کامیون|ماشین)\s*(جدید\s*)?(رسید|اومد|امد|اورد|رسیده|اومده)|رسید جدید|رسید بزن|ورودی جدید|خرید جدید|فاکتور خرید|رسید انبار|بار رسیده/.test(t);
+ const wantsInv=/(فاکتور|صورت ?حساب)\s*(جدید|تازه|باز|بزن|بساز|شروع)|(باز کن|بزن|بساز|شروع کن|شروع).{0,10}فاکتور|مشتری جدید|یه فاکتور|فاکتور فروش/.test(t);
+ const cmdStrip=s=>s.replace(/(بار|محموله|کامیون|ماشین)\s*(جدید\s*)?(رسید|اومد|امد|اورد|رسیده|اومده)/g,' ').replace(/(رسید جدید|رسید بزن|ورودی جدید|خرید جدید|فاکتور خرید|رسید انبار|بار رسیده)/g,' ').replace(/(فاکتور|صورت ?حساب)\s*(جدید|تازه|باز|بزن|بساز|شروع|فروش)?(\s*(باز کن|کن|بزن|بساز))?/g,' ').replace(/(مشتری جدید|یه فاکتور|شروع کن|شروع|باز کن)/g,' ').replace(/\s+/g,' ').trim();
+ /* commit / cancel / total / discount / delete on an open invoice */
+ if(active){
+  if(/^(ثبت|ثبت کن|ثبتش کن|ثبت فاکتور|ثبت رسید|فاکتور رو ثبت کن|رسید رو ثبت کن|فاکتور رو ببند|تمام|تموم|تمومه|ببند|ببندش|اوکی|تایید|تایید کن|همینه|همین|حله|ok)$/.test(t)){asInvCommit();return true}
+  if(/^(لغو|کنسل|انصراف|لغو کن|لغو فاکتور|فاکتور رو لغو کن|فاکتور رو پاک کن|لغو رسید|پاک کن)$/.test(t)){asInvCancel();return true}
+  if(/^(جمع|مجموع|جمعش|جمع کل|چقدر شد|حساب کن|حسابش کن|فاکتور|نشون بده|ببینم|لیست)$/.test(t)){asCard('');return true}
+  m=t.match(/^تخفیف\s+(.+)$/);if(m&&DOC.type==='out'){const tk=asToks(m[1]),r=readNum(tk,0);let v=r.val;if(tk[r.next]==='درصد'||/درصد/.test(m[1]))v=docSum(DOC)*v/100;if(v>0){DOC.disc=Math.round(v);asCard(`تخفیف ${money(v)} اعمال شد.`);return true}}
+  m=t.match(/^(?:حذف|پاک کن|بردار|حذفش کن)\s+(.+)$/);if(m){const nm=m[1].split(' ').filter(x=>!STOP.has(x)&&x.length>1),c=resolveProducts(nm).filter(x=>DOC.lines.some(l=>l.pid===x.p.id));if(c.length){DOC.lines=DOC.lines.filter(l=>l.pid!==c[0].p.id);asCard(`«${esc(c[0].p.name)}» حذف شد.`);return true}}
+  m=t.match(/^(.+?)\s+(?:رو\s+|را\s+)?((?:\d|نیم|یک|دو|سه|چهار|پنج|شش|هفت|هشت|نه|ده).*?)\s*(?:تا|عدد|کیلو)?\s+(?:کن|بذار|بزار|بشه)$/);
+  if(m&&!/^قیمت/.test(t)){const nm=m[1].split(' ').filter(x=>!STOP.has(x)&&x.length>1),c=resolveProducts(nm).filter(x=>DOC.lines.some(l=>l.pid===x.p.id));const r=readNum(asToks(m[2]),0);
+   if(c.length&&r.val>0){const l=DOC.lines.find(x=>x.pid===c[0].p.id);l.qty=r.val;asCard(`تعداد «${esc(c[0].p.name)}» شد ${N(r.val)}.`);return true}}}
+ /* start a receipt */
+ if(wantsRcpt){if(!can('act')&&!can('in')){asSay('ثبت ورود برای نقش تو مجاز نیست.');return true}asStartDoc('in');
+  const items=parseItems(asToks(cmdStrip(t)));if(items.length){const R=asAddItems(items);asReport(R,'');return true}
+  asSay('بار رسید باز شد 📦 چه کالاهایی آمد؟ اسم و تعدادشان را بنویس (مثلاً «۲۴ تا ماست، ۱۲ تا دوغ»).'+asRcptHint());return true}
+ /* parse items from the text */
+ let toks=asToks(t),commit=false;
+ const mc=t.match(/^(.*?)(?:\s+و)?\s+(?:ثبت|ببند|تمام|تموم)(?:\s+کن)?$/);if(mc&&mc[1]&&(active||wantsInv||/\d|نیم/.test(mc[1]))){commit=true;toks=asToks(mc[1])}
+ let party='';const forCust=!active&&/^(?:برای|مشتری)\s/.test(t),wi=wantsInv||forCust;
+ if(wi){const x=extractParty(toks);party=x.party;toks=x.toks}
+ if(wantsInv)toks=asToks(cmdStrip(toks.join(' ')));
+ const items=parseItems(toks);
+ const okItems=items.filter(i=>i.name.filter(x=>!STOP.has(x)&&x.length>1).length);
+ if(wi){if(!canOut()){asSay('این کار برای نقش تو مجاز نیست.');return true}asStartDoc('out',party);
+  if(!okItems.length){asCard(party?`فاکتور برای «${esc(party)}» باز شد. اقلام را بنویس.`:'فاکتور جدید باز شد. اقلام را بنویس (مثلاً «دو تا پاستیل، سه تا سس خرسی، یک کیلو گوجه»).');return true}
+  const R=asAddItems(okItems);asReport(R,'');if(commit)asInvCommit();return true}
+ if(active){if(!okItems.length)return false;if(hasQuestion)return false;
+  const explicit=okItems.some(i=>i.qty!==null)||/(اضافه|بذار|بزن|بنویس)/.test(t);if(!explicit)return false;
+  const R=asAddItems(okItems);asReport(R,'');if(commit)asInvCommit();return true}
+ /* no open invoice: a list of items with quantities starts one */
+ const withQty=okItems.filter(i=>i.qty!==null);
+ if(!hasQuestion&&withQty.length>=2&&withQty.length===okItems.length&&!/(بفروش|فروختم|انتقال|منتقل|ورود|خروج)/.test(t)){
+  if(!canOut()){asSay('این کار برای نقش تو مجاز نیست.');return true}asStartDoc('out','');const R=asAddItems(okItems);asReport(R,'');if(commit)asInvCommit();return true}
+ if(!hasQuestion&&withQty.length>=1&&/(به فاکتور|فاکتور اضافه|اضافه کن)/.test(t)&&/فاکتور/.test(t)){if(!canOut())return false;asStartDoc('out','');const R=asAddItems(okItems);asReport(R,'');if(commit)asInvCommit();return true}
+ return false}
 
 /* ================= settings / users / log / lock / sync ================= */
 function promptBox(title,val,cb,ph=''){sheet(`<h2>${esc(title)}</h2><input id="pbIn" class="inp" value="${esc(val||'')}" placeholder="${esc(ph)}"><div class="grid2" style="margin-top:12px"><button class="btn pri" id="pbOk">${ic('check')} ذخیره</button><button class="btn" onclick="closeSheet()">انصراف</button></div>`,'cen');

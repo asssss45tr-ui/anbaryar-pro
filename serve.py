@@ -13,7 +13,7 @@ import argparse, hmac, json, mimetypes, os, shutil, socket, sys, tempfile, threa
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-VERSION = '1.0'
+VERSION = '2.0'
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DEAD_TTL_MS = 180 * 86400 * 1000
 MAX_BODY = 60 * 1024 * 1024
