@@ -394,7 +394,7 @@ const cleanCode=c=>String(c||'').replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.in
 const bkey=c=>{c=cleanCode(c);return /^\d+$/.test(c)?(c.replace(/^0+/,'')||'0'):c.toLowerCase()};
 
 /* ================= store ================= */
-const APP_VER='۲٫۰';
+const APP_VER='۲٫۱';
 const UNITS=['عدد','کارتن','بسته','کیلوگرم','متر','لیتر','جفت','دست'];
 const R_IN={buy:'خرید',ret:'برگشت از مشتری',prod:'تولید / مونتاژ',gift:'هدیه / نمونه',other:'سایر'};
 const R_OUT={sale:'فروش',use:'مصرف داخلی',waste:'ضایعات / خرابی',ret:'برگشت به تأمین‌کننده',gift:'هدیه / نمونه',other:'سایر'};
@@ -1138,7 +1138,8 @@ function exportSalesCSV(){const {f,e}=rpRange(),S=saleStats(f,e),pf=can('profit'
 /* ================= smart assistant (Persian chat) ================= */
 const NUMW={'صفر':0,'یک':1,'یه':1,'دو':2,'سه':3,'چهار':4,'پنج':5,'شش':6,'شیش':6,'هفت':7,'هشت':8,'نه':9,'ده':10,'یازده':11,'دوازده':12,'سیزده':13,'چهارده':14,'پانزده':15,'شانزده':16,'هفده':17,'هجده':18,'نوزده':19,'بیست':20,'سی':30,'چهل':40,'پنجاه':50,'شصت':60,'هفتاد':70,'هشتاد':80,'نود':90,'صد':100,'دویست':200,'سیصد':300,'چهارصد':400,'پانصد':500,'ششصد':600,'هفتصد':700,'هشتصد':800,'نهصد':900};
 const STOP=new Set(('از به در رو را تا عدد عدده دونه تا چند چقدر چه چی چیه کدوم مونده مونده مانده باقی باقیمانده هست هستش هستن داریم دارم دارد داریم داره موجودی موجود کالا کالاها کالای محصول محصولات بزن بزنید ثبت کن کنید بکن بده بدید بگو بگید نشون نشان بده ببین ببینم اخرین کی وارد خارج ورود خروج فروش بفروش فروختم فروخته انتقال منتقل امروز دیروز انبار مغازه و یا هم یه یک این اون برای با من ما لطفا لطفاً الان الآن مثلا بود شد شده شدن اومد امد نیست نداریم کمه کم تموم تمام').split(' ').map(normFa));
-const AS={msgs:[],pend:{},seq:0};
+const AS={msgs:[],pend:{},seq:0,lastCtx:'',lastAct:null};
+['رسید','رسیده','رسیدند','اوردیم','گرفتیم','افزایش','برداشت','ارسال','مصرف','موجودیه','کنم','کردن','باشه','بشه','اینو','اینم','همین','این','رو','تعریف','جدید','جنس','محصول','قلم','فهرست','لیست','دنبال','گردم','میگردم','می','فعلی','باقی','مانده','باقیمانده','مقدار','تعداد','وضعیت','بررسی','کد','نام','پیدا','جستجو','جست','وجو','موردنظر','مربوط','چیست','نتیجه','سیستم','فرق','دارد','داره','محموله','واقعی','واقعا','شمارش','مغایرت','حذف','پاک','غیرفعال','بایگانی','حذفش','فعال','تغییر','عوض','اصلاح'].forEach(w=>STOP.add(normFa(w)));
 VIEWS.assistant={html(){return`<div class="card" style="padding:12px"><div class="row"><div class="bot-av" style="width:42px;height:42px;border-radius:14px">${ic('bot',22)}</div><div class="sp"><div class="b">دستیار هوشمند انبار</div><div class="xs muted">فارسی بنویس؛ فاکتور باز کن، اقلام را یک‌جا بگو، بار رسید ثبت کن، موجودی و سود بپرس</div></div></div></div>
  <div class="chat" id="chat"></div>
  <div class="chips" id="asChips" style="margin-top:4px">${['فاکتور جدید','بار رسید','سود امروز','کم‌موجودی‌ها کدوماست؟','امروز چی فروش رفت؟','چی یاد گرفتی؟','راهنما'].map(s=>`<button class="chip" onclick="asSend('${s}')">${s}</button>`).join('')}</div>
@@ -1180,14 +1181,14 @@ function asReply(raw){const t=normFa(raw);if(!t)return;let toks=t.split(' ');
  if(m&&can('act')){const r=resolveProducts(extractNum(m[2].split(' ').filter(x=>!STOP.has(x))).rest);if(r.length&&confident(r)){const ok=addAlias(r[0].p,m[1]);return asSay(ok?`یاد گرفتم ✅ از این به بعد «${esc(m[1])}» یعنی «${esc(r[0].p.name)}».`:`این اسم قبلاً برای «${esc(r[0].p.name)}» ثبت بوده.`)}
   return asSay('کالای دوم را مطمئن پیدا نکردم؛ اسمش را دقیق‌تر بنویس.')}
  /* summary queries */
- const isAct=/(بفروش|فروختم|فروش بزن|فروش کن|خروج بزن|خروج بده|خروج کن|کم کن|برداشتم|مصرف کردم|ورود بزن|وارد کن|وارد شد|اضافه کن|ورود کن|اوردم|خریدم|دریافت کردم|اومد|انتقال|منتقل|جابجا|ببر)/.test(t)||/^(ورود|خروج|فروش|وارد)\s/.test(t);
+ const isAct=/(بفروش|فروختم|فروش بزن|فروش کن|خروج بزن|خروج بده|خروج کن|کم کن|برداشتم|مصرف کردم|ورود بزن|وارد کن|وارد شد|اضافه کن|ورود کن|اوردم|خریدم|دریافت کردم|اومد|رسید|رسیده|رسیدند|اوردیم|تحویل گرفتیم|افزایش بده|موجودی اضافه|تحویل مشتری|خارج کن|خارج شد|ارسال شد|تحویل بده|برداشت|کم شد|انتقال|منتقل|جابجا|ببر)/.test(t)||/^(ورود|خروج|فروش|وارد)\s/.test(t);
  const {qty,rest}=extractNum(toks);
  const whs=whMatch(rest);const whIdx=new Set(whs.flatMap(w=>w.idx));
  const qT=rest.filter((x,i)=>!STOP.has(x)&&!whIdx.has(i)&&x.length>1);
  const cand=resolveProducts(qT);
  /* --- actions --- */
  if(isAct&&qty>0&&cand.length){if(!can('act')&&!can('act.sale'))return asSay('برای این کار دسترسی نداری. فقط می‌توانم موجودی را بگویم.');
-  const isX=/(انتقال|منتقل|جابجا|ببر)/.test(t),isIn=!isX&&/(ورود|وارد|اضافه|اوردم|خریدم|دریافت|اومد)/.test(t)&&!/(بفروش|فروش)/.test(t),type=isX?'xfer':isIn?'in':'out';
+  const isX=/(انتقال|منتقل|جابجا|ببر)/.test(t),isIn=!isX&&/(ورود|وارد|اضافه|اوردم|اوردیم|خریدم|دریافت|اومد|رسید|رسیده|رسیدند|تحویل گرفتیم|تحویل انباردار|افزایش)/.test(t)&&!/(بفروش|فروش)/.test(t),type=isX?'xfer':isIn?'in':'out';
   if(!can('act')&&(type!=='out'||!can('act.sale')))return asSay('این کار برای نقش تو مجاز نیست.');
   const intent={type,qty,reason:/فروش|فروختم/.test(t)?'sale':'other',qT:qT.join(' ')};
   /* warehouses */
@@ -1225,15 +1226,15 @@ function asChoose(id,pid){const o=AS.pend[id];if(!o)return;const p=PM[pid];asSay
  if(o.q&&addAlias(p,o.q))setTimeout(()=>asSay(`📚 یاد گرفتم: «${esc(o.q)}» = «${esc(p.name)}»`),250);
  setTimeout(()=>{if(o.intent.type==='query'){p.hits=(p.hits||0)+1;save();asSay(stockLine(p))}else asAction(o.intent,p)},120)}
 function asQuick(type,pid){const p=PM[pid];asSay(`${T_NAME[type]} ${esc(p.name)}`,'u');asAction({type,qty:1,reason:type==='out'?'sale':'buy',wh:type==='in'?db.prefs.defWh:db.prefs.saleWh},p)}
-function asAction(intent,p){const id='a'+(++AS.seq);AS.pend[id]={intent:{...intent},pid:p.id};const I=AS.pend[id].intent,s=ST[p.id];
+function asAction(intent,p){const id='a'+(++AS.seq);AS.lastCtx='act';AS.lastAct={id,ts:Date.now()};AS.pend[id]={intent:{...intent},pid:p.id};const I=AS.pend[id].intent,s=ST[p.id];
  const lab=I.type==='out'?(I.reason==='sale'?'فروش':'خروج'):T_NAME[I.type];
  asSay(`می‌خوای ثبت کنم؟<div class="card" style="margin:8px 0;padding:10px;box-shadow:none"><div class="b">${lab} ${N(I.qty)} ${esc(p.unit||'عدد')} «${esc(p.name)}»</div>
  <div class="xs muted" style="margin:4px 0">${I.type==='xfer'?`از ${esc(whName(I.wh))} به ${esc(whName(I.to))}`:`${I.type==='in'?'به':'از'} ${esc(whName(I.wh))}`} · موجودی فعلی آن انبار: ${N(stockAt(p.id,I.wh))}</div>
  <div class="chips" id="ch_${id}" style="padding:0">${I.type==='xfer'?'':db.wh.map(w=>`<button class="chip ${I.wh===w.id?'on':''}" onclick="asWh('${id}','${w.id}')">${esc(w.name)}</button>`).join('')}</div></div>
  <div class="grid2"><button class="btn pri sm" onclick="asConfirm('${id}')">✅ تأیید و ثبت</button><button class="btn sm" onclick="asCancel('${id}')">لغو</button></div>`)}
 function asWh(id,w){const o=AS.pend[id];if(!o)return;o.intent.wh=w;const c=$('#ch_'+id);if(c)c.querySelectorAll('.chip').forEach((b,i)=>b.classList.toggle('on',db.wh[i].id===w))}
-function asCancel(id){delete AS.pend[id];asSay('لغو شد.')}
-function asConfirm(id){const o=AS.pend[id];if(!o)return asSay('این درخواست قبلاً انجام یا لغو شده.');const I=o.intent,p=PM[o.pid];delete AS.pend[id];
+function asCancel(id){delete AS.pend[id];if(AS.lastAct&&AS.lastAct.id===id)AS.lastAct=null;asSay('عملیات لغو شد و اجرا نشد.')}
+function asConfirm(id){if(AS.lastAct&&AS.lastAct.id===id)AS.lastAct=null;const o=AS.pend[id];if(!o)return asSay('این درخواست قبلاً انجام یا لغو شده.');const I=o.intent,p=PM[o.pid];delete AS.pend[id];
  if(I.type!=='in'&&I.type!=='xfer'&&stockAt(p.id,I.wh)<I.qty)return asSay(`⚠️ موجودی ${esc(whName(I.wh))} فقط ${N(stockAt(p.id,I.wh))} است و کمتر از ${N(I.qty)}. انبار دیگری انتخاب کن یا اول موجودی را اصلاح کن.`);
  if(I.type==='xfer'&&stockAt(p.id,I.wh)<I.qty)return asSay(`⚠️ موجودی ${esc(whName(I.wh))} کافی نیست (${N(stockAt(p.id,I.wh))}).`);
  const r=commitDoc({type:I.type,wh:I.wh,to:I.to,date:todayISO(),reason:I.type==='in'?'buy':I.type==='out'?I.reason:'',note:'ثبت با دستیار',lines:[{pid:p.id,qty:I.qty}]});
@@ -1302,7 +1303,7 @@ function asCardHtml(){const t=DOC.type,out=t==='out',tot=docSum(DOC),disc=out?Ma
  ${tot>0?`<div class="row2 row" style="justify-content:space-between;border-top:1px solid var(--line);padding-top:6px;margin-top:4px"><span class="b">${out?'جمع':'جمع خرید'}</span><b>${money(tot)}</b></div>`:''}${disc>0?`<div class="row2 row" style="justify-content:space-between"><span class="muted">تخفیف</span><b>−${money(disc)}</b></div><div class="row2 row" style="justify-content:space-between"><span class="b">قابل پرداخت</span><b>${money(tot-disc)}</b></div>`:''}${prof}</div>
  <div class="grid2"><button class="btn pri sm" onclick="asInvCommit()">✅ ${out?'ثبت فاکتور':'ثبت رسید'}</button><button class="btn sm" onclick="asInvCancel()">لغو</button></div>
  <button class="btn sm blk" style="margin-top:6px" onclick="go('${t}')">باز کردن در فرم کامل</button>`}
-function asCard(pre){AS.msgs=AS.msgs.filter(m=>m.k!=='card');AS.msgs.push({c:'bot',h:(pre?pre+'<br>':'')+asCardHtml(),k:'card'});drawChat()}
+function asCard(pre){AS.lastCtx='inv';AS.msgs=AS.msgs.filter(m=>m.k!=='card');AS.msgs.push({c:'bot',h:(pre?pre+'<br>':'')+asCardHtml(),k:'card'});drawChat()}
 function asReport(R,extra){let h='';
  if(R.added.length)h+=`✅ اضافه شد: ${R.added.map(a=>`<b>${N(a.q)}</b> ${esc(a.p.name)}`).join('، ')}`;
  if(R.made.length)h+=`<br>🆕 کالای جدید ساخته شد: ${R.made.map(esc).join('، ')} <span class="xs muted">(موجودی‌اش را بعداً ثبت کن)</span>`;
@@ -1348,15 +1349,15 @@ function asKnowImport(){const i=document.createElement('input');i.type='file';i.
   for(const m of k.macros||[]){if(m.a&&m.b&&!asMacros().some(x=>x.a===m.a)){asMacros().push({a:m.a,b:m.b});nm++}}
   save();asSay(`📚 دانش بارگذاری شد: ${fa(na)} اسم مستعار و ${fa(nm)} میانبر جدید.`)}catch(e){toast('این فایل دانش انباریار نیست')}};i.click()}
 function asKnowList(){const al=db.products.reduce((s,p)=>s+(p.alias||[]).length,0),ms=asMacros();
- asSay(`📚 تا الان یاد گرفته‌ام:<br>• ${fa(al)} اسم مستعار برای کالاها<br>• ${fa(ms.length)} میانبر${ms.length?':<br>'+ms.slice(-6).map(m=>`«${esc(m.a)}» ← «${esc(m.b)}»`).join('<br>'):''}<br>• قیمت و واحد کالاهایی که در فاکتور گفته‌ای<div class="grid2" style="margin-top:6px"><button class="btn sm" onclick="asKnowExport()">${ic('down',16)} دانلود دانش</button><button class="btn sm" onclick="asKnowImport()">${ic('up',16)} بارگذاری دانش</button></div><div class="xs muted" style="margin-top:6px">برای یاد دادن: «وقتی گفتم <b>فاکتور بعدی</b> یعنی <b>فاکتور جدید</b>» یا «پاستیل یعنی پاستیل میوه‌ای».</div>`)}
+ asSay(`📚 تا الان یاد گرفته‌ام:<br>• ${fa(al)} اسم مستعار برای کالاها<br>• ${fa(ms.length)} میانبر${ms.length?':<br>'+ms.slice(-6).map(m=>`«${esc(m.a)}» ← «${esc(m.b)}»`).join('<br>'):''}<br>• قیمت و واحد کالاهایی که در فاکتور گفته‌ای<div class="grid2" style="margin-top:6px"><button class="btn sm" onclick="asKnowExport()">${ic('down',16)} دانلود دانش</button><button class="btn sm" onclick="asKnowImport()">${ic('up',16)} بارگذاری دانش</button></div><button class="btn sm blk" style="margin-top:6px" onclick="asTrainImport()">${ic('up',16)} بارگذاری فایل آموزشی (txt)</button><div class="xs muted" style="margin-top:6px">برای یاد دادن: «وقتی گفتم <b>فاکتور بعدی</b> یعنی <b>فاکتور جدید</b>» یا «پاستیل یعنی پاستیل میوه‌ای».</div>`)}
 function extractParty(toks){const i=toks.findIndex(w=>w==='برای'||w==='مشتری'||w==='اسم');if(i<0)return{party:'',toks};
  let j=i+1;if(toks[j]==='اسم')j++;while(toks[j]&&/^(اقای|اقا|خانم|دکتر|مهندس|حاج|حاجی)$/.test(toks[j]))j++;
  const nm=[];while(toks[j]&&nm.length<2&&!isNumTok(toks[j])&&!(toks[j] in UNITW)&&!FILLW.has(toks[j])){if(nm.length===1&&resolveProducts([toks[j]]).length)break;nm.push(toks[j]);j++}
  if(!nm.length)return{party:'',toks};return{party:nm.join(' '),toks:[...toks.slice(0,i),...toks.slice(j)]}}
 /* ---------- main entry ---------- */
 const _asReplyBase=asReply;
-asReply=function(raw){let handled=false;try{handled=asSmart(raw)}catch(e){console.error(e);handled=false}if(!handled)_asReplyBase(raw)};
-function asSmart(raw){let t=asPre(raw);if(!t)return false;t=applyMacros(t).replace(/(?:^|\s)هر\s*(?:کدوم|کدام|یک|یکی|عدد|دونه|تا)(?=\s|$)/g,' هر').trim();
+asReply=function(raw){let handled=false;try{handled=asSmart(raw)||(typeof asIntent==='function'&&asIntent(raw))}catch(e){console.error(e);handled=false}if(!handled)_asReplyBase(raw)};
+function asSmart(raw){let t=asPre(raw);if(!t)return false;if(typeof asConfirmFlow==='function'&&asConfirmFlow(applyMacros(t)))return true;t=applyMacros(t).replace(/(?:^|\s)هر\s*(?:کدوم|کدام|یک|یکی|عدد|دونه|تا)(?=\s|$)/g,' هر').trim();
  if(!can('assistant'))return false;
  let m;
  /* teach macro */
@@ -1418,6 +1419,191 @@ function asSmart(raw){let t=asPre(raw);if(!t)return false;t=applyMacros(t).repla
   if(!canOut()){asSay('این کار برای نقش تو مجاز نیست.');return true}asStartDoc('out','');const R=asAddItems(okItems);asReport(R,'');if(commit)asInvCommit();return true}
  if(!hasQuestion&&withQty.length>=1&&/(به فاکتور|فاکتور اضافه|اضافه کن)/.test(t)&&/فاکتور/.test(t)){if(!canOut())return false;asStartDoc('out','');const R=asAddItems(okItems);asReport(R,'');if(commit)asInvCommit();return true}
  return false}
+
+/* ================= assistant v3: trained intents (from Anbaryar training pack) ================= */
+const TRAIN={"stock_in": ["ورود کالا", "کالا وارد شد", "کالا به انبار رسید", "بار رسید", "بار جدید رسید", "اجناس رسیدند", "جنس وارد انبار شد", "خرید جدید رسید", "محموله تحویل شد", "رسید انبار ثبت کن", "موجودی این کالا را افزایش بده", "از این کالا تعداد بیشتری آمده", "این کالا را به موجودی اضافه کن", "امروز از این جنس آوردیم", "کالا تحویل انباردار شد", "بار ورودی داریم", "ورود محموله جدید", "ثبت کالای رسیده", "رسید کالا", "ثبت ورود", "جنس رسید", "بار را وارد انبار کن", "جنس جدید تحویل گرفتیم", "کالا به دستمان رسید", "بار را تحویل گرفتیم", "رسید خرید داریم", "این تعداد به انبار اضافه شده", "موجودی را با کالای رسیده افزایش بده"], "product_create": ["تعریف کالای جدید", "کالای جدید ثبت کن", "جنس جدید اضافه کن", "این کالا را تعریف کن", "محصول جدید بساز", "کالا در فهرست نیست", "این جنس قبلاً ثبت نشده", "یک قلم کالای جدید داریم", "اضافه کردن کالا به فهرست", "ثبت محصول تازه", "ساخت پرونده کالا", "ایجاد کالا", "تعریف جنس", "کالا اضافه کن", "محصول جدید وارد سیستم کن", "این کالا را به لیست کالاها اضافه کن", "کالا را در سیستم ایجاد کن", "ثبت مشخصات محصول", "یک جنس تازه داریم", "این محصول را به فهرست اضافه کن", "تعریف قلم جدید"], "confirmation": ["بله", "تأیید می‌کنم", "ثبت کن", "انجام بده", "درسته", "درست است", "موافقم", "نهایی کن", "بزن ثبت بشه", "همین اطلاعات ثبت شود", "عملیات را اجرا کن", "بله، همین است", "تأیید نهایی", "انجامش بده", "ذخیره کن"], "cancellation": ["نه", "لغو کن", "منصرف شدم", "ثبت نکن", "انجام نده", "اشتباه است", "برگرد", "بی‌خیال", "متوقف کن", "عملیات را لغو کن", "نمی‌خواهم", "فعلاً انجام نده"], "stock_out": ["خروج کالا", "کالا از انبار خارج شد", "جنس فروخته شد", "کالا تحویل مشتری شد", "کالا را از موجودی کم کن", "مصرف انبار", "کالا به بخش دیگر تحویل شد", "حواله خروج ثبت کن", "خروج ثبت کن", "تعدادی از کالا کم شد", "جنس از انبار برداشت شد", "کالا ارسال شد", "تحویل کالا", "ثبت مصرف کالا", "خروج محموله", "این کالا را از انبار خارج کن", "چند عدد از کالا تحویل شد", "کالا برای مصرف برداشته شد", "تعداد خروجی را ثبت کن", "کالا را به مشتری تحویل بده"], "stock_check": ["موجودی این کالا چقدر است؟", "چند تا داریم؟", "چند عدد باقی مانده؟", "چه مقدار در انبار هست؟", "وضعیت موجودی را بگو", "موجودی انبار را بررسی کن", "موجودی فعلی", "این جنس تمام شده؟", "از این کالا داریم؟", "موجودی روغن", "تعداد باقی‌مانده", "موجودی فعلی کالا را نشان بده", "کالا موجود است؟", "فهرست موجودی را بده", "چند عدد در انبار مانده؟", "موجودی این محصول را بگو", "این کالا صفر شده؟", "چه مقدار باقی داریم؟"], "product_update": ["نام کالا را تغییر بده", "اطلاعات کالا را اصلاح کن", "مشخصات این جنس اشتباه است", "بارکد را اصلاح کن", "دسته‌بندی کالا را تغییر بده", "واحد کالا را عوض کن", "توضیحات کالا را ویرایش کن", "این کالا را به دسته دیگری منتقل کن", "اطلاعات محصول را به‌روزرسانی کن", "ویرایش کالا", "نام محصول را عوض کن", "مشخصات کالا را تصحیح کن", "بارکد اشتباه است", "واحد اندازه‌گیری را اصلاح کن"], "product_search": ["کالا را پیدا کن", "جست‌وجوی کالا", "این بارکد مربوط به چیست؟", "کالا با این کد را پیدا کن", "فهرست کالاها را نشان بده", "کالای موردنظر را پیدا کن", "محصولی با این نام داریم؟", "کالاهای این دسته را نشان بده", "کالاهای برند مشخص را پیدا کن", "نام این کالا چیست؟", "این محصول ثبت شده؟", "دنبال یک کالا می‌گردم", "کالا را از روی کد پیدا کن"], "barcode": ["اسکن کالا", "بارکد را بخوان", "این بارکد را جست‌وجو کن", "کالا را با بارکد پیدا کن", "بارکد جدید ثبت کن", "اسکن برای ورود کالا", "اسکن برای خروج کالا", "اسکن محصول", "بارکد را اسکن کردم", "این کد را بررسی کن", "جست‌وجو با اسکنر", "بارکدخوان را فعال کن"], "low_stock": ["کدام کالاها رو به اتمام هستند؟", "کالاهای کم‌موجودی را نشان بده", "چه چیزهایی باید سفارش بدهیم؟", "کالاهای تمام‌شده کدام‌اند؟", "موجودی زیر حد مجاز", "فهرست کمبودها", "هشدار انبار", "کالاهایی که باید دوباره بخریم", "موجودی بحرانی", "کالاهای زیر حداقل موجودی", "کدام اجناس کم شده‌اند؟", "چه کالاهایی تمام شده‌اند؟", "کالاهای نیازمند تأمین"], "stock_count": ["شمارش انبار", "موجودی واقعی را ثبت کن", "موجودی سیستم با انبار فرق دارد", "اصلاح مغایرت", "شمارش مجدد کالا", "تعداد واقعی این کالا", "انبارگردانی", "ثبت نتیجه شمارش", "مغایرت موجودی را بررسی کن", "موجودی واقعی این محصول را وارد کن", "شمارش کالاها را شروع کن"], "report": ["گزارش انبار", "گزارش موجودی", "گزارش کالاها", "گزارش ورود کالا", "گزارش خروج کالا", "گزارش عملیات امروز", "تاریخچه تغییرات کالا", "گزارش کالاهای کم‌موجودی", "گزارش کالاهای بدون بارکد", "گزارش کالاهای غیرفعال", "گزارش تغییرات موجودی", "سوابق عملیات", "گزارش این ماه", "گزارش امروز انبار", "سابقه ورود و خروج", "گردش کالا", "چه تغییراتی انجام شده؟", "گزارش کالاهای ثبت‌شده"], "product_archive": ["این کالا را حذف کن", "کالا را غیرفعال کن", "محصول را از فهرست خارج کن", "این جنس دیگر استفاده نمی‌شود", "کالا را بایگانی کن", "این محصول را غیر فعال کن", "کالا را از فهرست پنهان کن"], "category_manage": ["دسته جدید بساز", "دسته‌بندی کالاها", "کالا را در دسته قرار بده", "دسته این محصول را تغییر بده", "فهرست دسته‌ها را نشان بده", "محصولات این گروه را نمایش بده", "دسته را ویرایش کن", "گروه جدید کالا بساز", "کالاهای این گروه را پیدا کن"]};
+const TR={list:[],conf:new Set(),canc:new Set()};
+function trCompile(){TR.list=[];TR.conf=new Set(['اره','باشه','اوکی','ok','تایید','تایید کن','حله','ثبت','تموم','همینه']);TR.canc=new Set(['لغو','کنسل','انصراف','لغو کن']);
+ const all={};for(const k in TRAIN)all[k]=(all[k]||[]).concat(TRAIN[k]);const ex=(db&&db.prefs&&db.prefs.phrases)||{};for(const k in ex)all[k]=(all[k]||[]).concat(ex[k]);
+ for(const k in all)for(const ph of all[k]){const p=normFa(ph);if(!p)continue;
+  if(k==='confirmation'){TR.conf.add(p);continue}if(k==='cancellation'){TR.canc.add(p);continue}
+  TR.list.push({intent:k,p,toks:p.split(' ').filter(x=>x.length>1)})}}
+function trMatch(t){if(!TR.list.length)trCompile();const tt=t.split(' ');let best=null;
+ for(const e of TR.list){let sc=0;
+  if(t===e.p)sc=1000+e.p.length;
+  else if(e.toks.length>=2){if((' '+t+' ').includes(' '+e.p+' '))sc=100+e.p.length;else{let hit=0;for(const pt of e.toks){let b=0;for(const x of tt){const s=tokSim(pt,x);if(s>b)b=s;if(b>=.99)break}if(b>=.85)hit++}if(hit===e.toks.length)sc=50+e.p.length*.5}}
+  if(sc&&(!best||sc>best.sc))best={intent:e.intent,sc,p:e.p}}
+ return best}
+const RE_IN=/(ورود|وارد شد|وارد کن|اومد|اومده|امد|امده|رسید|رسیده|رسیدند|اوردیم|اوردم|تحویل گرفتیم|اضافه شده|اضافه کن|افزایش)/;
+const RE_OUT=/(خروج|خارج|بفروش|فروختم|فروخته شد|تحویل مشتری|تحویل شد|ارسال شد|مصرف|برداشت|کم کن|کم شد)/;
+const CREATE_STRIP=new Set('کالا کالای جدید جنس محصول ثبت کن تعریف اضافه ایجاد ساخت پرونده قلم تازه فهرست لیست در به سیستم نیست قبلا شده یک یه داریم وارد بساز را رو اینو این مشخصات کالاها کنید اش ام ست هست بکن میخوام می خوام لطفا'.split(' ').map(normFa));
+function asMk(type,qty,t){const whs=whMatch(t.split(' '));let wh=whs[0]&&whs[0].id;wh=wh||(type==='in'?db.prefs.defWh:db.prefs.saleWh);if(!WM[wh])wh=db.wh[0].id;
+ return{type,qty,reason:type==='out'?(/فروش|فروخت/.test(t)?'sale':/مصرف/.test(t)?'use':'other'):type==='in'?'buy':'',wh}}
+function asCanType(type){return type==='in'?can('act'):(can('act')||can('act.sale'))}
+function asNameToks(t,drop){const e=drop?new Set(drop.split(' ')):new Set();return t.split(' ').filter(x=>x.length>1&&!STOP.has(x)&&!e.has(x)&&!isNumTok(x)&&!(x in UNITW)&&!FILLW.has(x))}
+/* ---- confirmation / cancellation by text ---- */
+function asConfirmFlow(t){const tt=t.replace(/[،,.!؟?]+$/,'').trim();if(!TR.list.length)trCompile();const isC=TR.conf.has(tt),isN=TR.canc.has(tt);if(!isC&&!isN)return false;
+ const pend=AS.lastAct&&Date.now()-(AS.lastAct.ts||0)<6e5&&AS.pend[AS.lastAct.id];
+ if(AS.lastCtx==='act'&&pend){const id=AS.lastAct.id;if(isC){pend.gen?asGen(id):asConfirm(id)}else{pend.gen?asGenCancel(id):asCancel(id)}return true}
+ if(AS.lastCtx==='inv'&&asActive()&&DOC.lines.length){
+  if(isC){asInvCommit();return true}
+  if(/^(لغو|کنسل|انصراف|پاک کن)/.test(tt)){asInvCancel();return true}
+  asSay('ثبت اجرا نشد؛ فاکتور همچنان باز است. برای حذف کامل «لغو فاکتور» را بنویس.');return true}
+ if(/^(ثبت|ثبت کن|ثبت شود|اینو ثبت کن|این رو ثبت کن)$/.test(tt))return false;
+ asSay(isC?'الان عملیاتی در انتظار تأیید نیست. چه کاری انجام بدهم؟':'عملیات فعالی برای لغو نیست.');return true}
+/* ---- generic confirm cards ---- */
+function asGenCard(o,title,rows){const id='g'+(++AS.seq);o.gen=true;AS.pend[id]=o;AS.lastCtx='act';AS.lastAct={id,ts:Date.now()};
+ asSay(`عملیات پیشنهادی:<div class="card" style="margin:8px 0;padding:10px;box-shadow:none"><div class="b">${title}</div>${rows.map(r=>`<div class="row2 row" style="justify-content:space-between"><span class="muted">${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>آیا تأیید می‌کنید؟<div class="grid2" style="margin-top:6px"><button class="btn pri sm" onclick="asGen('${id}')">✅ تأیید و ثبت</button><button class="btn sm" onclick="asGenCancel('${id}')">لغو</button></div>`);return id}
+function asGenCancel(id){delete AS.pend[id];if(AS.lastAct&&AS.lastAct.id===id)AS.lastAct=null;asSay('عملیات لغو شد و اجرا نشد.')}
+function asGen(id){const o=AS.pend[id];if(!o)return asSay('این درخواست قبلاً انجام یا لغو شده.');delete AS.pend[id];if(AS.lastAct&&AS.lastAct.id===id)AS.lastAct=null;
+ try{
+ if(o.kind==='update'){const p=PM[o.pid];if(!p)return asSay('ثبت انجام نشد. کالا پیدا نشد.');
+  if(o.field==='barcode'){const bc=cleanCode(o.val),d=BM[bkey(bc)];if(d&&d!==p.id)return asSay('ثبت انجام نشد. این بارکد برای «'+esc(PM[d].name)+'» ثبت شده است.');p.barcode=bc}
+  else if(o.field==='min'){p.min=o.val}else if(o.field==='cat'){p.cat=o.val}else p[o.field]=o.val;
+  touch(p);addLog('prod.edit','ویرایش با دستیار: '+p.name);save();recalc();const ok=(o.field==='name'&&PM[o.pid].name===o.val)||o.field!=='name';
+  return asSay(ok?`✅ ${o.label} «${esc(PM[o.pid].name)}» ثبت شد: <b>${esc(o.show)}</b>`:'ثبت انجام نشد.')}
+ if(o.kind==='count'){const m=commitAdj(o.wh,o.pid,o.counted,{note:'ثبت با دستیار'});if(!m)return asSay('موجودی سیستم از قبل با شمارش برابر است؛ تغییری لازم نبود.');save();recalc();beep();const uid2='u'+(++AS.seq);AS.pend[uid2]={undo:[m.id]};
+  return asSay(`✅ شمارش ثبت شد. موجودی جدید «${esc(PM[o.pid].name)}» در ${esc(whName(o.wh))}: <b>${N(stockAt(o.pid,o.wh))}</b><br><button class="btn sm" style="margin-top:6px" onclick="asUndo('${uid2}')">بازگردانی</button>`)}
+ if(o.kind==='delete'){if(db.moves.some(m=>m.pid===o.pid))return asSay('حذف انجام نشد؛ کالا سابقه دارد.');const r=delProduct(o.pid);const uid2='u'+(++AS.seq);AS.pend[uid2]={undoProd:r};return asSay(`✅ «${esc(r.p.name)}» حذف شد.<br><button class="btn sm" style="margin-top:6px" onclick="asUndoProd('${uid2}')">بازگردانی</button>`)}
+ if(o.kind==='cat'){if(db.cats.some(c=>normFa(c.name)===normFa(o.name)))return asSay('این دسته قبلاً هست.');db.cats.push(touch({id:uid(),name:o.name}));save();recalc();return asSay(`✅ دستهٔ «${esc(o.name)}» ساخته شد.`)}
+ if(o.kind==='catset'){const p=PM[o.pid];p.cat=o.cat;touch(p);save();recalc();return asSay(`✅ «${esc(p.name)}» در دستهٔ «${esc(catName(o.cat))}» قرار گرفت.`)}
+ }catch(e){asSay('ثبت انجام نشد. علت: '+esc(e&&e.message||'خطا')+'. اطلاعات بدون تغییر ماند.')}}
+function asUndoProd(id){const o=AS.pend[id];if(!o)return;delete AS.pend[id];restoreProduct(o.undoProd);asSay('↩️ بازگردانی شد.')}
+/* ---- flows ---- */
+function asCreateFlow(name,barcode){const toks=normFa(name).split(' ').filter(Boolean),c=toks.length?resolveProducts(toks):[];
+ if(c.length&&c[0].s>=.85){const p=c[0].p;return asSay(`«${esc(p.name)}» قبلاً در فهرست ثبت شده (موجودی ${N(ST[p.id].t)} ${esc(p.unit||'')}). کالای تکراری نمی‌سازم.<div class="chips" style="padding:0;margin-top:6px"><button class="chip" onclick="asPickIn('${p.id}')">ثبت ورود این کالا</button><button class="chip" onclick="productSheet('${p.id}')">دیدن کالا</button></div>`)}
+ if(!can('prod.add'))return asSay('تعریف کالای جدید برای نقش تو مجاز نیست.');
+ productForm({name:name.trim(),barcode:barcode||''});asSay(`فرم کالای جدید${name?' «'+esc(name)+'»':''} باز شد. مشخصات را بررسی کن و «ذخیره» را بزن؛ تا تأیید نکنی چیزی ثبت نمی‌شود.`)}
+function asPickIn(pid){const p=PM[pid];AS.ask={kind:'qty',type:'in',pid};asSay(`چند ${esc(p.unit||'عدد')} «${esc(p.name)}» رسیده؟${asLastInQty(pid)?` (آخرین بار ${N(asLastInQty(pid))} بود)`:''}`)}
+function asBarcodeLookup(bc){const p=findProduct(bc);if(p){p.hits=(p.hits||0)+1;save();asSay(`بارکد ${esc(bc)}: `+stockLine(p));return}
+ asSay(`کالایی با بارکد <b class="ltr">${esc(bc)}</b> ثبت نشده است.<div class="chips" style="padding:0;margin-top:6px">${can('prod.add')?`<button class="chip" onclick="asCreateFlow('','${esc(bc)}')">تعریف کالای جدید با این بارکد</button>`:''}</div>`)}
+function asAnswer(a,t){const tk=asToks(t);
+ if(a.kind==='stock'||a.kind==='search'||a.kind==='count0'){const nt=asNameToks(t),c=nt.length?resolveProducts(nt):[];if(!c.length){asSay(`کالایی با نام «${esc(nt.join(' ')||t)}» پیدا نکردم.`+(can('prod.add')?`<div class="chips" style="padding:0;margin-top:6px"><button class="chip" onclick="asCreateFlow('${esc(nt.join(' '))}')">تعریف کالای جدید</button></div>`:''));return true}
+  if(a.kind==='stock'){if(confident(c)){c[0].p.hits=(c[0].p.hits||0)+1;save();asSay(stockLine(c[0].p))}else asAmbig({type:'query'},c,nt.join(' '));return true}
+  if(a.kind==='search'){asProductList(c.map(x=>x.p),'این‌ها را پیدا کردم:');return true}
+  const ex=extractNum(tk);if(confident(c)){if(ex.qty>0)asCountCard(c[0].p,ex.qty,t);else{AS.ask={kind:'count',pid:c[0].p.id};asSay(`تعداد واقعی «${esc(c[0].p.name)}» چند است؟`)}}else asAmbig({type:'query'},c,nt.join(' '));return true}
+ if(a.kind==='barcode'){const d=en(t).replace(/\D/g,'');if(d.length>=4){asBarcodeLookup(d);return true}return false}
+ if(a.kind==='cat'){const nm=t.trim();if(nm){asGenCard({kind:'cat',name:nm},'ساخت دستهٔ جدید',[['نام دسته',esc(nm)]]);return true}return false}
+ if(a.kind==='create'){asCreateFlow(t);return true}
+ if(a.kind==='qty'||a.kind==='count'){const r=readNum(tk,0);if(!(r.val>0||(a.kind==='count'&&tk[0]==='0')))return false;const p=PM[a.pid];if(!p)return false;
+  if(a.kind==='count')return asCountCard(p,r.val,t),true;
+  if(!asCanType(a.type)){asSay('این کار برای نقش تو مجاز نیست.');return true}asAction(asMk(a.type,r.val,t),p);return true}
+ if(a.kind==='prod'||a.kind==='both'){const ex=extractNum(tk);const q=a.qty||ex.qty;const nt=asNameToks(t);const c=resolveProducts(nt);
+  if(!(q>0)||!c.length)return false;if(!asCanType(a.type)){asSay('این کار برای نقش تو مجاز نیست.');return true}
+  const I=asMk(a.type,q,t);if(confident(c))asAction(I,c[0].p);else asAmbig(I,c,nt.join(' '));return true}
+ return false}
+function asCountCard(p,counted,t){const whs=db.wh.filter(w=>stockAt(p.id,w.id)!==0||w.id===db.prefs.saleWh);let wh=(whMatch(t.split(' '))[0]||{}).id||(db.wh.length===1?db.wh[0].id:(ST[p.id].t!==0?db.wh.slice().sort((a,b)=>stockAt(p.id,b.id)-stockAt(p.id,a.id))[0].id:db.prefs.saleWh));if(!WM[wh])wh=db.wh[0].id;
+ const sys=stockAt(p.id,wh),diff=Math.round((counted-sys)*1000)/1000;
+ if(!diff)return asSay(`موجودی سیستم برای «${esc(p.name)}» در ${esc(whName(wh))} همان ${N(sys)} است؛ مغایرتی نیست.`);
+ asGenCard({kind:'count',pid:p.id,wh,counted},'اصلاح موجودی با شمارش',[['کالا',esc(p.name)],['انبار',esc(whName(wh))],['موجودی سیستم',N(sys)],['شمارش واقعی',N(counted)],['اختلاف',(diff>0?'+':'')+N(diff)]])}
+function asProductList(l,title){return asSay(`${title}<br>${l.slice(0,8).map(p=>`<button class="btn sm blk" style="justify-content:flex-start;margin-top:4px" onclick="productSheet('${p.id}')">${esc(p.name)} <span class="xs muted">(${N(ST[p.id].t)} ${esc(p.unit||'')})</span></button>`).join('')}${l.length>8?`<div class="xs muted">و ${fa(l.length-8)} مورد دیگر…</div>`:''}`)}
+function asHistory(p){const l=db.moves.filter(m=>m.pid===p.id).sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts).slice(0,10);
+ asSay(l.length?`🕘 تاریخچهٔ «${esc(p.name)}»:<br>${l.map(m=>`<div class="row2 row" style="justify-content:space-between"><span>${T_NAME[m.type]} · ${dShort(m.date)} · ${esc(whName(m.wh))}</span><b>${m.type==='out'?'−':m.type==='in'?'+':m.type==='adj'&&m.delta<0?'−':m.type==='adj'?'+':''}${N(m.type==='adj'?Math.abs(m.delta):m.qty)}</b></div>`).join('')}`:`برای «${esc(p.name)}» هنوز حرکتی ثبت نشده.`)}
+/* ---- main intent router ---- */
+const _noRe=/^(نه|نخیر|خیر)$/;
+function asIntent(raw){let t=asPre(raw);if(!t)return false;t=applyMacros(t);if(!can('assistant'))return false;
+ if(AS.ask){const a=AS.ask;AS.ask=null;if(asAnswer(a,t))return true}
+ const tk=asToks(t),ex=extractNum(tk),q=ex.qty;let m;
+ /* ambiguous / risky one-liners (training §16) */
+ if(/^(ثبت|ثبت کن|اینو ثبت کن|این رو ثبت کن|این ثبت کن)$/.test(t)){asSay('منظورتان ثبت کالای جدید است یا ثبت ورود کالا به انبار؟<div class="chips" style="padding:0;margin-top:6px"><button class="chip" onclick="asSend(\'کالای جدید\')">کالای جدید</button><button class="chip" onclick="asSend(\'بار رسید\')">ورود کالا</button></div>');return true}
+ if(/موجودی.{0,10}(درست|اصلاح|تصحیح).{0,6}(کن|بکن)|^موجودی رو درست کن/.test(t)){asSay('مقدار واقعی کالا را می‌خواهید ثبت کنید (شمارش) یا می‌خواهید اطلاعات کالای دیگری را اصلاح کنیم؟ مثلاً بنویس «موجودی واقعی ماست ۱۲ عدد است».');return true}
+ if(/(همه|تمام|کل)\s*(کالاها|اطلاعات|چیز|چی|سوابق|رو|را)?\s*(رو|را)?\s*(حذف|پاک)/.test(t)){asSay('این درخواست دامنهٔ مشخصی ندارد و می‌تواند باعث حذف گسترده‌ٔ اطلاعات شود. لطفاً نوع اطلاعات و محدودهٔ مورد نظر را مشخص کنید؛ برای هر کالا جداگانه می‌توانم کمک کنم.');return true}
+ if(/(ثبت سفارش|سفارش خرید ثبت|پرداخت|وصول|چک برگشتی)/.test(t)){asSay('این قابلیت هنوز در نرم‌افزار پیاده‌سازی نشده است. فقط پیشنهاد خرید (کالاهای کم‌موجودی) را می‌توانم نشان بدهم.');return true}
+ if(/^(\d{6,14})$/.test(tk.join(''))&&tk.length<=3||(m=t.match(/(?:بارکد|کد)\s+(\d{4,14})/))){const bc=m?m[1]:tk.join('');const p=findProduct(bc);
+  if(p){p.hits=(p.hits||0)+1;save();asSay(`بارکد ${esc(bc)}: `+stockLine(p));return true}
+  asSay(`کالایی با بارکد <b class="ltr">${esc(bc)}</b> ثبت نشده است.<div class="chips" style="padding:0;margin-top:6px">${can('prod.add')?`<button class="chip" onclick="asCreateFlow('','${esc(bc)}')">تعریف کالای جدید با این بارکد</button>`:''}</div>`);return true}
+ const tm=trMatch(t);let intent=tm?tm.intent:'';
+ const drop=tm?tm.p:'';
+ if(!intent||['stock_in','stock_out','stock_check','report'].includes(intent)){
+  if(/(موجودی واقعی|تعداد واقعی|مغایرت|انبارگردانی|شمارش)/.test(t)&&!/گزارش/.test(t))intent='stock_count';
+  else if(/^(نام|اسم|بارکد|واحد|دسته|حداقل موجودی|حد اقل موجودی)\s.+\s(تغییر بده|عوض کن|اصلاح کن|بذار|کن)$/.test(t))intent='product_update';
+  else if(/(حذف کن|حذفش کن|پاک کن|غیرفعال کن|بایگانی کن)$/.test(t))intent='product_archive';
+  else if(/(کالاهای|محصولات)\s+(دسته|گروه|برند)/.test(t))intent='product_search';
+  else if(!intent){if(RE_IN.test(t)&&!RE_OUT.test(t))intent='stock_in';else if(RE_OUT.test(t)&&!RE_IN.test(t))intent='stock_out'}}
+ if(!intent)return false;
+ if(!tm&&(intent==='stock_in'||intent==='stock_out')&&/(چقدر|چنده|چند تا|کی|کدوم|چیه|چی)/.test(t))return false;
+ const nt=asNameToks(t,drop),cand=nt.length?resolveProducts(nt):[];
+ /* intent understood but no product/number given: ask instead of guessing (training §16, §21) */
+ if(!nt.length&&!cand.length&&(!(q>0)||['product_search','stock_check','barcode'].includes(intent))){
+  if(intent==='stock_check'&&!/(فهرست|لیست|همه|وضعیت انبار)/.test(t)){AS.ask={kind:'stock'};asSay('موجودی کدام کالا را بررسی کنم؟ نام کالا را بنویس.');return true}
+  if(intent==='product_search'&&!/(فهرست|لیست|همه|دسته|گروه|برند)/.test(t)){AS.ask={kind:'search'};asSay('چه کالایی را پیدا کنم؟ نام یا بارکدش را بنویس.<div class="chips" style="padding:0;margin-top:6px"><button class="chip" onclick="scanFind()">اسکن بارکد</button></div>');return true}
+  if(intent==='barcode'){AS.ask={kind:'barcode'};asSay('بارکد را بنویس یا با دوربین اسکن کن. اگر ثبت نشده باشد، تعریف کالای جدید را پیشنهاد می‌کنم.<div class="chips" style="padding:0;margin-top:6px"><button class="chip" onclick="scanFind()">اسکن بارکد</button></div>');return true}
+  if(intent==='stock_count'&&!/(انبارگردانی|شمارش انبار|شمارش کالاها|شروع کن)/.test(t)){AS.ask={kind:'count0'};asSay('شمارش کدام کالا؟ نام کالا و تعداد واقعی را بنویس (مثلاً «موجودی واقعی ماست ۱۲ عدد است»).<div class="chips" style="padding:0;margin-top:6px"><button class="chip" onclick="go(\'count\')">شروع انبارگردانی کامل</button></div>');return true}
+  if(intent==='stock_in'&&/(محموله|بار|رسید|خرید جدید)/.test(t)){return asSmart('بار رسید')}}
+ if(intent==='product_create'||(intent==='stock_in'&&/(در سیستم نیست|ثبت نشده|قبلا ثبت)/.test(t))){const nm=t.split(' ').filter(x=>!CREATE_STRIP.has(x)&&!isNumTok(x)&&!FILLW.has(x)).join(' ').trim();
+  if(!nm){AS.ask={kind:'create'};asSay('نام کالای جدید چیست؟');return true}asCreateFlow(nm);return true}
+ if(intent==='stock_in'||intent==='stock_out'){const type=intent==='stock_in'?'in':'out';
+  if(/(فاکتور|رسید انبار|بار رسید|بار جدید|محموله جدید)/.test(t)&&!q)return false;
+  if(!asCanType(type)){asSay('این کار برای نقش تو مجاز نیست. فقط می‌توانم موجودی را بگویم.');return true}
+  if(type==='in'&&/(جدید|تازه)/.test(t)&&!(q>0)){const nm=nt.filter(x=>x!=='جدید'&&x!=='تازه');const c=nm.length?resolveProducts(nm):[];
+   asSay(`آیا ${nm.length?'«'+esc(nm.join(' '))+'»':'کالای'} مورد نظر قبلاً در فهرست ثبت شده است؟${c.length?' این‌ها را پیدا کردم:':''}<div class="chips" style="padding:0;margin-top:6px">${c.slice(0,4).map(x=>`<button class="chip" onclick="asPickIn('${x.p.id}')">${esc(x.p.name)}</button>`).join('')}${can('prod.add')?`<button class="chip" onclick="asCreateFlow('${esc(nm.join(' '))}')">تعریف کالای جدید</button>`:''}</div>`);return true}
+  if(cand.length&&q>0){const I=asMk(type,q,t);if(confident(cand))asAction(I,cand[0].p);else asAmbig(I,cand,nt.join(' '));return true}
+  if(cand.length&&!(q>0)){const c0=confident(cand)?cand[0].p:null;if(c0){AS.ask={kind:'qty',type,pid:c0.id};asSay(`چند ${esc(c0.unit||'عدد')} «${esc(c0.name)}» ${type==='in'?'وارد شده':'خارج شود'}؟`)}else asAmbig({type:'query'},cand,nt.join(' '));return true}
+  if(q>0&&!cand.length&&!nt.length){AS.ask={kind:'prod',type,qty:q};asSay(`${N(q)} عدد از کدام کالا را می‌خواهید ${type==='in'?'اضافه':'خارج'} کنید؟ آیا منظورتان ثبت ${type==='in'?'ورود':'خروج'} کالا است؟`);return true}
+  if(q>0&&nt.length&&!cand.length){asSay(`کالایی با نام «${esc(nt.join(' '))}» پیدا نکردم.${can('prod.add')?`<div class="chips" style="padding:0;margin-top:6px"><button class="chip" onclick="asCreateFlow('${esc(nt.join(' '))}')">تعریف کالای جدید</button></div>`:''}`);return true}
+  AS.ask={kind:'both',type};asSay(`برای ثبت ${type==='in'?'ورود':'خروج'} کالا، لطفاً نام دقیق کالا و مقدار را مشخص کنید.`);return true}
+ if(intent==='stock_count'){const c=cand;if(q>0&&c.length&&confident(c)){asCountCard(c[0].p,q,t);return true}
+  if(c.length&&confident(c)){AS.ask={kind:'count',pid:c[0].p.id};asSay(`تعداد واقعی «${esc(c[0].p.name)}» چند است؟`);return true}
+  if(/(انبارگردانی|شمارش انبار|شمارش کالاها|شمارش مجدد|شمارش را شروع)/.test(t)){asSay('صفحهٔ انبارگردانی را باز کردم؛ از آنجا شمارش را شروع کن و اختلاف‌ها را قبل از اعمال ببین.');go('count');return true}
+  if(q>0){asSay('منظورتان ثبت شمارش واقعی یک کالاست؟ اسم کالا را هم بنویس (مثلاً «موجودی واقعی ماست ۱۲ عدد است»).');return true}return false}
+ if(intent==='product_update'){
+  m=t.match(/^(?:نام|اسم)\s+(.+?)\s+(?:رو|را)\s+(?:به\s+)?(.+?)\s+(?:تغییر بده|عوض کن|کن|بذار)$/);
+  const m2=t.match(/^(بارکد|واحد|دسته|حداقل موجودی|حد اقل موجودی)\s+(.+?)\s+(?:رو|را)\s+(?:به\s+)?(.+?)\s+(?:تغییر بده|عوض کن|کن|بذار)$/);
+  if(!can('prod.edit')){asSay('ویرایش کالا برای نقش تو مجاز نیست.');return true}
+  const find=s=>{const c=resolveProducts(s.split(' ').filter(x=>!STOP.has(x)&&x.length>1));return c.length&&confident(c)?c[0].p:null};
+  if(m){const p=find(m[1]);if(!p){asSay('کدام کالا؟ نام دقیق کالا را بنویس.');return true}const nv=m[2].trim();asGenCard({kind:'update',pid:p.id,field:'name',val:nv,label:'نام',show:nv},'تغییر نام کالا',[['کالا',esc(p.name)],['نام قبلی',esc(p.name)],['نام جدید',esc(nv)]]);return true}
+  if(m2){const p=find(m2[2]);if(!p){asSay('کدام کالا؟ نام دقیق کالا را بنویس.');return true}const f=m2[1],v=m2[3].trim();let field,val,label,old,show=v;
+   if(f==='بارکد'){field='barcode';val=en(v).replace(/\s/g,'');label='بارکد';old=p.barcode||'—'}
+   else if(f==='واحد'){field='unit';val=v;label='واحد';old=p.unit||'—'}
+   else if(f==='دسته'){const c=db.cats.find(x=>normFa(x.name)===normFa(v));if(!c){asSay(`دسته‌ای به نام «${esc(v)}» نیست. اول دسته را بساز: «دسته جدید بساز ${esc(v)}».`);return true}field='cat';val=c.id;label='دستهٔ';old=catName(p.cat)||'—'}
+   else{field='min';val=numv(v);if(!(val>=0)){asSay('عدد حداقل موجودی را بنویس.');return true}label='حداقل موجودی';old=p.min||0;show=N(val)}
+   asGenCard({kind:'update',pid:p.id,field,val,label,show},'اصلاح اطلاعات کالا',[['کالا',esc(p.name)],[label,'مقدار قبلی: '+esc(String(old))],['مقدار جدید',esc(show)]]);return true}
+  if(cand.length&&confident(cand)){productForm({id:cand[0].p.id});asSay(`فرم ویرایش «${esc(cand[0].p.name)}» را باز کردم؛ تغییرها را بنویس و ذخیره کن.`);return true}
+  asSay('کدام کالا و کدام مشخصه را اصلاح کنیم؟ مثلاً «بارکد ماست را ۶۲۶۰۱۲۳ کن» یا «نام دوغ را دوغ محلی کن».');return true}
+ if(intent==='product_search'||intent==='barcode'){
+  if(intent==='barcode'&&/(اسکن|بارکدخوان|بخوان)/.test(t)){asSay('اسکنر را باز می‌کنم.');setTimeout(scanFind,150);return true}
+  const br=t.match(/برند\s+(\S+)/);if(br){const b=normFa(br[1]),l=db.products.filter(p=>normFa(p.brand||'').includes(b));asSay(l.length?'':`کالایی از برند «${esc(br[1])}» پیدا نکردم.`);if(l.length)asProductList(l,`کالاهای برند «${esc(br[1])}»:`);return true}
+  const ct=t.match(/(?:دسته|گروه)\s+(.+)$/);if(ct){const c=db.cats.find(x=>normFa(ct[1]).includes(normFa(x.name)));if(c){const l=db.products.filter(p=>p.cat===c.id);asSay(l.length?'':`دستهٔ «${esc(c.name)}» کالایی ندارد.`);if(l.length)asProductList(l,`کالاهای دستهٔ «${esc(c.name)}»:`);return true}asSay(`دسته‌ای به نام «${esc(ct[1])}» نیست.${db.cats.length?' دسته‌ها: '+db.cats.map(x=>esc(x.name)).join('، '):''}`);return true}
+  if(cand.length){asProductList(cand.map(x=>x.p),`این‌ها را پیدا کردم:`);return true}
+  if(/(فهرست|لیست)\s*(کالاها)?/.test(t)&&!nt.length){asProductList(db.products.slice().sort((a,b)=>(b.hits||0)-(a.hits||0)),`${fa(db.products.length)} کالا در فهرست هست؛ پرکاربردها:`);return true}
+  if(nt.length){asSay(`کالایی با نام «${esc(nt.join(' '))}» پیدا نکردم.${can('prod.add')?`<div class="chips" style="padding:0;margin-top:6px"><button class="chip" onclick="asCreateFlow('${esc(nt.join(' '))}')">تعریف کالای جدید</button></div>`:''}`);return true}
+  return false}
+ if(intent==='stock_check'){
+  if(!cand.length&&/(فهرست|لیست|همه|وضعیت|بررسی)/.test(t)){const l=db.products.filter(p=>ST[p.id].t!==0).sort((a,b)=>a.name.localeCompare(b.name,'fa'));asSay(`📋 فهرست موجودی (${fa(l.length)} قلم):<br>${l.slice(0,25).map(p=>`<div class="row2 row" style="justify-content:space-between"><span>${esc(p.name)}</span><b>${N(ST[p.id].t)} ${esc(p.unit||'')}</b></div>`).join('')}${l.length>25?`<div class="xs muted">و ${fa(l.length-25)} مورد دیگر…</div>`:''}<button class="btn sm blk" onclick="go('stock')">صفحهٔ موجودی</button>`);return true}
+  return false}
+ if(intent==='low_stock'){_asReplyBase('کم موجودی ها');return true}
+ if(intent==='report'){const dw=/دیروز/.test(t)?'y':/هفته|هفت روز/.test(t)?'w':/ماه|سی روز/.test(t)?'m':'t';
+  if(/بدون بارکد/.test(t)){const l=db.products.filter(p=>!p.barcode);asSay(l.length?'':'همهٔ کالاها بارکد دارند ✅');if(l.length)asProductList(l,`${fa(l.length)} کالا بدون بارکد:`);return true}
+  if(/کم موجودی|کمبود/.test(t)){_asReplyBase('کم موجودی ها');return true}
+  if(/(تاریخچه|سابقه|گردش|تغییرات)/.test(t)&&cand.length&&confident(cand)){asHistory(cand[0].p);return true}
+  if(/(ورود|وارد|رسید)/.test(t)&&!/(خروج|فروش)/.test(t)){asPeriod('in',dw);return true}
+  if(/(خروج|فروش|خارج)/.test(t)&&!/(ورود|وارد)/.test(t)){asPeriod('out',dw);return true}
+  if(/غیرفعال/.test(t)){asSay('وضعیت «غیرفعال» هنوز در نرم‌افزار پیاده‌سازی نشده است.');return true}
+  _asReplyBase('خلاصه وضعیت');asSay('<span class="xs muted">گزارش‌های کامل‌تر را در بخش «گزارش‌ها» ببین.</span>');return true}
+ if(intent==='product_archive'){
+  if(!cand.length||!confident(cand)){asSay('کدام کالا؟ نام دقیق کالا را بنویس. توجه: بایگانی/غیرفعال‌سازی هنوز در نرم‌افزار نیست و حذف فقط برای کالاهای بدون سابقه ممکن است.');return true}
+  const p=cand[0].p;if(!can('prod.del')){asSay('حذف کالا فقط برای مدیر مجاز است.');return true}
+  const n=db.moves.filter(x=>x.pid===p.id).length;
+  if(n){asSay(`«${esc(p.name)}» ${fa(n)} سابقهٔ ورود/خروج/شمارش دارد و حذف دائمی آن بدون بررسی سوابق انجام نمی‌شود. بایگانی یا غیرفعال‌سازی هنوز در نرم‌افزار پیاده‌سازی نشده است.`);return true}
+  asGenCard({kind:'delete',pid:p.id},'حذف کالا',[['کالا',esc(p.name)],['سابقه','ندارد'],['امکان بازگردانی','بله، بلافاصله بعد از حذف']]);return true}
+ if(intent==='category_manage'){
+  const mk=t.match(/(?:دسته|گروه)\s+جدید\s+(?:بساز|ایجاد کن|اضافه کن)?\s*(.*)$/)||t.match(/(?:دسته|گروه)\s+(.+?)\s+(?:بساز|ایجاد کن)$/);
+  if(mk&&can('settings')){const nm=(mk[1]||'').replace(/\b(بساز|ایجاد کن|اضافه کن)\b/g,'').trim();if(!nm){AS.ask={kind:'cat'};asSay('نام دستهٔ جدید چیست؟');return true}asGenCard({kind:'cat',name:nm},'ساخت دستهٔ جدید',[['نام دسته',esc(nm)]]);return true}
+  if(/(فهرست|لیست|نشان بده|دسته بندی کالاها|دسته ها)/.test(t)&&!cand.length){asSay(db.cats.length?`دسته‌ها:<br>${db.cats.map(c=>`• ${esc(c.name)} (${fa(db.products.filter(p=>p.cat===c.id).length)})`).join('<br>')}`:'هنوز دسته‌ای تعریف نشده. بنویس «دسته جدید بساز …».');return true}
+  asSay('ایجاد دسته، ویرایش دسته و انتقال کالا به دسته سه کار جدا هستند. کدام را می‌خواهی؟ مثلاً «دسته جدید بساز نوشیدنی» یا «دسته ماست را لبنیات کن».');return true}
+ return false}
+/* ---- import training text (same format as the training pack) ---- */
+function asTrainParse(txt){const D={};let intent=null,n=0;const MAP=[[/ورود کالا/,'stock_in'],[/کالای جدید/,'product_create'],[/خروج/,'stock_out'],[/بررسی موجودی/,'stock_check'],[/اصلاح/,'product_update'],[/جست ?و ?جو/,'product_search'],[/بارکدخوان/,'barcode'],[/کمبود/,'low_stock'],[/شمارش|مغایرت/,'stock_count'],[/گزارش/,'report'],[/حذف|غیرفعال/,'product_archive'],[/دسته/,'category_manage']];
+ for(const raw of String(txt).split('\n')){const ln=raw.trim();
+  if(/^##\s/.test(ln)){const h=normFa(ln);intent=null;for(const [re,k] of MAP)if(re.test(h)){intent=k;break}continue}
+  if(/^عبارت.?های تایید|^عبارتهای تایید/.test(normFa(ln))||normFa(ln).startsWith('عبارت های تایید')){intent='confirmation';continue}
+  if(normFa(ln).startsWith('عبارت های لغو')){intent='cancellation';continue}
+  if(normFa(ln).startsWith('عبارت های هم معنی')){continue}
+  if(/^[-•]\s+/.test(ln)&&intent){const ph=ln.replace(/^[-•]\s+/,'').trim();if(ph&&ph.length<80){(D[intent]=D[intent]||[]).push(ph);n++}}}
+ return{D,n}}
+function asTrainImport(){const i=document.createElement('input');i.type='file';i.accept='.txt,text/plain';i.onchange=async()=>{try{const{D,n}=asTrainParse(await i.files[0].text());if(!n)throw 0;const ex=db.prefs.phrases||(db.prefs.phrases={});let add=0;
+  for(const k in D){const cur=new Set((ex[k]||[]).map(normFa).concat((TRAIN[k]||[]).map(normFa)));for(const p of D[k]){const np=normFa(p);if(np&&!cur.has(np)){(ex[k]=ex[k]||[]).push(p);cur.add(np);add++}}}
+  save();trCompile();asSay(`📚 آموزش بارگذاری شد: ${fa(n)} عبارت خوانده شد، ${fa(add)} عبارت جدید یاد گرفتم.`)}catch(e){toast('فایل آموزشی خوانده نشد')}};i.click()}
 
 /* ================= settings / users / log / lock / sync ================= */
 function promptBox(title,val,cb,ph=''){sheet(`<h2>${esc(title)}</h2><input id="pbIn" class="inp" value="${esc(val||'')}" placeholder="${esc(ph)}"><div class="grid2" style="margin-top:12px"><button class="btn pri" id="pbOk">${ic('check')} ذخیره</button><button class="btn" onclick="closeSheet()">انصراف</button></div>`,'cen');
