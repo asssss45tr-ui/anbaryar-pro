@@ -394,7 +394,7 @@ const cleanCode=c=>String(c||'').replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.in
 const bkey=c=>{c=cleanCode(c);return /^\d+$/.test(c)?(c.replace(/^0+/,'')||'0'):c.toLowerCase()};
 
 /* ================= store ================= */
-const APP_VER='۲٫۱';
+const APP_VER='۲٫۲';
 const UNITS=['عدد','کارتن','بسته','کیلوگرم','متر','لیتر','جفت','دست'];
 const R_IN={buy:'خرید',ret:'برگشت از مشتری',prod:'تولید / مونتاژ',gift:'هدیه / نمونه',other:'سایر'};
 const R_OUT={sale:'فروش',use:'مصرف داخلی',waste:'ضایعات / خرابی',ret:'برگشت به تأمین‌کننده',gift:'هدیه / نمونه',other:'سایر'};
@@ -1350,14 +1350,14 @@ function asKnowImport(){const i=document.createElement('input');i.type='file';i.
   for(const m of k.macros||[]){if(m.a&&m.b&&!asMacros().some(x=>x.a===m.a)){asMacros().push({a:m.a,b:m.b});nm++}}
   save();asSay(`📚 دانش بارگذاری شد: ${fa(na)} اسم مستعار و ${fa(nm)} میانبر جدید.`)}catch(e){toast('این فایل دانش انباریار نیست')}};i.click()}
 function asKnowList(){const al=db.products.reduce((s,p)=>s+(p.alias||[]).length,0),ms=asMacros();
- asSay(`📚 تا الان یاد گرفته‌ام:<br>• ${fa(al)} اسم مستعار برای کالاها<br>• ${fa(ms.length)} میانبر${ms.length?':<br>'+ms.slice(-6).map(m=>`«${esc(m.a)}» ← «${esc(m.b)}»`).join('<br>'):''}<br>• قیمت و واحد کالاهایی که در فاکتور گفته‌ای<div class="grid2" style="margin-top:6px"><button class="btn sm" onclick="asKnowExport()">${ic('down',16)} دانلود دانش</button><button class="btn sm" onclick="asKnowImport()">${ic('up',16)} بارگذاری دانش</button></div><button class="btn sm blk" style="margin-top:6px" onclick="asTrainImport()">${ic('up',16)} بارگذاری فایل آموزشی (txt)</button><div class="xs muted" style="margin-top:6px">برای یاد دادن: «وقتی گفتم <b>فاکتور بعدی</b> یعنی <b>فاکتور جدید</b>» یا «پاستیل یعنی پاستیل میوه‌ای».</div>`)}
+ asSay(`📚 تا الان یاد گرفته‌ام:<br>• ${fa(al)} اسم مستعار برای کالاها<br>• ${fa(ms.length)} میانبر${ms.length?':<br>'+ms.slice(-6).map(m=>`«${esc(m.a)}» ← «${esc(m.b)}»`).join('<br>'):''}<br>• قیمت و واحد کالاهایی که در فاکتور گفته‌ای<div class="grid2" style="margin-top:6px"><button class="btn sm" onclick="asKnowExport()">${ic('down',16)} دانلود دانش</button><button class="btn sm" onclick="asKnowImport()">${ic('up',16)} بارگذاری دانش</button></div><button class="btn sm blk" style="margin-top:6px" onclick="asTrainImport()">${ic('up',16)} بارگذاری فایل آموزشی (txt)</button><button class="btn sm blk" style="margin-top:6px" onclick="trManage()">🧠 آموزش و دستورات (افزودن / حذف)</button><div class="xs muted" style="margin-top:6px">برای یاد دادن: «وقتی گفتم <b>فاکتور بعدی</b> یعنی <b>فاکتور جدید</b>» یا «پاستیل یعنی پاستیل میوه‌ای».</div>`)}
 function extractParty(toks){const i=toks.findIndex(w=>w==='برای'||w==='مشتری'||w==='اسم');if(i<0)return{party:'',toks};
  let j=i+1;if(toks[j]==='اسم')j++;while(toks[j]&&/^(اقای|اقا|خانم|دکتر|مهندس|حاج|حاجی)$/.test(toks[j]))j++;
  const nm=[];while(toks[j]&&nm.length<2&&!isNumTok(toks[j])&&!(toks[j] in UNITW)&&!FILLW.has(toks[j])){if(nm.length===1&&resolveProducts([toks[j]]).length)break;nm.push(toks[j]);j++}
  if(!nm.length)return{party:'',toks};return{party:nm.join(' '),toks:[...toks.slice(0,i),...toks.slice(j)]}}
 /* ---------- main entry ---------- */
 const _asReplyBase=asReply;
-asReply=function(raw){let handled=false;try{handled=asSmart(raw)||(typeof asIntent==='function'&&asIntent(raw))}catch(e){console.error(e);handled=false}if(!handled)_asReplyBase(raw)};
+asReply=function(raw){let handled=false;try{handled=asSmart(raw)||(typeof asIntent==='function'&&asIntent(raw))}catch(e){console.error(e);handled=false}if(!handled){_asReplyBase(raw);try{const l=AS.msgs[AS.msgs.length-1];if(l&&l.h&&l.h.indexOf('متوجه نشدم')===0&&typeof asUnknownOffer==='function')asUnknownOffer(raw)}catch(e){}}};
 function asSmart(raw){let t=asPre(raw);if(!t)return false;if(typeof asConfirmFlow==='function'&&asConfirmFlow(applyMacros(t)))return true;t=applyMacros(t).replace(/(?:^|\s)هر\s*(?:کدوم|کدام|یک|یکی|عدد|دونه|تا)(?=\s|$)/g,' هر').trim();
  if(!can('assistant'))return false;
  let m;
@@ -1511,6 +1511,8 @@ const _noRe=/^(نه|نخیر|خیر)$/;
 function asIntent(raw){let t=asPre(raw);if(!t)return false;t=applyMacros(t);if(!can('assistant'))return false;
  if(/^(راهنما|دستورات|دستورها|دستور ها|کمک|help|چه کارایی بلدی|چه کارهایی بلدی|چیکار میتونی بکنی|لیست دستورات|فهرست دستورات|دستورات رو نشون بده)$/.test(t)){asHelp();return true}
  if(AS.ask){const a=AS.ask;AS.ask=null;if(asAnswer(a,t))return true}
+ if(typeof asTeachChat==='function'&&asTeachChat(t))return true
+ {const cr=typeof asCustomReply==='function'&&asCustomReply(t);if(cr){asSay(esc(cr.b));return true}}
  const tk=asToks(t),ex=extractNum(tk),q=ex.qty;let m;
  /* ambiguous / risky one-liners (training §16) */
  if(/^(ثبت|ثبت کن|اینو ثبت کن|این رو ثبت کن|این ثبت کن)$/.test(t)){asSay('منظورتان ثبت کالای جدید است یا ثبت ورود کالا به انبار؟<div class="chips" style="padding:0;margin-top:6px"><button class="chip" onclick="asSend(\'کالای جدید\')">کالای جدید</button><button class="chip" onclick="asSend(\'بار رسید\')">ورود کالا</button></div>');return true}
@@ -1528,7 +1530,9 @@ function asIntent(raw){let t=asPre(raw);if(!t)return false;t=applyMacros(t);if(!
   else if(/(حذف کن|حذفش کن|پاک کن|غیرفعال کن|بایگانی کن)$/.test(t))intent='product_archive';
   else if(/(کالاهای|محصولات)\s+(دسته|گروه|برند)/.test(t))intent='product_search';
   else if(!intent){if(RE_IN.test(t)&&!RE_OUT.test(t))intent='stock_in';else if(RE_OUT.test(t)&&!RE_IN.test(t))intent='stock_out'}}
+ if(!intent&&/(تاریخچه|سابقه|گردش)/.test(t)){const nt0=asNameToks(t,'').filter(x=>!/^(تاریخچه|سابقه|گردش|تغییرات|تغییر|کالای|کالا)$/.test(x)),c0=nt0.length?resolveProducts(nt0):[];if(c0.length&&confident(c0)){asHistory(c0[0].p);return true}}
  if(!intent)return false;
+ if(intent==='new_invoice')return asSmart('فاکتور جدید');if(intent==='receipt')return asSmart('بار رسید');if(intent==='help'){asHelp();return true}if(intent==='profit'){asMoney(/دیروز/.test(t)?'y':/هفته/.test(t)?'w':/ماه/.test(t)?'m':'t');return true}
  if(!tm&&(intent==='stock_in'||intent==='stock_out')&&/(چقدر|چنده|چند تا|کی|کدوم|چیه|چی)/.test(t))return false;
  const nt=asNameToks(t,drop),cand=nt.length?resolveProducts(nt):[];
  /* intent understood but no product/number given: ask instead of guessing (training §16, §21) */
@@ -1609,7 +1613,7 @@ function asTrainParse(txt){const D={};let intent=null,n=0;const MAP=[[/ورود 
   if(normFa(ln).startsWith('عبارت های هم معنی')){continue}
   if(/^[-•]\s+/.test(ln)&&intent){const ph=ln.replace(/^[-•]\s+/,'').trim();if(ph&&ph.length<80){(D[intent]=D[intent]||[]).push(ph);n++}}}
  return{D,n}}
-function asTrainImport(){const i=document.createElement('input');i.type='file';i.accept='.txt,text/plain';i.onchange=async()=>{try{const{D,n}=asTrainParse(await i.files[0].text());if(!n)throw 0;const ex=db.prefs.phrases||(db.prefs.phrases={});let add=0;
+function asTrainImportOld(){const i=document.createElement('input');i.type='file';i.accept='.txt,text/plain';i.onchange=async()=>{try{const{D,n}=asTrainParse(await i.files[0].text());if(!n)throw 0;const ex=db.prefs.phrases||(db.prefs.phrases={});let add=0;
   for(const k in D){const cur=new Set((ex[k]||[]).map(normFa).concat((TRAIN[k]||[]).map(normFa)));for(const p of D[k]){const np=normFa(p);if(np&&!cur.has(np)){(ex[k]=ex[k]||[]).push(p);cur.add(np);add++}}}
   save();trCompile();asSay(`📚 آموزش بارگذاری شد: ${fa(n)} عبارت خوانده شد، ${fa(add)} عبارت جدید یاد گرفتم.`)}catch(e){toast('فایل آموزشی خوانده نشد')}};i.click()}
 
@@ -1623,9 +1627,108 @@ const HELP=[['🧾 فاکتور فروش',['فاکتور جدید','فاکتور
  ['💰 قیمت، فروش و سود',['قیمت شامپو چنده؟','قیمت شامپو و صابون','جمع','سود امروز','فروش دیروز','سود این ماه','قیمت پاستیل رو ۱۵ هزار کن','قیمت خرید پاستیل رو ۸ هزار کن']],
  ['📊 گزارش',['امروز چی فروش رفت؟','امروز چی وارد شد؟','گزارش این ماه','تاریخچه تغییرات روغن','خلاصهٔ وضعیت انبار']],
  ['📷 بارکد',['اسکن کالا','بارکد ۶۲۶۰۱۲۳۴۵۶۷۸۶ را پیدا کن']],
- ['📚 یادگیری',['چی یاد گرفتی؟','کابل شارژر یعنی کابل تایپ‌سی','وقتی گفتم ف۱ یعنی فاکتور جدید']],
+ ['📚 یادگیری',['آموزش و دستورات','چی یاد گرفتی؟','برام ۱۰ تا ماست بیار یعنی ورود کالا','فراموش کن برام ۱۰ تا ماست بیار','کابل شارژر یعنی کابل تایپ‌سی','وقتی گفتم ف۱ یعنی فاکتور جدید']],
  ['✅ تأیید',['بله','نه']]];
 function asHelp(){asSay('📖 دستورها — روی هر مورد بزن تا ارسال شود (بعضی را باید نام کالای خودت را جایش بگذاری):'+HELP.map(g=>`<details style="margin-top:6px"><summary class="b sm">${g[0]}</summary><div class="chips" style="padding:4px 0 0;flex-wrap:wrap">${g[1].map(x=>`<button class="chip" onclick="asSend(this.dataset.t)" data-t="${esc(x)}">${esc(x.length>46?x.slice(0,44)+'…':x)}</button>`).join('')}</div></details>`).join('')+'<div class="xs muted" style="margin-top:8px">هر کاری که موجودی یا اطلاعات را عوض کند، اول پیش‌نمایش می‌دهد و فقط با «بله/ثبت» اجرا می‌شود.</div>')}
+
+/* ================= assistant v4: open, user-extensible command packs + free learning ================= */
+const INTENT_LABEL={stock_in:'ورود کالا',stock_out:'خروج کالا',product_create:'کالای جدید',stock_check:'بررسی موجودی',product_update:'ویرایش کالا',product_search:'جست‌وجوی کالا',barcode:'بارکد',low_stock:'کمبود موجودی',stock_count:'شمارش و مغایرت',report:'گزارش',product_archive:'حذف کالا',category_manage:'دسته‌بندی',new_invoice:'فاکتور جدید',receipt:'بار رسید',help:'راهنما / دستورات',profit:'فروش و سود',confirmation:'تأیید',cancellation:'لغو'};
+const INTENTS=Object.keys(INTENT_LABEL);
+const LABEL2INT={};for(const k of INTENTS){LABEL2INT[normFa(INTENT_LABEL[k])]=k}
+Object.assign(LABEL2INT,{[normFa('موجودی')]:'stock_check',[normFa('جستجو')]:'product_search',[normFa('جست و جو')]:'product_search',[normFa('کمبود')]:'low_stock',[normFa('شمارش')]:'stock_count',[normFa('ویرایش')]:'product_update',[normFa('حذف')]:'product_archive',[normFa('سود')]:'profit',[normFa('فروش')]:'profit',[normFa('راهنما')]:'help',[normFa('دستورات')]:'help',[normFa('خروج')]:'stock_out',[normFa('ورود')]:'stock_in',[normFa('فاکتور')]:'new_invoice',[normFa('رسید')]:'receipt'});
+const prefs=()=>db.prefs;
+const phr=()=>prefs().phrases||(prefs().phrases={});
+const rem=()=>prefs().removed||(prefs().removed=[]);
+const rpl=()=>prefs().replies||(prefs().replies=[]);
+/* ---- parse a pack / training text. Never throws; collects line errors. ---- */
+function asPackParse(txt){const R={phr:{},alias:[],macros:[],replies:[],remove:[],errors:[],n:0};let sec=null,arg='',cur=null;
+ const KW=[[/ورود کالا/,'stock_in'],[/کالای جدید/,'product_create'],[/خروج/,'stock_out'],[/بررسی موجودی/,'stock_check'],[/اصلاح/,'product_update'],[/جست ?و ?جو/,'product_search'],[/بارکدخوان/,'barcode'],[/کمبود/,'low_stock'],[/شمارش|مغایرت/,'stock_count'],[/گزارش/,'report'],[/حذف|غیرفعال/,'product_archive'],[/دسته/,'category_manage']];
+ const lines=String(txt||'').replace(/\r/g,'').split('\n');
+ lines.forEach((raw,i)=>{try{const ln=raw.trim(),no=i+1;if(!ln||/^(\/\/|#(?!#))/.test(ln))return;
+  let m=ln.match(/^##\s*(.*)$/);
+  if(m){const h=m[1].replace(/\s+#.*$/,'').trim(),hn=normFa(h);sec=null;arg='';
+   let x=h.match(/^(intent|قصد|هدف)\s*[:：]\s*(\S+)$/i);if(x){const key=x[2].trim(),it=INTENTS.includes(key)?key:LABEL2INT[normFa(key)];if(it){sec='intent';arg=it}else R.errors.push({line:no,msg:'قصد ناشناخته: '+key+' (فهرست: '+INTENTS.join(', ')+')'});return}
+   x=h.match(/^(alias|اسم مستعار|مترادف)\s*[:：]\s*(.+)$/i);if(x){sec='alias';arg=x[2].trim();cur={name:arg,list:[]};R.alias.push(cur);return}
+   if(/^(macro|میانبر)/i.test(h)){sec='macro';return}if(/^(reply|پاسخ|جواب)/i.test(h)){sec='reply';return}if(/^(remove|حذف عبارت|فراموش)/i.test(h)){sec='remove';return}
+   if(hn.startsWith('عبارت') ){/* inline label lines are handled below */}
+   for(const [re,k] of KW)if(re.test(hn)){sec='intent';arg=k;return}if(/^(intent|alias|قصد|هدف)\b/i.test(h))R.errors.push({line:no,msg:'بخش ناشناخته: '+h.slice(0,30)});return}
+  if(/^عبارت.?های (تایید|تأیید)/.test(ln)||normFa(ln).startsWith('عبارت های تایید')){sec='intent';arg='confirmation';return}
+  if(normFa(ln).startsWith('عبارت های لغو')){sec='intent';arg='cancellation';return}
+  if(normFa(ln).startsWith('عبارت های هم معنی')||normFa(ln).startsWith('عبارت اصلی'))return;
+  m=ln.match(/^[-•*]\s+(.+)$/);if(!m)return;const body=m[1].trim();if(!body)return;
+  if(sec==='intent'&&arg){if(body.length>90){R.errors.push({line:no,msg:'عبارت خیلی بلند است'});return}(R.phr[arg]=R.phr[arg]||[]).push(body);R.n++}
+  else if(sec==='alias'&&cur){cur.list.push(body);R.n++}
+  else if(sec==='macro'||sec==='reply'){const k=body.split(/\s*(?:=>|←|->)\s*/);if(k.length<2||!k[0]||!k.slice(1).join(' ')){R.errors.push({line:no,msg:'باید به شکل «عبارت => مقصد» باشد'});return}
+   (sec==='macro'?R.macros:R.replies).push({a:normFa(k[0]),b:sec==='macro'?normFa(k.slice(1).join(' ')):k.slice(1).join(' => ').trim()});R.n++}
+  else if(sec==='remove'){R.remove.push(normFa(body));R.n++}
+ }catch(e){R.errors.push({line:i+1,msg:'خطای خواندن خط'})}});
+ return R}
+function asPackApply(R){const S={phr:0,alias:0,macro:0,reply:0,rem:0,noProd:[],dup:0};
+ try{for(const k in R.phr){const cur=new Set((phr()[k]||[]).map(normFa).concat((TRAIN[k]||[]).map(normFa)));for(const p of R.phr[k]){const n=normFa(p);if(!n)continue;if(cur.has(n)){S.dup++;continue}(phr()[k]=phr()[k]||[]).push(p);cur.add(n);S.phr++}}
+  for(const a of R.alias){const p=db.products.find(x=>normFa(x.name)===normFa(a.name));if(!p){S.noProd.push(a.name);continue}for(const al of a.list)if(addAlias(p,al))S.alias++}
+  for(const m of R.macros){if(!asMacros().some(x=>x.a===m.a)){asMacros().push({a:m.a,b:m.b});S.macro++}else S.dup++}
+  for(const r of R.replies){const f=rpl().find(x=>x.a===r.a);if(f){f.b=r.b}else{rpl().push({a:r.a,b:r.b})}S.reply++}
+  for(const r of R.remove){if(!rem().includes(r)){rem().push(r);S.rem++}for(const k in phr())phr()[k]=phr()[k].filter(p=>normFa(p)!==r);prefs().replies=rpl().filter(x=>x.a!==r);prefs().macros=asMacros().filter(x=>x.a!==r)}
+  save();trCompile()}catch(e){}
+ return S}
+function asPackSummary(R,S){let h=`📚 آموزش بارگذاری شد: ${fa(R.n)} مورد خوانده شد — ${fa(S.phr)} عبارت، ${fa(S.alias)} اسم مستعار، ${fa(S.macro)} میانبر، ${fa(S.reply)} پاسخ، ${fa(S.rem)} حذف.`;
+ if(S.dup)h+=`<br><span class="xs muted">${fa(S.dup)} مورد تکراری بود و نادیده گرفته شد.</span>`;
+ if(S.noProd.length)h+=`<br><span class="xs">کالایی با این نام پیدا نشد (اسم مستعار اضافه نشد): ${S.noProd.slice(0,5).map(esc).join('، ')}</span>`;
+ if(R.errors.length)h+=`<br><span class="xs red">${fa(R.errors.length)} خط ایراد داشت و رد شد (بقیه کار کرد):</span><div class="xs">${R.errors.slice(0,6).map(e=>`خط ${fa(e.line)}: ${esc(e.msg)}`).join('<br>')}</div>`;
+ return h}
+function asTrainImport(){const i=document.createElement('input');i.type='file';i.accept='.txt,text/plain';i.onchange=async()=>{try{const R=asPackParse(await i.files[0].text());if(!R.n&&!R.errors.length)throw 0;const S=asPackApply(R);asSay(asPackSummary(R,S));if(document.querySelector('.sheet'))trManage()}catch(e){toast('فایل خوانده نشد؛ قالبش را در راهنما ببین')}};i.click()}
+/* ---- compile: built-in + custom, minus removed ---- */
+trCompile=function(){TR.list=[];TR.conf=new Set(['اره','باشه','اوکی','ok','تایید','تایید کن','حله','ثبت','تموم','همینه']);TR.canc=new Set(['لغو','کنسل','انصراف','لغو کن']);
+ try{const rm=new Set((prefs().removed||[]).map(normFa)),all={};for(const k in TRAIN)all[k]=(all[k]||[]).concat(TRAIN[k]);const ex=prefs().phrases||{};for(const k in ex)all[k]=(all[k]||[]).concat(ex[k]);
+  for(const k in all)for(const ph of all[k]){const p=normFa(ph);if(!p||rm.has(p))continue;
+   if(k==='confirmation'){TR.conf.add(p);continue}if(k==='cancellation'){TR.canc.add(p);continue}
+   TR.list.push({intent:k,p,toks:p.split(' ').filter(x=>x.length>1)})}}catch(e){}};
+/* ---- custom replies ---- */
+function asCustomReply(t){for(const r of (prefs().replies||[])){const toks=r.a.split(' ').filter(x=>x.length>1);if(!toks.length)continue;
+  if(t===r.a)return r;if(toks.length<2)continue;const tt=t.split(' ');if(toks.every(pt=>tt.some(x=>tokSim(pt,x)>=.9)))return r}return null}
+/* ---- learning from conversation ---- */
+function asPhraseFrom(raw){const t=asPre(raw),pn=new Set();db.products.forEach(p=>normFa(p.name+' '+(p.alias||[]).join(' ')).split(' ').forEach(w=>{if(w.length>1)pn.add(w)}));
+ const keep=asToks(t).filter(w=>!isNumTok(w)&&!(w in UNITW)&&!pn.has(w));return keep.length>=2?keep.join(' '):t}
+function asTeach(idx,intent){const u=(AS.unk||[])[idx];if(!u)return;if(!INTENTS.includes(intent))return;const ph=asPhraseFrom(u);
+ const cur=(phr()[intent]=phr()[intent]||[]);if(!cur.map(normFa).includes(normFa(ph)))cur.push(ph);save();trCompile();asSay(`📚 یاد گرفتم: «${esc(ph)}» یعنی «${esc(INTENT_LABEL[intent])}». دوباره امتحان می‌کنم…`);setTimeout(()=>asReply(u),200)}
+function asUnknownOffer(raw){AS.unk=AS.unk||[];AS.unk.push(raw);if(AS.unk.length>30)AS.unk.shift();const i=AS.unk.length-1;
+ const log=prefs().unk||(prefs().unk=[]);log.push(raw);if(log.length>40)log.shift();
+ asSay('نفهمیدم 🙏 می‌خواهی یادم بدهی؟ این جمله یعنی:<div class="chips" style="padding:0;margin-top:6px;flex-wrap:wrap">'+['stock_in','stock_out','stock_check','product_create','new_invoice','receipt','report','profit','low_stock'].map(k=>`<button class="chip" onclick="asTeach(${i},'${k}')">${esc(INTENT_LABEL[k])}</button>`).join('')+'</div><div class="xs muted" style="margin-top:4px">بعداً هم در «آموزش و دستورات» می‌توانی بسازی یا حذف کنی.</div>')}
+/* ---- management sheet ---- */
+function trManage(){const ex=prefs().phrases||{},ks=Object.keys(ex).filter(k=>ex[k].length),ms=asMacros(),rs=rpl(),al=db.products.reduce((s,p)=>s+(p.alias||[]).length,0),un=(prefs().unk||[]).slice(-8).reverse();
+ sheet(`<h2>🧠 آموزش و دستورات دستیار</h2>
+ <div class="hint">${fa(Object.values(TRAIN).reduce((s,a)=>s+a.length,0))} عبارت پیش‌فرض + ${fa(Object.values(ex).reduce((s,a)=>s+a.length,0))} عبارت خودت · ${fa(al)} اسم مستعار · ${fa(ms.length)} میانبر · ${fa(rs.length)} پاسخ ثابت</div>
+ <div class="card" style="margin-top:8px;padding:10px"><div class="b sm">➕ عبارت جدید برای یک کار</div><div class="row" style="margin-top:6px"><select id="trInt" class="inp">${INTENTS.map(k=>`<option value="${k}">${esc(INTENT_LABEL[k])}</option>`).join('')}</select></div><input id="trPh" class="inp" style="margin-top:6px" placeholder="مثلاً: برام ۱۰ تا ماست بیار"><button class="btn pri sm blk" style="margin-top:6px" onclick="trAdd()">افزودن</button></div>
+ <div class="card" style="margin-top:8px;padding:10px"><div class="b sm">💬 پاسخ ثابت (سؤال و جواب مغازه)</div><input id="trQ" class="inp" style="margin-top:6px" placeholder="وقتی کسی بنویسد… (ساعت کاری)"><input id="trA" class="inp" style="margin-top:6px" placeholder="جواب بدهد… (۹ تا ۲۱)"><button class="btn sm blk" style="margin-top:6px" onclick="trAddReply()">افزودن پاسخ</button></div>
+ ${un.length?`<div class="sect"><h3>جمله‌هایی که نفهمیدم</h3></div>${un.map((u,i)=>`<div class="card" style="padding:8px 10px;margin-bottom:6px"><div class="sm">${esc(u)}</div><div class="row" style="margin-top:6px"><select id="un${i}" class="inp">${INTENTS.filter(k=>!/ation$/.test(k)).map(k=>`<option value="${k}">${esc(INTENT_LABEL[k])}</option>`).join('')}</select><button class="btn sm pri" onclick="trTeachUnk(${i})">یاد بگیر</button></div></div>`).join('')}`:''}
+ ${ks.length?`<div class="sect"><h3>عبارت‌های خودت</h3></div>${ks.map(k=>`<div class="xs b" style="margin:6px 0 2px">${esc(INTENT_LABEL[k]||k)}</div>${ex[k].map((p,j)=>`<div class="row2 row" style="justify-content:space-between"><span class="sm sp">${esc(p)}</span><button class="ibtn" style="width:30px;height:30px;color:var(--red)" onclick="trDel('${k}',${j})">${ic('x',14)}</button></div>`).join('')}`).join('')}`:''}
+ ${ms.length?`<div class="sect"><h3>میانبرها</h3></div>${ms.map((m,j)=>`<div class="row2 row" style="justify-content:space-between"><span class="sm sp">«${esc(m.a)}» ← «${esc(m.b)}»</span><button class="ibtn" style="width:30px;height:30px;color:var(--red)" onclick="trDelMacro(${j})">${ic('x',14)}</button></div>`).join('')}`:''}
+ ${rs.length?`<div class="sect"><h3>پاسخ‌های ثابت</h3></div>${rs.map((m,j)=>`<div class="row2 row" style="justify-content:space-between"><span class="sm sp">«${esc(m.a)}» ← ${esc(m.b)}</span><button class="ibtn" style="width:30px;height:30px;color:var(--red)" onclick="trDelReply(${j})">${ic('x',14)}</button></div>`).join('')}`:''}
+ <div class="grid2" style="margin-top:12px"><button class="btn sm" onclick="trExport()">${ic('down',16)} ذخیرهٔ بسته</button><button class="btn sm" onclick="asTrainImport()">${ic('up',16)} بارگذاری بسته</button></div>
+ <button class="btn sm blk" style="margin-top:6px;color:var(--red)" onclick="trReset()">پاک کردن آموزش‌های خودم</button>
+ <div class="hint" style="margin-top:8px">فایل بسته یک متن ساده است؛ می‌توانی با هر ویرایشگری بنویسی. راهنما: پوشهٔ docs در همین برنامه.</div>`)}
+function trAdd(){const k=$('#trInt').value,ph=$('#trPh').value.trim();if(!ph)return toast('عبارت را بنویس');const cur=(phr()[k]=phr()[k]||[]);if(cur.map(normFa).includes(normFa(ph)))return toast('این عبارت قبلاً هست');cur.push(ph);save();trCompile();toast('✓ یاد گرفتم');trManage()}
+function trAddReply(){const q=$('#trQ').value.trim(),a=$('#trA').value.trim();if(!q||!a)return toast('هر دو را بنویس');rpl().push({a:normFa(q),b:a});save();toast('✓ ثبت شد');trManage()}
+function trDel(k,j){const arr=phr()[k];if(!arr)return;arr.splice(j,1);save();trCompile();trManage()}
+function trDelMacro(j){asMacros().splice(j,1);save();trManage()}
+function trDelReply(j){rpl().splice(j,1);save();trManage()}
+function trTeachUnk(i){const un=(prefs().unk||[]).slice(-8).reverse(),raw=un[i],k=$('#un'+i).value;if(!raw)return;const ph=asPhraseFrom(raw),cur=(phr()[k]=phr()[k]||[]);if(!cur.map(normFa).includes(normFa(ph)))cur.push(ph);prefs().unk=(prefs().unk||[]).filter(x=>x!==raw);save();trCompile();toast('✓ یاد گرفتم');trManage()}
+function trReset(){confirmBox('همهٔ عبارت‌ها، میانبرها و پاسخ‌هایی که خودت آموزش داده‌ای پاک شود؟ (اسم‌های مستعار کالاها می‌ماند)','پاک شود',()=>{prefs().phrases={};prefs().macros=[];prefs().replies=[];prefs().removed=[];prefs().unk=[];save();trCompile();trManage()},true)}
+function trExport(){const ex=prefs().phrases||{};let s='# بستهٔ دستور انباریار — این فایل را می‌توانی با هر ویرایشگر متن عوض کنی و دوباره «بارگذاری بسته» بزنی\n# هر بخش با ## شروع می‌شود و هر مورد با «- ». خط‌های # توضیح‌اند.\n\n';
+ for(const k of Object.keys(ex)){if(!ex[k].length)continue;s+=`## intent: ${k}   # ${INTENT_LABEL[k]||''}\n`+ex[k].map(p=>'- '+p).join('\n')+'\n\n'}
+ for(const p of db.products.filter(x=>(x.alias||[]).length))s+=`## alias: ${p.name}\n`+p.alias.map(a=>'- '+a).join('\n')+'\n\n';
+ if(asMacros().length)s+='## macro\n'+asMacros().map(m=>`- ${m.a} => ${m.b}`).join('\n')+'\n\n';
+ if(rpl().length)s+='## reply\n'+rpl().map(m=>`- ${m.a} => ${m.b}`).join('\n')+'\n\n';
+ if((prefs().removed||[]).length)s+='## remove\n'+prefs().removed.map(p=>'- '+p).join('\n')+'\n\n';
+ download('anbaryar-commands-'+todayISO()+'.txt',s,'text/plain');toast('بسته ذخیره شد')}
+/* ---- chat commands for teaching ---- */
+function asTeachChat(t){let m=t.match(/^(?:یاد بگیر\s*)?(.+?)\s+یعنی\s+(.+)$/);
+ if(m){const it=LABEL2INT[normFa(m[2].trim())];if(it&&can('act')){const ph=m[1].replace(/^(?:وقتی|هر وقت)\s+(?:گفتم\s+)?/,'').trim();if(ph){const gp=asPhraseFrom(ph),cur=(phr()[it]=phr()[it]||[]);if(!cur.map(normFa).includes(normFa(gp)))cur.push(gp);save();trCompile();asSay(`📚 یاد گرفتم: «${esc(gp)}» یعنی «${esc(INTENT_LABEL[it])}».`);return true}}}
+ m=t.match(/^(?:فراموش کن|حذف عبارت|عبارت)\s*:?\s*(.+?)(?:\s+(?:رو|را))?(?:\s+فراموش کن)?$/);
+ if(/^فراموش کن\s/.test(t)||/فراموش کن$/.test(t)){const ph0=normFa(t.replace(/^فراموش کن\s*:?\s*/,'').replace(/\s*فراموش کن$/,'').replace(/\s+(?:رو|را)$/,'')),ph=ph0,ph1=normFa(asPhraseFrom(ph0));if(ph){let n=0;for(const k in phr()){const a=phr()[k],b=a.filter(p=>{const z=normFa(p);return z!==ph0&&z!==ph1});n+=a.length-b.length;phr()[k]=b}
+   const mm=asMacros().length;prefs().macros=asMacros().filter(x=>x.a!==ph);n+=mm-asMacros().length;const rr=rpl().length;prefs().replies=rpl().filter(x=>x.a!==ph);n+=rr-rpl().length;
+   if(!n&&!rem().includes(ph)){rem().push(ph);n=1}save();trCompile();asSay(n?`🗑️ فراموش کردم: «${esc(ph)}».`:'چنین عبارتی در آموزش‌هایم نبود.');return true}}
+ return false}
 
 /* ================= settings / users / log / lock / sync ================= */
 function promptBox(title,val,cb,ph=''){sheet(`<h2>${esc(title)}</h2><input id="pbIn" class="inp" value="${esc(val||'')}" placeholder="${esc(ph)}"><div class="grid2" style="margin-top:12px"><button class="btn pri" id="pbOk">${ic('check')} ذخیره</button><button class="btn" onclick="closeSheet()">انصراف</button></div>`,'cen');
