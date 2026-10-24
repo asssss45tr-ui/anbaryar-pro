@@ -394,7 +394,7 @@ const cleanCode=c=>String(c||'').replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.in
 const bkey=c=>{c=cleanCode(c);return /^\d+$/.test(c)?(c.replace(/^0+/,'')||'0'):c.toLowerCase()};
 
 /* ================= store ================= */
-const APP_VER='۲٫۲';
+const APP_VER='۲٫۵';
 const UNITS=['عدد','کارتن','بسته','کیلوگرم','متر','لیتر','جفت','دست'];
 const R_IN={buy:'خرید',ret:'برگشت از مشتری',prod:'تولید / مونتاژ',gift:'هدیه / نمونه',other:'سایر'};
 const R_OUT={sale:'فروش',use:'مصرف داخلی',waste:'ضایعات / خرابی',ret:'برگشت به تأمین‌کننده',gift:'هدیه / نمونه',other:'سایر'};
@@ -1350,7 +1350,7 @@ function asKnowImport(){const i=document.createElement('input');i.type='file';i.
   for(const m of k.macros||[]){if(m.a&&m.b&&!asMacros().some(x=>x.a===m.a)){asMacros().push({a:m.a,b:m.b});nm++}}
   save();asSay(`📚 دانش بارگذاری شد: ${fa(na)} اسم مستعار و ${fa(nm)} میانبر جدید.`)}catch(e){toast('این فایل دانش انباریار نیست')}};i.click()}
 function asKnowList(){const al=db.products.reduce((s,p)=>s+(p.alias||[]).length,0),ms=asMacros();
- asSay(`📚 تا الان یاد گرفته‌ام:<br>• ${fa(al)} اسم مستعار برای کالاها<br>• ${fa(ms.length)} میانبر${ms.length?':<br>'+ms.slice(-6).map(m=>`«${esc(m.a)}» ← «${esc(m.b)}»`).join('<br>'):''}<br>• قیمت و واحد کالاهایی که در فاکتور گفته‌ای<div class="grid2" style="margin-top:6px"><button class="btn sm" onclick="asKnowExport()">${ic('down',16)} دانلود دانش</button><button class="btn sm" onclick="asKnowImport()">${ic('up',16)} بارگذاری دانش</button></div><button class="btn sm blk" style="margin-top:6px" onclick="asTrainImport()">${ic('up',16)} بارگذاری فایل آموزشی (txt)</button><button class="btn sm blk" style="margin-top:6px" onclick="trManage()">🧠 آموزش و دستورات (افزودن / حذف)</button><div class="xs muted" style="margin-top:6px">برای یاد دادن: «وقتی گفتم <b>فاکتور بعدی</b> یعنی <b>فاکتور جدید</b>» یا «پاستیل یعنی پاستیل میوه‌ای».</div>`)}
+ asSay(`📚 تا الان یاد گرفته‌ام:<br>• ${fa(al)} اسم مستعار برای کالاها<br>• ${fa(ms.length)} میانبر${ms.length?':<br>'+ms.slice(-6).map(m=>`«${esc(m.a)}» ← «${esc(m.b)}»`).join('<br>'):''}<br>• قیمت و واحد کالاهایی که در فاکتور گفته‌ای<div class="grid2" style="margin-top:6px"><button class="btn sm" onclick="asKnowExport()">${ic('down',16)} دانلود دانش</button><button class="btn sm" onclick="asTrainImport()">${ic('up',16)} بارگذاری دانش</button></div><button class="btn sm blk" style="margin-top:6px" onclick="asTrainImport()">${ic('up',16)} بارگذاری فایل آموزشی (txt)</button><button class="btn sm blk" style="margin-top:6px" onclick="trManage()">🧠 آموزش و دستورات (افزودن / حذف)</button><div class="xs muted" style="margin-top:6px">برای یاد دادن: «وقتی گفتم <b>فاکتور بعدی</b> یعنی <b>فاکتور جدید</b>» یا «پاستیل یعنی پاستیل میوه‌ای».</div>`)}
 function extractParty(toks){const i=toks.findIndex(w=>w==='برای'||w==='مشتری'||w==='اسم');if(i<0)return{party:'',toks};
  let j=i+1;if(toks[j]==='اسم')j++;while(toks[j]&&/^(اقای|اقا|خانم|دکتر|مهندس|حاج|حاجی)$/.test(toks[j]))j++;
  const nm=[];while(toks[j]&&nm.length<2&&!isNumTok(toks[j])&&!(toks[j] in UNITW)&&!FILLW.has(toks[j])){if(nm.length===1&&resolveProducts([toks[j]]).length)break;nm.push(toks[j]);j++}
@@ -1510,6 +1510,7 @@ function asHistory(p){const l=db.moves.filter(m=>m.pid===p.id).sort((a,b)=>b.dat
 const _noRe=/^(نه|نخیر|خیر)$/;
 function asIntent(raw){let t=asPre(raw);if(!t)return false;t=applyMacros(t);if(!can('assistant'))return false;
  if(/^(راهنما|دستورات|دستورها|دستور ها|کمک|help|چه کارایی بلدی|چه کارهایی بلدی|چیکار میتونی بکنی|لیست دستورات|فهرست دستورات|دستورات رو نشون بده)$/.test(t)){asHelp();return true}
+ if(/^(اموزش|اموزش و دستورات|اموزش دستورات|اموزش ربات|اموزش دستیار|یادگیری|یاد دادن|یاد بده|دستور جدید|دستور تازه|افزودن دستور|اضافه کردن دستور|ویرایش دستورات|حذف دستور|مدیریت دستورات|بارگذاری اموزش|بارگذاری بسته|اپلود اموزش|اموزش بارگذاری)$/.test(t)){AS.ask=null;if(typeof trManage==='function'){asSay('🧠 صفحهٔ آموزش را باز کردم. آنجا عبارت و پاسخ می‌سازی و فایل بسته بارگذاری می‌کنی.');trManage();return true}}
  if(AS.ask){const a=AS.ask;AS.ask=null;if(asAnswer(a,t))return true}
  if(typeof asTeachChat==='function'&&asTeachChat(t))return true
  {const cr=typeof asCustomReply==='function'&&asCustomReply(t);if(cr){asSay(esc(cr.b));return true}}
@@ -1641,7 +1642,7 @@ const phr=()=>prefs().phrases||(prefs().phrases={});
 const rem=()=>prefs().removed||(prefs().removed=[]);
 const rpl=()=>prefs().replies||(prefs().replies=[]);
 /* ---- parse a pack / training text. Never throws; collects line errors. ---- */
-function asPackParse(txt){const R={phr:{},alias:[],macros:[],replies:[],remove:[],errors:[],n:0};let sec=null,arg='',cur=null;
+function asPackParse(txt){const R={phr:{},alias:[],macros:[],replies:[],qa:[],remove:[],errors:[],n:0};let sec=null,arg='',cur=null;
  const KW=[[/ورود کالا/,'stock_in'],[/کالای جدید/,'product_create'],[/خروج/,'stock_out'],[/بررسی موجودی/,'stock_check'],[/اصلاح/,'product_update'],[/جست ?و ?جو/,'product_search'],[/بارکدخوان/,'barcode'],[/کمبود/,'low_stock'],[/شمارش|مغایرت/,'stock_count'],[/گزارش/,'report'],[/حذف|غیرفعال/,'product_archive'],[/دسته/,'category_manage']];
  const lines=String(txt||'').replace(/\r/g,'').split('\n');
  lines.forEach((raw,i)=>{try{const ln=raw.trim(),no=i+1;if(!ln||/^(\/\/|#(?!#))/.test(ln))return;
@@ -1649,34 +1650,49 @@ function asPackParse(txt){const R={phr:{},alias:[],macros:[],replies:[],remove:[
   if(m){const h=m[1].replace(/\s+#.*$/,'').trim(),hn=normFa(h);sec=null;arg='';
    let x=h.match(/^(intent|قصد|هدف)\s*[:：]\s*(\S+)$/i);if(x){const key=x[2].trim(),it=INTENTS.includes(key)?key:LABEL2INT[normFa(key)];if(it){sec='intent';arg=it}else R.errors.push({line:no,msg:'قصد ناشناخته: '+key+' (فهرست: '+INTENTS.join(', ')+')'});return}
    x=h.match(/^(alias|اسم مستعار|مترادف)\s*[:：]\s*(.+)$/i);if(x){sec='alias';arg=x[2].trim();cur={name:arg,list:[]};R.alias.push(cur);return}
-   if(/^(macro|میانبر)/i.test(h)){sec='macro';return}if(/^(reply|پاسخ|جواب)/i.test(h)){sec='reply';return}if(/^(remove|حذف عبارت|فراموش)/i.test(h)){sec='remove';return}
+   if(/^(macro|میانبر)/i.test(h)){sec='macro';return}if(/^(reply|پاسخ|جواب)/i.test(h)){sec='reply';return}if(/^(qa|q&a|سوال|سؤال|پرسش)/i.test(h)){sec='qa';return}if(/^(remove|حذف عبارت|فراموش)/i.test(h)){sec='remove';return}
    if(hn.startsWith('عبارت') ){/* inline label lines are handled below */}
    for(const [re,k] of KW)if(re.test(hn)){sec='intent';arg=k;return}if(/^(intent|alias|قصد|هدف)\b/i.test(h))R.errors.push({line:no,msg:'بخش ناشناخته: '+h.slice(0,30)});return}
   if(/^عبارت.?های (تایید|تأیید)/.test(ln)||normFa(ln).startsWith('عبارت های تایید')){sec='intent';arg='confirmation';return}
   if(normFa(ln).startsWith('عبارت های لغو')){sec='intent';arg='cancellation';return}
   if(normFa(ln).startsWith('عبارت های هم معنی')||normFa(ln).startsWith('عبارت اصلی'))return;
-  m=ln.match(/^[-•*]\s+(.+)$/);if(!m)return;const body=m[1].trim();if(!body)return;
+  m=ln.match(/^(?:[-–—•*·▪●]|\d+[.)])\s*(.+)$/);if(!m)return;const body=m[1].trim();if(!body)return;
   if(sec==='intent'&&arg){if(body.length>90){R.errors.push({line:no,msg:'عبارت خیلی بلند است'});return}(R.phr[arg]=R.phr[arg]||[]).push(body);R.n++}
   else if(sec==='alias'&&cur){cur.list.push(body);R.n++}
-  else if(sec==='macro'||sec==='reply'){const k=body.split(/\s*(?:=>|←|->)\s*/);if(k.length<2||!k[0]||!k.slice(1).join(' ')){R.errors.push({line:no,msg:'باید به شکل «عبارت => مقصد» باشد'});return}
-   (sec==='macro'?R.macros:R.replies).push({a:normFa(k[0]),b:sec==='macro'?normFa(k.slice(1).join(' ')):k.slice(1).join(' => ').trim()});R.n++}
+  else if(sec==='macro'||sec==='reply'||sec==='qa'){const k=body.split(/\s*(?:=>|←|->)\s*/);if(k.length<2||!k[0]||!k.slice(1).join(' ')){R.errors.push({line:no,msg:'باید به شکل «عبارت => مقصد» باشد'});return}
+   if(sec==='qa')R.qa.push({q:k[0].trim(),a:k.slice(1).join(' => ').trim()});else(sec==='macro'?R.macros:R.replies).push({a:normFa(k[0]),b:sec==='macro'?normFa(k.slice(1).join(' ')):k.slice(1).join(' => ').trim()});R.n++}
   else if(sec==='remove'){R.remove.push(normFa(body));R.n++}
  }catch(e){R.errors.push({line:i+1,msg:'خطای خواندن خط'})}});
  return R}
-function asPackApply(R){const S={phr:0,alias:0,macro:0,reply:0,rem:0,noProd:[],dup:0};
+function asPackApply(R){const S={phr:0,alias:0,macro:0,reply:0,qa:0,rem:0,noProd:[],dup:0};
  try{for(const k in R.phr){const cur=new Set((phr()[k]||[]).map(normFa).concat((TRAIN[k]||[]).map(normFa)));for(const p of R.phr[k]){const n=normFa(p);if(!n)continue;if(cur.has(n)){S.dup++;continue}(phr()[k]=phr()[k]||[]).push(p);cur.add(n);S.phr++}}
   for(const a of R.alias){const p=db.products.find(x=>normFa(x.name)===normFa(a.name));if(!p){S.noProd.push(a.name);continue}for(const al of a.list)if(addAlias(p,al))S.alias++}
   for(const m of R.macros){if(!asMacros().some(x=>x.a===m.a)){asMacros().push({a:m.a,b:m.b});S.macro++}else S.dup++}
   for(const r of R.replies){const f=rpl().find(x=>x.a===r.a);if(f){f.b=r.b}else{rpl().push({a:r.a,b:r.b})}S.reply++}
+  for(const x of R.qa){if(typeof qaAdd==='function'&&qaAdd(x.q,x.a,'بستهٔ آموزشی','',false))S.qa++}
   for(const r of R.remove){if(!rem().includes(r)){rem().push(r);S.rem++}for(const k in phr())phr()[k]=phr()[k].filter(p=>normFa(p)!==r);prefs().replies=rpl().filter(x=>x.a!==r);prefs().macros=asMacros().filter(x=>x.a!==r)}
   save();trCompile()}catch(e){}
  return S}
-function asPackSummary(R,S){let h=`📚 آموزش بارگذاری شد: ${fa(R.n)} مورد خوانده شد — ${fa(S.phr)} عبارت، ${fa(S.alias)} اسم مستعار، ${fa(S.macro)} میانبر، ${fa(S.reply)} پاسخ، ${fa(S.rem)} حذف.`;
+function asPackSummary(R,S){let h=`📚 آموزش بارگذاری شد: ${fa(R.n)} مورد خوانده شد — ${fa(S.phr)} عبارت، ${fa(S.alias)} اسم مستعار، ${fa(S.macro)} میانبر، ${fa(S.reply)} پاسخ، ${fa(S.qa||0)} پرسش‌وپاسخ، ${fa(S.rem)} حذف.`;
  if(S.dup)h+=`<br><span class="xs muted">${fa(S.dup)} مورد تکراری بود و نادیده گرفته شد.</span>`;
  if(S.noProd.length)h+=`<br><span class="xs">کالایی با این نام پیدا نشد (اسم مستعار اضافه نشد): ${S.noProd.slice(0,5).map(esc).join('، ')}</span>`;
  if(R.errors.length)h+=`<br><span class="xs red">${fa(R.errors.length)} خط ایراد داشت و رد شد (بقیه کار کرد):</span><div class="xs">${R.errors.slice(0,6).map(e=>`خط ${fa(e.line)}: ${esc(e.msg)}`).join('<br>')}</div>`;
  return h}
-function asTrainImport(){const i=document.createElement('input');i.type='file';i.accept='.txt,text/plain';i.onchange=async()=>{try{const R=asPackParse(await i.files[0].text());if(!R.n&&!R.errors.length)throw 0;const S=asPackApply(R);asSay(asPackSummary(R,S));if(document.querySelector('.sheet'))trManage()}catch(e){toast('فایل خوانده نشد؛ قالبش را در راهنما ببین')}};i.click()}
+async function asReadFileText(file){const buf=await file.arrayBuffer(),u=new Uint8Array(buf);let enc='utf-8';if(u[0]===0xFF&&u[1]===0xFE)enc='utf-16le';else if(u[0]===0xFE&&u[1]===0xFF)enc='utf-16be';let t='';try{t=new TextDecoder(enc).decode(u)}catch(e){t=await file.text()}
+ if(enc==='utf-8'&&/\uFFFD/.test(t)&&!/[\u0600-\u06FF]/.test(t)){try{const w=new TextDecoder('windows-1256').decode(u);if(/[\u0600-\u06FF]/.test(w))t=w}catch(e){}}
+ return t.replace(/^\uFEFF/,'')}
+function asKnowApply(k){let na=0,nm=0;for(const a of k.aliases||[]){const p=db.products.find(x=>normFa(x.name)===normFa(a.name));if(p)for(const al of a.alias||[])if(addAlias(p,al))na++}
+ for(const m of k.macros||[]){if(m.a&&m.b&&!asMacros().some(x=>x.a===m.a)){asMacros().push({a:m.a,b:m.b});nm++}}save();return `📚 دانش بارگذاری شد: ${fa(na)} اسم مستعار و ${fa(nm)} میانبر جدید.`}
+function asTrainImport(){const i=document.createElement('input');i.type='file';i.style.cssText='position:fixed;left:-9999px;opacity:0';document.body.appendChild(i);
+ const done=()=>{try{i.remove()}catch(e){}};
+ i.onchange=async()=>{try{const f=i.files&&i.files[0];if(!f){done();return}toast('در حال خواندن «'+f.name+'»…');let txt;try{txt=await asReadFileText(f)}catch(e){asSay('❌ فایل خوانده نشد. یک بار دیگر انتخابش کن یا فایل را در پوشهٔ Download بگذار.');done();return}
+  const tt=txt.trim();
+  if(tt[0]==='{'){try{const k=JSON.parse(tt);if(k.app==='anbaryar-know'){asSay(asKnowApply(k));done();return}}catch(e){}}
+  const R=asPackParse(txt);
+  if(!R.n){const lines=txt.split(/\r?\n/).filter(x=>x.trim()),sample=lines.slice(0,4).map(x=>'<div class="ltr xs" style="text-align:left">'+esc(x.slice(0,60))+'</div>').join('');
+   asSay(`❌ از فایل «${esc(f.name)}» هیچ عبارتی نخواندم (${fa(lines.length)} خط، ${fa(txt.length)} حرف).<br>${lines.length?'اولین خط‌های فایل:'+sample:'فایل خالی است.'}<br><span class="xs">هر بخش باید با <b class="ltr">## intent: stock_in</b> شروع شود و هر مورد با <b class="ltr">- </b>. نمونه: training/my-commands-example.txt</span>`+(R.errors.length?'<div class="xs red">'+R.errors.slice(0,4).map(e=>`خط ${fa(e.line)}: ${esc(e.msg)}`).join('<br>')+'</div>':''));done();return}
+  const S=asPackApply(R);asSay(asPackSummary(R,S));toast('✓ بارگذاری شد');if(document.querySelector('.sheet'))trManage()}catch(e){asSay('❌ مشکلی پیش آمد، ولی برنامه سالم است. فایل را دوباره امتحان کن.')}done()};
+ i.click()}
 /* ---- compile: built-in + custom, minus removed ---- */
 trCompile=function(){TR.list=[];TR.conf=new Set(['اره','باشه','اوکی','ok','تایید','تایید کن','حله','ثبت','تموم','همینه']);TR.canc=new Set(['لغو','کنسل','انصراف','لغو کن']);
  try{const rm=new Set((prefs().removed||[]).map(normFa)),all={};for(const k in TRAIN)all[k]=(all[k]||[]).concat(TRAIN[k]);const ex=prefs().phrases||{};for(const k in ex)all[k]=(all[k]||[]).concat(ex[k]);
@@ -1691,7 +1707,7 @@ function asPhraseFrom(raw){const t=asPre(raw),pn=new Set();db.products.forEach(p
  const keep=asToks(t).filter(w=>!isNumTok(w)&&!(w in UNITW)&&!pn.has(w));return keep.length>=2?keep.join(' '):t}
 function asTeach(idx,intent){const u=(AS.unk||[])[idx];if(!u)return;if(!INTENTS.includes(intent))return;const ph=asPhraseFrom(u);
  const cur=(phr()[intent]=phr()[intent]||[]);if(!cur.map(normFa).includes(normFa(ph)))cur.push(ph);save();trCompile();asSay(`📚 یاد گرفتم: «${esc(ph)}» یعنی «${esc(INTENT_LABEL[intent])}». دوباره امتحان می‌کنم…`);setTimeout(()=>asReply(u),200)}
-function asUnknownOffer(raw){AS.unk=AS.unk||[];AS.unk.push(raw);if(AS.unk.length>30)AS.unk.shift();const i=AS.unk.length-1;
+function asUnknownOffer(raw,skipWeb){if(!skipWeb&&typeof asWebTry==='function'&&asWebTry(raw))return;AS.unk=AS.unk||[];AS.unk.push(raw);if(AS.unk.length>30)AS.unk.shift();const i=AS.unk.length-1;
  const log=prefs().unk||(prefs().unk=[]);log.push(raw);if(log.length>40)log.shift();
  asSay('نفهمیدم 🙏 می‌خواهی یادم بدهی؟ این جمله یعنی:<div class="chips" style="padding:0;margin-top:6px;flex-wrap:wrap">'+['stock_in','stock_out','stock_check','product_create','new_invoice','receipt','report','profit','low_stock'].map(k=>`<button class="chip" onclick="asTeach(${i},'${k}')">${esc(INTENT_LABEL[k])}</button>`).join('')+'</div><div class="xs muted" style="margin-top:4px">بعداً هم در «آموزش و دستورات» می‌توانی بسازی یا حذف کنی.</div>')}
 /* ---- management sheet ---- */
@@ -1700,6 +1716,8 @@ function trManage(){const ex=prefs().phrases||{},ks=Object.keys(ex).filter(k=>ex
  <div class="hint">${fa(Object.values(TRAIN).reduce((s,a)=>s+a.length,0))} عبارت پیش‌فرض + ${fa(Object.values(ex).reduce((s,a)=>s+a.length,0))} عبارت خودت · ${fa(al)} اسم مستعار · ${fa(ms.length)} میانبر · ${fa(rs.length)} پاسخ ثابت</div>
  <div class="card" style="margin-top:8px;padding:10px"><div class="b sm">➕ عبارت جدید برای یک کار</div><div class="row" style="margin-top:6px"><select id="trInt" class="inp">${INTENTS.map(k=>`<option value="${k}">${esc(INTENT_LABEL[k])}</option>`).join('')}</select></div><input id="trPh" class="inp" style="margin-top:6px" placeholder="مثلاً: برام ۱۰ تا ماست بیار"><button class="btn pri sm blk" style="margin-top:6px" onclick="trAdd()">افزودن</button></div>
  <div class="card" style="margin-top:8px;padding:10px"><div class="b sm">💬 پاسخ ثابت (سؤال و جواب مغازه)</div><input id="trQ" class="inp" style="margin-top:6px" placeholder="وقتی کسی بنویسد… (ساعت کاری)"><input id="trA" class="inp" style="margin-top:6px" placeholder="جواب بدهد… (۹ تا ۲۱)"><button class="btn sm blk" style="margin-top:6px" onclick="trAddReply()">افزودن پاسخ</button></div>
+ <div class="card" style="margin-top:8px;padding:10px"><label class="row" style="justify-content:space-between"><span class="sm b">🌐 جستجوی خودکار در اینترنت (ویکی‌پدیا)</span><input type="checkbox" ${db.prefs.web!==false?'checked':''} onchange="db.prefs.web=this.checked;save()"></label><div class="xs muted" style="margin-top:4px">وقتی چیزی را نفهمم و شبیه سؤال باشد، می‌گردم و جواب را نشان می‌دهم. اگر نگویی غلط است، یاد می‌گیرم. فقط متن سؤال فرستاده می‌شود.</div></div>
+ ${(prefs().qa||[]).length?`<div class="sect"><h3>پرسش‌وپاسخ‌هایی که یاد گرفتم (${fa(prefs().qa.length)})</h3></div>${prefs().qa.slice(-15).reverse().map(e=>`<div class="row2 row" style="justify-content:space-between"><span class="sm sp">${esc(e.q)}${e.imp?' <span class="xs muted">(ضمنی)</span>':''}</span><button class="ibtn" style="width:30px;height:30px;color:var(--red)" onclick="trDelQa('${prefs().qa.indexOf(e)}')">${ic('x',14)}</button></div>`).join('')}`:''}
  ${un.length?`<div class="sect"><h3>جمله‌هایی که نفهمیدم</h3></div>${un.map((u,i)=>`<div class="card" style="padding:8px 10px;margin-bottom:6px"><div class="sm">${esc(u)}</div><div class="row" style="margin-top:6px"><select id="un${i}" class="inp">${INTENTS.filter(k=>!/ation$/.test(k)).map(k=>`<option value="${k}">${esc(INTENT_LABEL[k])}</option>`).join('')}</select><button class="btn sm pri" onclick="trTeachUnk(${i})">یاد بگیر</button></div></div>`).join('')}`:''}
  ${ks.length?`<div class="sect"><h3>عبارت‌های خودت</h3></div>${ks.map(k=>`<div class="xs b" style="margin:6px 0 2px">${esc(INTENT_LABEL[k]||k)}</div>${ex[k].map((p,j)=>`<div class="row2 row" style="justify-content:space-between"><span class="sm sp">${esc(p)}</span><button class="ibtn" style="width:30px;height:30px;color:var(--red)" onclick="trDel('${k}',${j})">${ic('x',14)}</button></div>`).join('')}`).join('')}`:''}
  ${ms.length?`<div class="sect"><h3>میانبرها</h3></div>${ms.map((m,j)=>`<div class="row2 row" style="justify-content:space-between"><span class="sm sp">«${esc(m.a)}» ← «${esc(m.b)}»</span><button class="ibtn" style="width:30px;height:30px;color:var(--red)" onclick="trDelMacro(${j})">${ic('x',14)}</button></div>`).join('')}`:''}
@@ -1710,14 +1728,16 @@ function trManage(){const ex=prefs().phrases||{},ks=Object.keys(ex).filter(k=>ex
 function trAdd(){const k=$('#trInt').value,ph=$('#trPh').value.trim();if(!ph)return toast('عبارت را بنویس');const cur=(phr()[k]=phr()[k]||[]);if(cur.map(normFa).includes(normFa(ph)))return toast('این عبارت قبلاً هست');cur.push(ph);save();trCompile();toast('✓ یاد گرفتم');trManage()}
 function trAddReply(){const q=$('#trQ').value.trim(),a=$('#trA').value.trim();if(!q||!a)return toast('هر دو را بنویس');rpl().push({a:normFa(q),b:a});save();toast('✓ ثبت شد');trManage()}
 function trDel(k,j){const arr=phr()[k];if(!arr)return;arr.splice(j,1);save();trCompile();trManage()}
+function trDelQa(i){const L=prefs().qa||[];L.splice(+i,1);save();trManage()}
 function trDelMacro(j){asMacros().splice(j,1);save();trManage()}
 function trDelReply(j){rpl().splice(j,1);save();trManage()}
 function trTeachUnk(i){const un=(prefs().unk||[]).slice(-8).reverse(),raw=un[i],k=$('#un'+i).value;if(!raw)return;const ph=asPhraseFrom(raw),cur=(phr()[k]=phr()[k]||[]);if(!cur.map(normFa).includes(normFa(ph)))cur.push(ph);prefs().unk=(prefs().unk||[]).filter(x=>x!==raw);save();trCompile();toast('✓ یاد گرفتم');trManage()}
-function trReset(){confirmBox('همهٔ عبارت‌ها، میانبرها و پاسخ‌هایی که خودت آموزش داده‌ای پاک شود؟ (اسم‌های مستعار کالاها می‌ماند)','پاک شود',()=>{prefs().phrases={};prefs().macros=[];prefs().replies=[];prefs().removed=[];prefs().unk=[];save();trCompile();trManage()},true)}
+function trReset(){confirmBox('همهٔ عبارت‌ها، میانبرها و پاسخ‌هایی که خودت آموزش داده‌ای پاک شود؟ (اسم‌های مستعار کالاها می‌ماند)','پاک شود',()=>{prefs().phrases={};prefs().macros=[];prefs().replies=[];prefs().removed=[];prefs().unk=[];prefs().qa=[];save();trCompile();trManage()},true)}
 function trExport(){const ex=prefs().phrases||{};let s='# بستهٔ دستور انباریار — این فایل را می‌توانی با هر ویرایشگر متن عوض کنی و دوباره «بارگذاری بسته» بزنی\n# هر بخش با ## شروع می‌شود و هر مورد با «- ». خط‌های # توضیح‌اند.\n\n';
  for(const k of Object.keys(ex)){if(!ex[k].length)continue;s+=`## intent: ${k}   # ${INTENT_LABEL[k]||''}\n`+ex[k].map(p=>'- '+p).join('\n')+'\n\n'}
  for(const p of db.products.filter(x=>(x.alias||[]).length))s+=`## alias: ${p.name}\n`+p.alias.map(a=>'- '+a).join('\n')+'\n\n';
  if(asMacros().length)s+='## macro\n'+asMacros().map(m=>`- ${m.a} => ${m.b}`).join('\n')+'\n\n';
+ if((prefs().qa||[]).length)s+='## qa\n'+prefs().qa.filter(e=>!e.imp||e.n>0).map(e=>`- ${e.q} => ${String(e.a).replace(/\s+/g,' ')}`).join('\n')+'\n\n';
  if(rpl().length)s+='## reply\n'+rpl().map(m=>`- ${m.a} => ${m.b}`).join('\n')+'\n\n';
  if((prefs().removed||[]).length)s+='## remove\n'+prefs().removed.map(p=>'- '+p).join('\n')+'\n\n';
  download('anbaryar-commands-'+todayISO()+'.txt',s,'text/plain');toast('بسته ذخیره شد')}
@@ -1729,6 +1749,50 @@ function asTeachChat(t){let m=t.match(/^(?:یاد بگیر\s*)?(.+?)\s+یعنی\
    const mm=asMacros().length;prefs().macros=asMacros().filter(x=>x.a!==ph);n+=mm-asMacros().length;const rr=rpl().length;prefs().replies=rpl().filter(x=>x.a!==ph);n+=rr-rpl().length;
    if(!n&&!rem().includes(ph)){rem().push(ph);n=1}save();trCompile();asSay(n?`🗑️ فراموش کردم: «${esc(ph)}».`:'چنین عبارتی در آموزش‌هایم نبود.');return true}}
  return false}
+
+/* ================= assistant v5: self-learning Q&A + internet lookup (Wikipedia, no key) ================= */
+const QF=new Set('چیه چیست چی کی کیه کیست کجا کجاست کجاس چطور چگونه چرا آیا ایا لطفا بگو بگید بهم میشه میتونی میتونید درباره مورد راجب راجع یه یک رو را از به که است هست بود برای با و در تو من ما رو اینترنت گوگل ویکی پدیا ویکیپدیا انلاین آنلاین وب بگرد جستجو سرچ کن بکن پیدا'.split(' ').map(normFa));
+const NEG_RE=/^(نه|نخیر|نه خیر|غلط|اشتباه|اشتباهه|غلطه|نادرست|درست نیست|این نبود|نه این نبود|نه اشتباهه|نه غلطه|بد بود|بی ربط|ربطی نداشت)(\s|$)/;
+const OK_RE=/^(اره|بله|اوکی|ok|okay|درسته|درست|درست بود|ممنون|مرسی|مرسی از شما|دمت گرم|عالی|خوبه|ایول|تایید|اره درسته|اره ممنون|خیلی خوب|خوب بود|همینه)$/;
+const qaList=()=>db.prefs.qa||(db.prefs.qa=[]);
+const webOn=()=>db.prefs.web!==false;
+function qaToks(raw){let t=asPre(raw);return asToks(t).map(normFa).filter(w=>w&&w.length>1&&!QF.has(w)&&!isNumTok(w))}
+function qaSim(a,b){if(!a.length||!b.length)return 0;let c=0;for(const x of a){for(const y of b)if(tokSim(x,y)>=.88){c++;break}}return c/Math.max(a.length,b.length)}
+function qaCov(q,t){if(!q.length)return 0;let c=0;for(const x of q){for(const y of t)if(tokSim(x,y)>=.88){c++;break}}return c/q.length}
+function qaFind(raw){const q=qaToks(raw);if(!q.length)return null;let best=null,bs=0;for(const e of qaList()){const s=qaSim(q,e.t||qaToks(e.q));if(s>bs){bs=s;best=e}}return best&&bs>=.8&&(q.length>=2||bs>=.99)?best:null}
+function qaAdd(q,a,src,url,imp){const t=qaToks(q);if(!t.length||!a)return null;const L=qaList();let e=L.find(x=>qaSim(t,x.t||qaToks(x.q))>=.95);if(e){e.a=a;e.src=src||e.src;e.url=url||e.url;e.imp=imp?e.imp:0}else{e={q:String(q).slice(0,120),a:String(a).slice(0,700),src:src||'',url:url||'',n:0,ts:Date.now(),imp:imp?1:0,t};L.push(e);if(L.length>300){L.sort((x,y)=>(y.n||0)-(x.n||0)||y.ts-x.ts);L.length=300}}save();return e}
+/* ---- network ---- */
+async function wikiSearch(q){const u='https://fa.wikipedia.org/w/api.php?action=query&generator=search&gsrlimit=6&prop=extracts%7Cinfo&exintro=1&explaintext=1&exsentences=3&exlimit=max&inprop=url&format=json&origin=*&gsrsearch='+encodeURIComponent(q);
+ const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),9000);try{const r=await fetch(u,{signal:ac.signal});if(!r.ok)throw 0;const j=await r.json();const pg=Object.values((j.query||{}).pages||{});
+  const qt=qaToks(q);return pg.filter(p=>p.extract&&p.extract.trim().length>25).map(p=>{const tt=qaToks(p.title),et=qaToks(p.extract.slice(0,400));let s=qaSim(qt,tt)*3+qaCov(qt,et)+(p.index?(7-p.index)*.05:0);if(normFa(p.title)===normFa(q))s+=3;return{title:p.title,text:p.extract.replace(/\s+/g,' ').trim(),url:p.fullurl||'https://fa.wikipedia.org/wiki/'+encodeURIComponent(p.title),s}}).sort((a,b)=>b.s-a.s)}finally{clearTimeout(tm)}}
+function webCard(){const w=AS.web;if(!w)return;const c=w.c[w.i];if(!c)return;let tx=c.text;if(tx.length>420)tx=tx.slice(0,420).replace(/\s\S*$/,'')+'…';
+ const h=`🌐 <b>${esc(c.title)}</b><br>${esc(tx)}<br><a class="xs" href="${esc(c.url)}" target="_blank" rel="noopener">منبع: ویکی‌پدیا</a><div class="chips" style="padding:0;margin-top:8px"><button class="chip" onclick="asWebOk()">✅ درست بود</button><button class="chip" onclick="asWebNo()">❌ نه، این نبود</button></div><div class="xs muted" style="margin-top:4px">اگر مخالفی نگویی، همین را یاد می‌گیرم.</div>`;
+ asSay(h);AS.pendQA={q:w.q,a:c.text.length>700?c.text.slice(0,700):c.text,src:'ویکی‌پدیا',url:c.url,kind:'web'}}
+async function asWebAsk(raw,force){if(!webOn()){return false}if(!navigator.onLine){asSay('الان اینترنت نیست 📴 نمی‌توانم جستجو کنم. وقتی وصل شدی دوباره بپرس.');return true}
+ const q=qaToks(raw).join(' ');if(!q)return false;asSay('🔎 دارم در اینترنت می‌گردم… <span class="xs muted">(فقط متن سؤال برای ویکی‌پدیا فرستاده می‌شود)</span>');const mine=AS.msgs.length;
+ try{const c=await wikiSearch(q);const good=c.filter(x=>x.s>=.9);AS.msgs.splice(mine-1,1);
+  if(!good.length){AS.web=null;AS.pendQA=null;asSay(`چیز مطمئنی دربارهٔ «${esc(q)}» پیدا نکردم 🤷`+(force?'':'<br><span class="xs muted">اگر منظورت یک کالا یا دستور است، یادم بده:</span>'));if(!force)asUnknownOffer(raw,true);return true}
+  AS.web={q:raw,c:good,i:0};webCard()}catch(e){AS.msgs.splice(mine-1,1);asSay('جستجو کار نکرد (اینترنت ضعیف است یا ویکی‌پدیا در دسترس نیست).');if(!force)asUnknownOffer(raw,true)}
+ drawChat();return true}
+function asWebTry(raw){/* called when nothing local understood the sentence */
+ const l=AS.msgs[AS.msgs.length-1];const hit=qaFind(raw);
+ if(hit){if(l&&l.h&&l.h.indexOf('متوجه نشدم')===0)AS.msgs.pop();hit.n=(hit.n||0)+1;save();asSay(`💡 ${esc(hit.a)}${hit.url?`<br><a class="xs" href="${esc(hit.url)}" target="_blank" rel="noopener">منبع: ${esc(hit.src||'')}</a>`:''}<div class="chips" style="padding:0;margin-top:6px"><button class="chip" onclick="asQaBad()">❌ اشتباه است</button></div>`);AS.pendQA={kind:'local',e:hit};return true}
+ const q=qaToks(raw);if(!webOn()||(q.length<2&&!/[؟?]/.test(raw))||String(raw).length>140)return false;
+ if(l&&l.h&&l.h.indexOf('متوجه نشدم')===0)AS.msgs.pop();drawChat();asWebAsk(raw);return true}
+function asQaBad(){const p=AS.pendQA;if(p&&p.kind==='local'){const L=qaList(),i=L.indexOf(p.e);if(i>=0)L.splice(i,1);save();AS.pendQA=null;asSay('🗑️ فراموشش کردم. دوباره در اینترنت می‌گردم…');asWebAsk(p.e.q,true)}}
+function asWebOk(){const p=AS.pendQA;if(!p||p.kind!=='web')return;qaAdd(p.q,p.a,p.src,p.url,false);AS.pendQA=null;asSay('📚 یاد گرفتم. دفعهٔ بعد بدون اینترنت جواب می‌دهم.')}
+function asWebNo(){const w=AS.web;AS.pendQA=null;if(w&&w.i+1<w.c.length){w.i++;asSay('باشه، نتیجهٔ بعدی:');webCard()}else{AS.web=null;asSay('نتیجهٔ دیگری ندارم 🙏 اگر می‌خواهی خودت جوابش را یادم بده: <span class="ltr">سؤال => جواب</span> را در «آموزش و دستورات» ← بخش پاسخ ثابت بنویس.')}}
+/* ---- feedback + explicit triggers around every message ---- */
+const _asReply5=asReply;
+asReply=function(raw){try{const p=AS.pendQA,t=normFa(raw);
+  if(p){AS.pendQA=null;
+   if(NEG_RE.test(t)){if(p.kind==='local'){const L=qaList(),i=L.indexOf(p.e);if(i>=0)L.splice(i,1);save();asSay('🗑️ فراموشش کردم؛ دوباره می‌گردم…');asWebAsk(p.e.q,true);return}AS.pendQA=p;asWebNo();return}
+   if(OK_RE.test(t)){if(p.kind==='web'){qaAdd(p.q,p.a,p.src,p.url,false);asSay('📚 ممنون، یاد گرفتم.')}else asSay('😊');return}
+   if(p.kind==='web')qaAdd(p.q,p.a,p.src,p.url,true)}/* no objection => learn it silently */
+  const m=t.match(/(?:^|\s)(اینترنت|گوگل|ویکی ?پدیا|ویکیپدیا|انلاین|وب)(?:\s|$)/);
+  if(m&&/(بگرد|جستجو|جست و جو|سرچ|پیدا|بپرس|ببین|چیه|چیست|بگو)/.test(t)&&!AS.ask){asWebAsk(raw,true);return}
+ }catch(e){console.error(e)}
+ return _asReply5(raw)};
 
 /* ================= settings / users / log / lock / sync ================= */
 function promptBox(title,val,cb,ph=''){sheet(`<h2>${esc(title)}</h2><input id="pbIn" class="inp" value="${esc(val||'')}" placeholder="${esc(ph)}"><div class="grid2" style="margin-top:12px"><button class="btn pri" id="pbOk">${ic('check')} ذخیره</button><button class="btn" onclick="closeSheet()">انصراف</button></div>`,'cen');
